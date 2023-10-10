@@ -1,5 +1,7 @@
 const getPriceOfETH = require("../../../helper/currencies/ETH.js");
 
+// TODO - Turn the process into a general solution so that the user just sends the token name.
+
 async function PriceOfETH() {
   return new Promise((resolve) => {
     const value = getPriceOfETH();

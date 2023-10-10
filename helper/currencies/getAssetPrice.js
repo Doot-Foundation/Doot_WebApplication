@@ -1,4 +1,4 @@
-const getPriceOfETH = require("./currencies/ETH.js");
+const getPriceOfETH = require("./ETH.js");
 
 async function priceOfETH() {
   return new Promise((resolve) => {
