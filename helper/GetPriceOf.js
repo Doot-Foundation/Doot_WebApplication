@@ -22,6 +22,7 @@ async function getPriceCoinGecko(token) {
     const response = await axios.get(
       `https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=usd`
     );
+    console.log("COINGECKO-RESPONSE :", response);
     const Price = response.data[id].usd;
     return String(Price);
   } catch (error) {
@@ -37,6 +38,7 @@ async function getPriceBinance(token) {
     const response = await axios.get(
       `https://api.binance.com/api/v3/ticker/price?symbol=${id}USDT`
     );
+    console.log("COINGECKO-RESPONSE :", response);
     const Price = response.data.price;
     return String(Price);
   } catch (error) {
@@ -58,6 +60,7 @@ async function getPriceCMC(token) {
         },
       }
     );
+    console.log("COINGECKO-RESPONSE :", response);
     const Price = response.data.data[id].quote.USD.price;
     return String(Price);
   } catch (error) {
@@ -73,6 +76,7 @@ async function getPriceCryptoCompare(token) {
     const response = await axios.get(
       `https://min-api.cryptocompare.com/data/price?fsym=${id}&tsyms=USD`
     );
+    console.log("COINGECKO-RESPONSE :", response);
     const Price = response.data.USD;
     return String(Price);
   } catch (error) {
@@ -95,6 +99,7 @@ async function getPriceCoinAPI(token) {
         },
       }
     );
+    console.log("COINGECKO-RESPONSE :", response);
     const Price = response.data.rate;
     return String(Price);
   } catch (error) {
@@ -110,6 +115,7 @@ async function getPricePaprika(token) {
     const response = await axios.get(
       `https://api.coinpaprika.com/v1/tickers/${id}`
     );
+    console.log("COINGECKO-RESPONSE :", response);
     const Price = response.data.quotes.USD.price;
     return String(Price);
   } catch (error) {
@@ -124,6 +130,7 @@ async function getPriceMessari(token) {
     const response = await axios.get(
       `https://data.messari.io/api/v1/assets/${id}/metrics`
     );
+    console.log("COINGECKO-RESPONSE :", response);
     const Price = response.data.data.market_data.price_usd;
     return String(Price);
   } catch (error) {
@@ -137,6 +144,7 @@ async function getPriceCoinCap(token) {
 
   try {
     const response = await axios.get(`https://api.coincap.io/v2/assets/${id}`);
+    console.log("COINGECKO-RESPONSE :", response);
     const Price = response.data.data.priceUsd;
     return String(Price);
   } catch (error) {
@@ -152,6 +160,7 @@ async function getPriceCoinlore(token) {
     const response = await axios.get(
       `https://api.coinlore.net/api/ticker/?id=${id}`
     );
+    console.log("COINGECKO-RESPONSE :", response);
     const ethPrice = response.data[0].price_usd;
     return String(ethPrice);
   } catch (error) {
@@ -173,6 +182,7 @@ async function getPriceCoinRanking(token) {
         },
       }
     );
+    console.log("COINGECKO-RESPONSE :", response);
     const Price = response.data.data.price;
     return String(Price);
   } catch (error) {
@@ -188,6 +198,7 @@ async function getPriceCoinCodex(token) {
     const response = await axios.get(
       `https://coincodex.com/api/coincodex/get_coin/${id}`
     );
+    console.log("COINGECKO-RESPONSE :", response);
     const Price = response.data.last_price_usd;
     return String(Price);
   } catch (error) {
