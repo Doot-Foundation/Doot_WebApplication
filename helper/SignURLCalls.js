@@ -12,34 +12,19 @@ config({ path: envPath });
 const client = new Client({ network: "testnet" });
 const privateKey = process.env.ORACLE_KEY;
 
-function getSignedAPICall(
-  urlCalled,
-  price,
-  decimals,
-  timestamp,
-  priceGenerationId
-) {
+function getSignedAPICall(urlCalled, price, timestamp, priceGenerationId) {
   console.log(privateKey);
 
   const fieldURL = BigInt(CircuitString.fromString(urlCalled).hash());
   const fieldPrice = BigInt(price);
-  const fieldDecimals = BigInt(decimals);
   const fieldTimestamp = BigInt(timestamp);
   const fieldPriceGenerationId = BigInt(priceGenerationId);
-
-  // console.log(
-  //   fieldURL,
-  //   fieldDecimals,
-  //   fieldPrice,
-  //   fieldTimestamp,
-  //   fieldPriceGenerationId
-  // );
 
   const signature = client.signFields(
     [
       fieldURL,
       fieldPrice,
-      fieldDecimals,
+      // fieldDecimals,
       fieldTimestamp,
       fieldPriceGenerationId,
     ],
@@ -47,12 +32,7 @@ function getSignedAPICall(
   );
   console.log(signature);
 
-  return {
-    signature: signature.signature,
-    publicKey: signature.publicKey,
-  };
+  return signature.signature;
 }
-
-// getSignedAPICall("htts", 123, 234, 234, 1);
 
 export { getSignedAPICall };
