@@ -1,9 +1,10 @@
-import Client from "mina-signer";
-import { CircuitString } from "o1js";
+const Client = require("mina-signer");
+const { CircuitString } = require("o1js");
 
-import { config } from "dotenv";
-import { resolve, dirname } from "path";
-import { fileURLToPath } from "url";
+const { config } = require("dotenv");
+const { resolve, dirname } = require("path");
+const { fileURLToPath } = require("url");
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const envPath = resolve(__dirname, "..", ".env");
@@ -12,11 +13,29 @@ config({ path: envPath });
 const client = new Client({ network: "testnet" });
 const privateKey = process.env.ORACLE_KEY;
 
+const { MULTIPLICATION_FACTOR } = require("../constants/info");
+
+function processFloatString(input) {
+  const floatValue = parseFloat(input);
+
+  // Check if the input is a valid float
+  if (isNaN(floatValue)) {
+    return "Invalid input";
+  }
+
+  const multipliedValue = floatValue * Math.pow(10, MULTIPLICATION_FACTOR);
+  const integerValue = Math.floor(multipliedValue);
+  const resultString = integerValue.toString();
+
+  return resultString;
+}
+
 function getSignedAPICall(urlCalled, price, timestamp, priceGenerationId) {
-  console.log(privateKey);
+  console.log(price);
 
   const fieldURL = BigInt(CircuitString.fromString(urlCalled).hash());
-  const fieldPrice = BigInt(price);
+  const fieldPrice = BigInt(processFloatString(price));
+  const fieldDecimals = BigInt(MULTIPLICATION_FACTOR);
   const fieldTimestamp = BigInt(timestamp);
   const fieldPriceGenerationId = BigInt(priceGenerationId);
 
@@ -24,7 +43,7 @@ function getSignedAPICall(urlCalled, price, timestamp, priceGenerationId) {
     [
       fieldURL,
       fieldPrice,
-      // fieldDecimals,
+      fieldDecimals,
       fieldTimestamp,
       fieldPriceGenerationId,
     ],
@@ -35,4 +54,4 @@ function getSignedAPICall(urlCalled, price, timestamp, priceGenerationId) {
   return signature.signature;
 }
 
-export { getSignedAPICall };
+module.exports = { getSignedAPICall };

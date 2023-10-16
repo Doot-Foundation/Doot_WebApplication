@@ -1,7 +1,7 @@
 require("dotenv").config();
 const axios = require("axios");
 
-import { getSignedAPICall } from "./SignURLCalls";
+const { getSignedAPICall } = require("./SignURLCalls");
 
 import {
   CoinGekoSymbols,
@@ -31,10 +31,10 @@ async function getPriceCoinGecko(token) {
     console.log(response.status);
 
     const Timestamp = getTimestamp(response.headers["date"]);
-    const Price = response.data[id].usd;
+    const Price = String(response.data[id].usd);
 
     const signauture = getSignedAPICall(URLCalled, Price, Timestamp, 1);
-    return [String(Price), signauture];
+    return [Price, signauture];
   } catch (error) {
     console.error("Error fetching ETH price coin gecko:", error.message);
     return 0;
@@ -50,10 +50,10 @@ async function getPriceBinance(token) {
     console.log(response.status);
 
     const Timestamp = getTimestamp(response.headers["date"]);
-    const Price = response.data.price;
+    const Price = String(response.data.price);
 
     const signauture = getSignedAPICall(URLCalled, Price, Timestamp, 1);
-    return [String(Price), signauture];
+    return [Price, signauture];
   } catch (error) {
     console.error("Error fetching price binance:", error.message);
     return 0;
@@ -74,10 +74,10 @@ async function getPriceCMC(token) {
     console.log(response.status);
 
     const Timestamp = getTimestamp(response.headers["date"]);
-    const Price = response.data.data[id].quote.USD.price;
+    const Price = String(response.data.data[id].quote.USD.price);
 
     const signauture = getSignedAPICall(URLCalled, Price, Timestamp, 1);
-    return [String(Price), signauture];
+    return [Price, signauture];
   } catch (error) {
     console.error("Error fetching price cmc:", error.message);
     return 0;
@@ -93,10 +93,10 @@ async function getPriceCryptoCompare(token) {
     console.log(response.status);
 
     const Timestamp = getTimestamp(response.headers["date"]);
-    const Price = response.data.USD;
+    const Price = String(response.data.USD);
 
     const signauture = getSignedAPICall(URLCalled, Price, Timestamp, 1);
-    return [String(Price), signauture];
+    return [Price, signauture];
   } catch (error) {
     console.error("Error fetching price crypto compare:", error.message);
     return 0;
@@ -117,10 +117,10 @@ async function getPriceCoinAPI(token) {
     console.log(response.status);
 
     const Timestamp = getTimestamp(response.headers["date"]);
-    const Price = response.data.rate;
+    const Price = String(response.data.rate);
 
     const signauture = getSignedAPICall(URLCalled, Price, Timestamp, 1);
-    return [String(Price), signauture];
+    return [Price, signauture];
   } catch (error) {
     console.error("Error fetching  price coin api:", error.message);
     return 0;
@@ -136,10 +136,10 @@ async function getPricePaprika(token) {
     console.log(response.status);
 
     const Timestamp = getTimestamp(response.headers["date"]);
-    const Price = response.data.quotes.USD.price;
+    const Price = String(response.data.quotes.USD.price);
 
     const signauture = getSignedAPICall(URLCalled, Price, Timestamp, 1);
-    return [String(Price), signauture];
+    return [Price, signauture];
   } catch (error) {
     console.error("Error fetching price paprika:", error.message);
     return 0;
@@ -155,10 +155,10 @@ async function getPriceMessari(token) {
     console.log(response.status);
 
     const Timestamp = getTimestamp(response.headers["date"]);
-    const Price = response.data.data.market_data.price_usd;
+    const Price = String(response.data.data.market_data.price_usd);
 
     const signauture = getSignedAPICall(URLCalled, Price, Timestamp, 1);
-    return [String(Price), signauture];
+    return [Price, signauture];
   } catch (error) {
     console.error("Error fetching price messari:", error.message);
     return 0;
@@ -173,10 +173,10 @@ async function getPriceCoinCap(token) {
     console.log(response.status);
 
     const Timestamp = getTimestamp(response.headers["date"]);
-    const Price = response.data.data.priceUsd;
+    const Price = String(response.data.data.priceUsd);
 
     const signauture = getSignedAPICall(URLCalled, Price, Timestamp, 1);
-    return [String(Price), signauture];
+    return [Price, signauture];
   } catch (error) {
     console.error("Error fetching price coin cap:", error.message);
     return 0;
@@ -192,10 +192,10 @@ async function getPriceCoinlore(token) {
     console.log(response.status);
 
     const Timestamp = getTimestamp(response.headers["date"]);
-    const Price = response.data[0].price_usd;
+    const Price = String(response.data[0].price_usd);
 
     const signauture = getSignedAPICall(URLCalled, Price, Timestamp, 1);
-    return [String(Price), signauture];
+    return [Price, signauture];
   } catch (error) {
     console.error("Error fetching price coin lore:", error.message);
     return 0;
@@ -216,10 +216,10 @@ async function getPriceCoinRanking(token) {
     console.log(response.status);
 
     const Timestamp = getTimestamp(response.headers["date"]);
-    const Price = response.data.data.price;
+    const Price = String(response.data.data.price);
 
     const signauture = getSignedAPICall(URLCalled, Price, Timestamp, 1);
-    return [String(Price), signauture];
+    return [Price, signauture];
   } catch (error) {
     console.error("Error fetching price coin ranking:", error.message);
     return 0;
@@ -235,10 +235,10 @@ async function getPriceCoinCodex(token) {
     console.log(response.status);
 
     const Timestamp = getTimestamp(response.headers["date"]);
-    const Price = response.data.last_price_usd;
+    const Price = String(response.data.last_price_usd);
 
     const signauture = getSignedAPICall(URLCalled, Price, Timestamp, 1);
-    return [String(Price), signauture];
+    return [Price, signauture];
   } catch (error) {
     console.error("Error fetching price coin codex:", error.message);
     return 0;

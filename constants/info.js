@@ -1,0 +1,5 @@
+const MULTIPLICATION_FACTOR = 10;
+
+module.exports = {
+  MULTIPLICATION_FACTOR,
+};
