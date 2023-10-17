@@ -15,7 +15,7 @@ import {
   CoinLoreSymbols,
   CoinRankingSymbols,
   CoinCodexSymbols,
-} from "./Symbols";
+} from "../constants/symbols";
 
 function getTimestamp(data) {
   const date = new Date(data);
@@ -33,8 +33,8 @@ async function getPriceCoinGecko(token) {
     const Timestamp = getTimestamp(response.headers["date"]);
     const Price = String(response.data[id].usd);
 
-    const signauture = getSignedAPICall(URLCalled, Price, Timestamp, 1);
-    return [Price, signauture];
+    const signature = getSignedAPICall(URLCalled, Price, Timestamp, 1);
+    return [Price, signature];
   } catch (error) {
     console.error("Error fetching ETH price coin gecko:", error.message);
     return 0;
@@ -52,8 +52,8 @@ async function getPriceBinance(token) {
     const Timestamp = getTimestamp(response.headers["date"]);
     const Price = String(response.data.price);
 
-    const signauture = getSignedAPICall(URLCalled, Price, Timestamp, 1);
-    return [Price, signauture];
+    const signature = getSignedAPICall(URLCalled, Price, Timestamp, 1);
+    return [Price, signature];
   } catch (error) {
     console.error("Error fetching price binance:", error.message);
     return 0;
@@ -76,8 +76,8 @@ async function getPriceCMC(token) {
     const Timestamp = getTimestamp(response.headers["date"]);
     const Price = String(response.data.data[id].quote.USD.price);
 
-    const signauture = getSignedAPICall(URLCalled, Price, Timestamp, 1);
-    return [Price, signauture];
+    const signature = getSignedAPICall(URLCalled, Price, Timestamp, 1);
+    return [Price, signature];
   } catch (error) {
     console.error("Error fetching price cmc:", error.message);
     return 0;
@@ -95,8 +95,8 @@ async function getPriceCryptoCompare(token) {
     const Timestamp = getTimestamp(response.headers["date"]);
     const Price = String(response.data.USD);
 
-    const signauture = getSignedAPICall(URLCalled, Price, Timestamp, 1);
-    return [Price, signauture];
+    const signature = getSignedAPICall(URLCalled, Price, Timestamp, 1);
+    return [Price, signature];
   } catch (error) {
     console.error("Error fetching price crypto compare:", error.message);
     return 0;
@@ -119,8 +119,8 @@ async function getPriceCoinAPI(token) {
     const Timestamp = getTimestamp(response.headers["date"]);
     const Price = String(response.data.rate);
 
-    const signauture = getSignedAPICall(URLCalled, Price, Timestamp, 1);
-    return [Price, signauture];
+    const signature = getSignedAPICall(URLCalled, Price, Timestamp, 1);
+    return [Price, signature];
   } catch (error) {
     console.error("Error fetching  price coin api:", error.message);
     return 0;
@@ -138,8 +138,8 @@ async function getPricePaprika(token) {
     const Timestamp = getTimestamp(response.headers["date"]);
     const Price = String(response.data.quotes.USD.price);
 
-    const signauture = getSignedAPICall(URLCalled, Price, Timestamp, 1);
-    return [Price, signauture];
+    const signature = getSignedAPICall(URLCalled, Price, Timestamp, 1);
+    return [Price, signature];
   } catch (error) {
     console.error("Error fetching price paprika:", error.message);
     return 0;
@@ -157,8 +157,8 @@ async function getPriceMessari(token) {
     const Timestamp = getTimestamp(response.headers["date"]);
     const Price = String(response.data.data.market_data.price_usd);
 
-    const signauture = getSignedAPICall(URLCalled, Price, Timestamp, 1);
-    return [Price, signauture];
+    const signature = getSignedAPICall(URLCalled, Price, Timestamp, 1);
+    return [Price, signature];
   } catch (error) {
     console.error("Error fetching price messari:", error.message);
     return 0;
@@ -175,8 +175,8 @@ async function getPriceCoinCap(token) {
     const Timestamp = getTimestamp(response.headers["date"]);
     const Price = String(response.data.data.priceUsd);
 
-    const signauture = getSignedAPICall(URLCalled, Price, Timestamp, 1);
-    return [Price, signauture];
+    const signature = getSignedAPICall(URLCalled, Price, Timestamp, 1);
+    return [Price, signature];
   } catch (error) {
     console.error("Error fetching price coin cap:", error.message);
     return 0;
@@ -194,8 +194,8 @@ async function getPriceCoinlore(token) {
     const Timestamp = getTimestamp(response.headers["date"]);
     const Price = String(response.data[0].price_usd);
 
-    const signauture = getSignedAPICall(URLCalled, Price, Timestamp, 1);
-    return [Price, signauture];
+    const signature = getSignedAPICall(URLCalled, Price, Timestamp, 1);
+    return [Price, signature];
   } catch (error) {
     console.error("Error fetching price coin lore:", error.message);
     return 0;
@@ -218,8 +218,8 @@ async function getPriceCoinRanking(token) {
     const Timestamp = getTimestamp(response.headers["date"]);
     const Price = String(response.data.data.price);
 
-    const signauture = getSignedAPICall(URLCalled, Price, Timestamp, 1);
-    return [Price, signauture];
+    const signature = getSignedAPICall(URLCalled, Price, Timestamp, 1);
+    return [Price, signature];
   } catch (error) {
     console.error("Error fetching price coin ranking:", error.message);
     return 0;
@@ -237,8 +237,8 @@ async function getPriceCoinCodex(token) {
     const Timestamp = getTimestamp(response.headers["date"]);
     const Price = String(response.data.last_price_usd);
 
-    const signauture = getSignedAPICall(URLCalled, Price, Timestamp, 1);
-    return [Price, signauture];
+    const signature = getSignedAPICall(URLCalled, Price, Timestamp, 1);
+    return [Price, signature];
   } catch (error) {
     console.error("Error fetching price coin codex:", error.message);
     return 0;
@@ -259,19 +259,24 @@ function getMAD(array) {
   return getMedian(deviations);
 }
 
-function removeOutliers(array, threshold) {
+async function removeOutliers(array, signatures, threshold) {
   const median = getMedian(array);
   const mad = getMAD(array);
-  const nonOutliers = [];
+
+  var nonOutlierPrices = [];
+  var nonOutlierSignatures = [];
 
   for (let i = 0; i < array.length; i++) {
+    if (isNaN(Number(array[i]))) continue;
+
     const deviation = Math.abs(array[i] - median);
     if (deviation <= threshold * mad) {
-      nonOutliers.push(array[i]);
+      nonOutlierPrices.push(array[i]);
+      nonOutlierSignatures.push(signatures[i]);
     }
   }
 
-  return nonOutliers;
+  return [nonOutlierPrices, nonOutlierSignatures];
 }
 
 async function createPriceArray(token) {
@@ -290,8 +295,7 @@ async function createPriceArray(token) {
   ];
 
   var priceArray = [];
-  var nextPrice;
-
+  var signatureArray = [];
   console.log(1.1);
 
   for (const func of functions) {
@@ -299,22 +303,32 @@ async function createPriceArray(token) {
     const results = await func(token);
     const floatValue = parseFloat(results[0]);
 
-    if (results[0] != 0) priceArray.push(floatValue);
+    if (results[0] != "0") {
+      priceArray.push(floatValue);
+      signatureArray.push(results[1]);
+    }
   }
 
+  console.log(priceArray, signatureArray);
+
   console.log("\n1.2");
-  priceArray = removeOutliers(priceArray, 2);
+  const arrays = await removeOutliers(priceArray, signatureArray, 2);
+  console.log("Arrays :", arrays);
+
   console.log(1.3);
-  return priceArray;
+  return arrays;
 }
 
 async function getPriceOf(token) {
   console.log(1);
-  const prices = await createPriceArray(token);
+  const results = await createPriceArray(token);
   console.log(2);
+
+  console.log(results);
+
+  const prices = results[0];
   let sum = 0;
   let count = 0;
-
   await new Promise((resolve, reject) => {
     for (const price of prices) {
       sum += price;
