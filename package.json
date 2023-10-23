@@ -9,12 +9,24 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@chakra-ui/react": "^2.8.1",
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@fontsource-variable/montserrat": "^5.0.16",
+    "@fontsource-variable/source-code-pro": "^5.0.16",
     "axios": "^1.4.0",
     "dotenv": "^16.3.1",
     "eslint": "8.43.0",
     "eslint-config-next": "13.4.7",
+    "framer-motion": "^10.16.4",
+    "mina-signer": "^2.1.1",
     "next": "13.4.7",
+    "o1js": "^0.13.1",
     "react": "18.2.0",
     "react-dom": "18.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "20.8.3",
+    "@types/react": "18.2.25"
   }
 }

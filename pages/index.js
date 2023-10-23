@@ -1,3 +1,9 @@
+import HomeLayout from "./components/Layouts/HomeLayout";
+
 export default function Home() {
-  return <>Doot</>;
+  return (
+    <>
+      <HomeLayout />
+    </>
+  );
 }
