@@ -46,14 +46,17 @@ export default function HomeFooter() {
           </Link>
         </Flex>
       </Flex>
-      <Flex direction={"column"} p={10} bgColor={"#090909"} gap={2}>
+      <Flex direction={"column"} p={10} gap={2}>
         <Flex direction={"row"} align={"center"} gap={4}>
           <Image src="/static/images/Doot.png" boxSize={10} />
           <Heading size={"lg"} mt={2}>
             Doot
           </Heading>
           <Spacer />
-          <Link href="https://zkignite.minaprotocol.com/zkignite/dev4dev/refineproposals/suggestion/567/detail">
+          <Link
+            href="https://zkignite.minaprotocol.com/zkignite/dev4dev/refineproposals/suggestion/567/detail"
+            target="_blank"
+          >
             <Flex direction={"row"} align={"center"} gap={1}>
               <Text>Read More</Text>
               <BsArrowUpRight size={15} />
@@ -62,7 +65,7 @@ export default function HomeFooter() {
         </Flex>
         <Text mt={1}>2023 - Present</Text>
         <Text>
-          <Link href="https://zkignite.minaprotocol.com/">
+          <Link href="https://zkignite.minaprotocol.com/" target="_blank">
             zkIgnite Cohort 2
           </Link>{" "}
           Funded Project
