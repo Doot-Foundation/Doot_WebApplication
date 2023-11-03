@@ -50,17 +50,17 @@ export default function HomeFooter() {
         <Flex direction={"row"} align={"center"} gap={4}>
           <Image src="/static/images/Doot.png" boxSize={10} />
           <Heading size={"lg"} mt={2}>
-            Doot Protocol
+            Doot
           </Heading>
           <Spacer />
-          <Link href="">
+          <Link href="https://zkignite.minaprotocol.com/zkignite/dev4dev/refineproposals/suggestion/567/detail">
             <Flex direction={"row"} align={"center"} gap={1}>
               <Text>Read More</Text>
               <BsArrowUpRight size={15} />
             </Flex>
           </Link>
         </Flex>
-        <Text>2023 - Present</Text>
+        <Text mt={1}>2023 - Present</Text>
         <Text>
           <Link href="https://zkignite.minaprotocol.com/">
             zkIgnite Cohort 2
