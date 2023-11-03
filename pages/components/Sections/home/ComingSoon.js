@@ -43,7 +43,7 @@ export default function ComingSoon() {
               fontSize={"3xl"}
               fontWeight={800}
             >
-              Verifiable, Trustless, Transparent.
+              Verifiable, Trusthworthy, Transparent.
             </Box>
             <br />
             That's how we like our data feeds for the Mina Protocol.
