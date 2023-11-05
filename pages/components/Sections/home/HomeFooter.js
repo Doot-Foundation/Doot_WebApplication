@@ -10,7 +10,7 @@ export default function HomeFooter() {
         <Box
           position={"absolute"}
           left={0}
-          top={120}
+          top={"50%"}
           borderBottom={"1px solid white"}
           w={"100vw"}
           m={0}
@@ -49,9 +49,7 @@ export default function HomeFooter() {
       <Flex direction={"column"} p={10} gap={2}>
         <Flex direction={"row"} align={"center"} gap={4}>
           <Image src="/static/images/Doot.png" boxSize={10} />
-          <Heading size={"lg"} mt={2}>
-            Doot
-          </Heading>
+          <Heading size={"lg"}>Doot</Heading>
           <Spacer />
           <Link
             href="https://zkignite.minaprotocol.com/zkignite/dev4dev/refineproposals/suggestion/567/detail"

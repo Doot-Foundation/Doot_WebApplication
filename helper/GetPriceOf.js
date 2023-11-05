@@ -37,7 +37,7 @@ async function getPriceCoinGecko(token) {
     return [Price, signature];
   } catch (error) {
     console.error("Error fetching ETH price coin gecko:", error.message);
-    return 0;
+    return [0, ""];
   }
 }
 
@@ -56,7 +56,7 @@ async function getPriceBinance(token) {
     return [Price, signature];
   } catch (error) {
     console.error("Error fetching price binance:", error.message);
-    return 0;
+    return [0, ""];
   }
 }
 
@@ -80,7 +80,7 @@ async function getPriceCMC(token) {
     return [Price, signature];
   } catch (error) {
     console.error("Error fetching price cmc:", error.message);
-    return 0;
+    return [0, ""];
   }
 }
 
@@ -99,15 +99,14 @@ async function getPriceCryptoCompare(token) {
     return [Price, signature];
   } catch (error) {
     console.error("Error fetching price crypto compare:", error.message);
-    return 0;
+    return [0, ""];
   }
 }
 
 async function getPriceCoinAPI(token) {
   const id = CoinAPISymbols[token.toLowerCase()];
-  const URLCalled = `https://docs.coinapi.io/v1/exchangerate/${id}/USD`;
-
   const API_KEY = process.env.COIN_API_KEY;
+  const URLCalled = `https://rest.coinapi.io/v1/exchangerate/${id}/USD`;
   try {
     const response = await axios.get(URLCalled, {
       headers: {
@@ -116,14 +115,14 @@ async function getPriceCoinAPI(token) {
     });
     console.log(response.status);
 
-    const Timestamp = getTimestamp(response.headers["date"]);
+    const Timestamp = getTimestamp(response.data.time);
     const Price = String(response.data.rate);
 
     const signature = getSignedAPICall(URLCalled, Price, Timestamp, 1);
     return [Price, signature];
   } catch (error) {
     console.error("Error fetching  price coin api:", error.message);
-    return 0;
+    return [0, ""];
   }
 }
 
@@ -142,7 +141,7 @@ async function getPricePaprika(token) {
     return [Price, signature];
   } catch (error) {
     console.error("Error fetching price paprika:", error.message);
-    return 0;
+    return [0, ""];
   }
 }
 
@@ -161,7 +160,7 @@ async function getPriceMessari(token) {
     return [Price, signature];
   } catch (error) {
     console.error("Error fetching price messari:", error.message);
-    return 0;
+    return [0, ""];
   }
 }
 
@@ -179,7 +178,7 @@ async function getPriceCoinCap(token) {
     return [Price, signature];
   } catch (error) {
     console.error("Error fetching price coin cap:", error.message);
-    return 0;
+    return [0, ""];
   }
 }
 
@@ -198,7 +197,7 @@ async function getPriceCoinlore(token) {
     return [Price, signature];
   } catch (error) {
     console.error("Error fetching price coin lore:", error.message);
-    return 0;
+    return [0, ""];
   }
 }
 
@@ -222,7 +221,7 @@ async function getPriceCoinRanking(token) {
     return [Price, signature];
   } catch (error) {
     console.error("Error fetching price coin ranking:", error.message);
-    return 0;
+    return [0, ""];
   }
 }
 
@@ -241,7 +240,7 @@ async function getPriceCoinCodex(token) {
     return [Price, signature];
   } catch (error) {
     console.error("Error fetching price coin codex:", error.message);
-    return 0;
+    return [0, ""];
   }
 }
 
@@ -284,7 +283,7 @@ async function createPriceArray(token) {
   const functions = [
     getPriceBinance,
     getPriceCMC,
-    // getPriceCoinAPI,
+    getPriceCoinAPI,
     getPriceCoinCap,
     getPriceCoinGecko,
     getPriceCoinRanking,

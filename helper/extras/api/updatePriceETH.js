@@ -1,4 +1,4 @@
-const getPriceOfETH = require("../../../helper/currencies/ETH.js");
+const getPriceOfETH = require("../../../helper/extras/currencies/ETH.js/index.js");
 
 // TODO - Turn the process into a general solution so that the user just sends the token name.
 
