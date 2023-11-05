@@ -1,14 +1,7 @@
+require("dotenv").config();
+
 const Client = require("mina-signer");
 const { CircuitString } = require("o1js");
-
-const { config } = require("dotenv");
-const { resolve, dirname } = require("path");
-const { fileURLToPath } = require("url");
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const envPath = resolve(__dirname, "..", ".env");
-config({ path: envPath });
 
 const client = new Client({ network: "testnet" });
 const privateKey = process.env.ORACLE_KEY;
@@ -32,6 +25,9 @@ function processFloatString(input) {
 
 function getSignedAPICall(urlCalled, price, timestamp, priceGenerationId) {
   console.log(price);
+  console.log(urlCalled);
+  console.log(timestamp);
+  console.log(privateKey);
 
   const fieldURL = BigInt(CircuitString.fromString(urlCalled).hash());
   const fieldPrice = BigInt(processFloatString(price));
