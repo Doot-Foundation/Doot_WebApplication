@@ -1,4 +1,9 @@
 {
+  "functions": {
+    "api/*.rs": {
+      "runtime": "vercel-rust@4.0.6"
+    }
+  },
   "_comment": {
     "crons": [
       {
@@ -6,10 +11,5 @@
         "schedule": "* * * * *"
       }
     ]
-  },
-  "functions": {
-    "api/**/*.rs": {
-      "runtime": "vercel-rust@4.0.6"
-    }
   }
 }
