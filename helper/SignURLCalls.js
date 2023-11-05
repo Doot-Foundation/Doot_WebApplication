@@ -1,10 +1,7 @@
-require("dotenv").config();
-
 const Client = require("mina-signer");
-const { CircuitString } = require("o1js");
-
 const client = new Client({ network: "testnet" });
-const privateKey = process.env.ORACLE_KEY;
+
+const { CircuitString } = require("o1js");
 
 const { MULTIPLICATION_FACTOR } = require("../constants/info");
 
@@ -27,6 +24,8 @@ function getSignedAPICall(urlCalled, price, timestamp, priceGenerationId) {
   console.log(price);
   console.log(urlCalled);
   console.log(timestamp);
+
+  const privateKey = process.env.ORACLE_KEY;
   console.log(privateKey);
 
   const fieldURL = BigInt(CircuitString.fromString(urlCalled).hash());

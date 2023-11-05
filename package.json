@@ -15,7 +15,6 @@
     "@fontsource-variable/montserrat": "^5.0.16",
     "@fontsource-variable/source-code-pro": "^5.0.16",
     "axios": "^1.6.0",
-    "dotenv": "^16.3.1",
     "framer-motion": "^10.16.4",
     "mina-signer": "^2.1.1",
     "next": "14.0.1",
