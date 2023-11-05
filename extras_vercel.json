@@ -1,0 +1,10 @@
+{
+  "_comment": {
+    "crons": [
+      {
+        "path": "/api/cron/updatePrice",
+        "schedule": "* * * * *"
+      }
+    ]
+  }
+}

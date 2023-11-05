@@ -5,6 +5,7 @@
 
 # dependencies
 /node_modules
+/target
 /.pnp
 .pnp.js
 
