@@ -1,6 +1,4 @@
-const axios = require("axios");
-
-const { getSignedAPICall } = require("./SignURLCalls");
+const { callSignAPICall } = require("./CallAndSignAPICalls");
 
 import {
   CoinGekoSymbols,
@@ -16,230 +14,160 @@ import {
   CoinCodexSymbols,
 } from "../constants/symbols";
 
-function getTimestamp(data) {
-  const date = new Date(data);
-  return Math.floor(date.getTime() / 1000);
-}
-
 async function getPriceCoinGecko(token) {
   const id = CoinGekoSymbols[token.toLowerCase()];
-  const URLCalled = `https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=usd`;
-
+  const apiToCall = `https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=usd`;
+  const resultPath = `data[${id}].usd`;
+  /// [Price, Timestamp, Signature]
   try {
-    const response = await axios.get(URLCalled);
-    console.log(response.status);
-
-    const Timestamp = getTimestamp(response.headers["date"]);
-    const Price = String(response.data[id].usd);
-
-    const signature = getSignedAPICall(URLCalled, Price, Timestamp, 1);
-    return [Price, signature];
+    const results = await callSignAPICall(apiToCall, resultPath, "");
+    return results;
   } catch (error) {
     console.error("Error fetching ETH price coin gecko:", error.message);
-    return [0, ""];
+    return [0, 0, ""];
   }
 }
 
 async function getPriceBinance(token) {
   const id = BinanceSymbols[token.toLowerCase()];
-  const URLCalled = `https://api.binance.com/api/v3/ticker/price?symbol=${id}USDT`;
+  const apiToCall = `https://api.binance.com/api/v3/ticker/price?symbol=${id}USDT`;
+  const resultPath = `data.price`;
 
   try {
-    const response = await axios.get(URLCalled);
-    console.log(response.status);
-
-    const Timestamp = getTimestamp(response.headers["date"]);
-    const Price = String(response.data.price);
-
-    const signature = getSignedAPICall(URLCalled, Price, Timestamp, 1);
-    return [Price, signature];
+    const results = await callSignAPICall(apiToCall, resultPath, "");
+    return results;
   } catch (error) {
     console.error("Error fetching price binance:", error.message);
-    return [0, ""];
+    return [0, 0, ""];
   }
 }
 
 async function getPriceCMC(token) {
   const id = CMCSymbols[token.toLowerCase()];
-  const URLCalled = `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=${id}&convert=USD`;
+  const apiToCall = `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=${id}&convert=USD`;
+  const header = `X-CMC_PRO_API_KEY`;
+  const resultPath = `data.data[${id}].quote.USD.price`;
 
-  const API_KEY = process.env.CMC_KEY;
   try {
-    const response = await axios.get(URLCalled, {
-      headers: {
-        "X-CMC_PRO_API_KEY": API_KEY,
-      },
-    });
-    console.log(response.status);
-
-    const Timestamp = getTimestamp(response.headers["date"]);
-    const Price = String(response.data.data[id].quote.USD.price);
-
-    const signature = getSignedAPICall(URLCalled, Price, Timestamp, 1);
-    return [Price, signature];
+    const results = await callSignAPICall(apiToCall, resultPath, header);
+    return results;
   } catch (error) {
     console.error("Error fetching price cmc:", error.message);
-    return [0, ""];
+    return [0, 0, ""];
   }
 }
 
 async function getPriceCryptoCompare(token) {
   const id = CryptoCompareSymbols[token.toLowerCase()];
-  const URLCalled = `https://min-api.cryptocompare.com/data/price?fsym=${id}&tsyms=USD`;
+  const apiToCall = `https://min-api.cryptocompare.com/data/price?fsym=${id}&tsyms=USD`;
+  const resultPath = `data.USD`;
 
   try {
-    const response = await axios.get(URLCalled);
-    console.log(response.status);
-
-    const Timestamp = getTimestamp(response.headers["date"]);
-    const Price = String(response.data.USD);
-
-    const signature = getSignedAPICall(URLCalled, Price, Timestamp, 1);
-    return [Price, signature];
+    const results = await callSignAPICall(apiToCall, resultPath, "");
+    return results;
   } catch (error) {
     console.error("Error fetching price crypto compare:", error.message);
-    return [0, ""];
+    return [0, 0, ""];
   }
 }
 
 async function getPriceCoinAPI(token) {
   const id = CoinAPISymbols[token.toLowerCase()];
-  const API_KEY = process.env.COIN_API_KEY;
-  const URLCalled = `https://rest.coinapi.io/v1/exchangerate/${id}/USD`;
+  const apiToCall = `https://rest.coinapi.io/v1/exchangerate/${id}/USD`;
+  const header = "X-CoinAPI-Key";
+  const resultPath = `data.rate`;
+
   try {
-    const response = await axios.get(URLCalled, {
-      headers: {
-        "X-CoinAPI-Key": API_KEY,
-      },
-    });
-    console.log(response.status);
-
-    const Timestamp = getTimestamp(response.data.time);
-    const Price = String(response.data.rate);
-
-    const signature = getSignedAPICall(URLCalled, Price, Timestamp, 1);
-    return [Price, signature];
+    const results = await callSignAPICall(apiToCall, resultPath, header);
+    return results;
   } catch (error) {
     console.error("Error fetching  price coin api:", error.message);
-    return [0, ""];
+    return [0, 0, ""];
   }
 }
 
 async function getPricePaprika(token) {
   const id = PricePaprikeSymbols[token.toLowerCase()];
-  const URLCalled = `https://api.coinpaprika.com/v1/tickers/${id}`;
+  const apiToCall = `https://api.coinpaprika.com/v1/tickers/${id}`;
+  const resultPath = `data.quotes.USD.price`;
 
   try {
-    const response = await axios.get(URLCalled);
-    console.log(response.status);
-
-    const Timestamp = getTimestamp(response.headers["date"]);
-    const Price = String(response.data.quotes.USD.price);
-
-    const signature = getSignedAPICall(URLCalled, Price, Timestamp, 1);
-    return [Price, signature];
+    const results = await callSignAPICall(apiToCall, resultPath, "");
+    return results;
   } catch (error) {
     console.error("Error fetching price paprika:", error.message);
-    return [0, ""];
+    return [0, 0, ""];
   }
 }
 
 async function getPriceMessari(token) {
   const id = PriceMessariSymbols[token.toLowerCase()];
-  const URLCalled = `https://data.messari.io/api/v1/assets/${id}/metrics`;
+  const apiToCall = `https://data.messari.io/api/v1/assets/${id}/metrics`;
+  const resultPath = `data.data.market_data.price_usd`;
 
   try {
-    const response = await axios.get(URLCalled);
-    console.log(response.status);
-
-    const Timestamp = getTimestamp(response.headers["date"]);
-    const Price = String(response.data.data.market_data.price_usd);
-
-    const signature = getSignedAPICall(URLCalled, Price, Timestamp, 1);
-    return [Price, signature];
+    const results = await callSignAPICall(apiToCall, resultPath, "");
+    return results;
   } catch (error) {
     console.error("Error fetching price messari:", error.message);
-    return [0, ""];
+    return [0, 0, ""];
   }
 }
 
 async function getPriceCoinCap(token) {
   const id = CoinCapSymbols[token.toLowerCase()];
-  const URLCalled = `https://api.coincap.io/v2/assets/${id}`;
+  const apiToCall = `https://api.coincap.io/v2/assets/${id}`;
+  const resultPath = `data.data.priceUsd`;
+
   try {
-    const response = await axios.get(URLCalled);
-    console.log(response.status);
-
-    const Timestamp = getTimestamp(response.headers["date"]);
-    const Price = String(response.data.data.priceUsd);
-
-    const signature = getSignedAPICall(URLCalled, Price, Timestamp, 1);
-    return [Price, signature];
+    const results = await callSignAPICall(apiToCall, resultPath, "");
+    return results;
   } catch (error) {
     console.error("Error fetching price coin cap:", error.message);
-    return [0, ""];
+    return [0, 0, ""];
   }
 }
 
 async function getPriceCoinlore(token) {
   const id = CoinLoreSymbols[token.toLowerCase()];
-  const URLCalled = `https://api.coinlore.net/api/ticker/?id=${id}`;
+  const apiToCall = `https://api.coinlore.net/api/ticker/?id=${id}`;
+  const resultPath = `data[0].price_usd`;
 
   try {
-    const response = await axios.get(URLCalled);
-    console.log(response.status);
-
-    const Timestamp = getTimestamp(response.headers["date"]);
-    const Price = String(response.data[0].price_usd);
-
-    const signature = getSignedAPICall(URLCalled, Price, Timestamp, 1);
-    return [Price, signature];
+    const results = await callSignAPICall(apiToCall, resultPath, "");
+    return results;
   } catch (error) {
     console.error("Error fetching price coin lore:", error.message);
-    return [0, ""];
+    return [0, 0, ""];
   }
 }
 
 async function getPriceCoinRanking(token) {
   const id = CoinRankingSymbols[token.toLowerCase()];
-  const URLCalled = `https://api.coinranking.com/v2/coin/${id}/price`;
+  const apiToCall = `https://api.coinranking.com/v2/coin/${id}/price`;
+  const header = "x-access-token";
+  const resultPath = `data.data.price`;
 
-  const API_KEY = process.env.COIN_RANKING_KEY;
   try {
-    const response = await axios.get(URLCalled, {
-      headers: {
-        "x-access-token": API_KEY,
-      },
-    });
-    console.log(response.status);
-
-    const Timestamp = getTimestamp(response.headers["date"]);
-    const Price = String(response.data.data.price);
-
-    const signature = getSignedAPICall(URLCalled, Price, Timestamp, 1);
-    return [Price, signature];
+    const results = await callSignAPICall(apiToCall, resultPath, header);
+    return results;
   } catch (error) {
     console.error("Error fetching price coin ranking:", error.message);
-    return [0, ""];
+    return [0, 0, ""];
   }
 }
 
 async function getPriceCoinCodex(token) {
   const id = CoinCodexSymbols[token.toLowerCase()];
-  const URLCalled = `https://coincodex.com/api/coincodex/get_coin/${id}`;
+  const apiToCall = `https://coincodex.com/api/coincodex/get_coin/${id}`;
+  const resultPath = `data.last_price_usd`;
 
   try {
-    const response = await axios.get(URLCalled);
-    console.log(response.status);
-
-    const Timestamp = getTimestamp(response.headers["date"]);
-    const Price = String(response.data.last_price_usd);
-
-    const signature = getSignedAPICall(URLCalled, Price, Timestamp, 1);
-    return [Price, signature];
+    const results = await callSignAPICall(apiToCall, resultPath, "");
+    return results;
   } catch (error) {
     console.error("Error fetching price coin codex:", error.message);
-    return [0, ""];
+    return [0, 0, ""];
   }
 }
 
@@ -258,11 +186,12 @@ function getMAD(array) {
 }
 
 // MODIFIED Z-SCORE OUTLIER MECHANISM
-async function removeOutliers(array, signatures, threshold) {
+async function removeOutliers(array, timestamps, signatures, threshold) {
   const median = getMedian(array);
   const mad = getMAD(array);
 
   var nonOutlierPrices = [];
+  var nonOutlierTimestamps = [];
   var nonOutlierSignatures = [];
 
   for (let i = 0; i < array.length; i++) {
@@ -271,6 +200,7 @@ async function removeOutliers(array, signatures, threshold) {
     const deviation = Math.abs(array[i] - median);
     if (deviation <= threshold * mad) {
       nonOutlierPrices.push(array[i]);
+      nonOutlierTimestamps.push(timestamps[i]);
       nonOutlierSignatures.push(signatures[i]);
     }
   }
@@ -294,6 +224,7 @@ async function createPriceArray(token) {
   ];
 
   var priceArray = [];
+  var timestampArray = [];
   var signatureArray = [];
   console.log(1.1);
 
@@ -304,14 +235,20 @@ async function createPriceArray(token) {
 
     if (results[0] != "0") {
       priceArray.push(floatValue);
-      signatureArray.push(results[1]);
+      timestampArray.push(results[1]);
+      signatureArray.push(results[2]);
     }
   }
 
-  console.log(priceArray, signatureArray);
+  console.log(priceArray, timestampArray, signatureArray);
 
   console.log("\n1.2");
-  const arrays = await removeOutliers(priceArray, signatureArray, 2);
+  const arrays = await removeOutliers(
+    priceArray,
+    timestampArray,
+    signatureArray,
+    2
+  );
   console.log("Arrays :", arrays);
 
   console.log(1.3);
