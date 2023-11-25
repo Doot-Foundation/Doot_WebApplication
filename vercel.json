@@ -1,0 +1,24 @@
+{
+  "crons": [
+    {
+      "path": "/api/getPriceBitcoin",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/getPriceChainlink",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/getPriceEthereum",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/getPriceSolana",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/getPriceMina",
+      "schedule": "* * * * *"
+    }
+  ]
+}

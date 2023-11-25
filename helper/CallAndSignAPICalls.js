@@ -52,6 +52,7 @@ async function callSignAPICall(url, resultPath, headerName) {
   header = null;
 
   const price = _.get(response, resultPath);
+
   const Price = String(price);
   const Timestamp = getTimestamp(response.headers["date"]);
 

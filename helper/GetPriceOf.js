@@ -143,6 +143,8 @@ async function getPriceCoinlore(token) {
 }
 
 async function getPriceCoinRanking(token) {
+  if (token.toLowerCase() == "mina") return [0, 0, ""];
+
   const id = CoinRankingSymbols[token.toLowerCase()];
   const apiToCall = `https://api.coinranking.com/v2/coin/${id}/price`;
   const header = "x-access-token";
@@ -226,10 +228,8 @@ async function createPriceArray(token) {
   var priceArray = [];
   var timestampArray = [];
   var signatureArray = [];
-  console.log(1.1);
 
   for (const func of functions) {
-    console.log(`\nCalculating....`);
     const results = await func(token);
     const floatValue = parseFloat(results[0]);
 
@@ -240,25 +240,18 @@ async function createPriceArray(token) {
     }
   }
 
-  console.log(priceArray, timestampArray, signatureArray);
-
-  console.log("\n1.2");
   const arrays = await removeOutliers(
     priceArray,
     timestampArray,
     signatureArray,
     2
   );
-  console.log("Arrays :", arrays);
-
-  console.log(1.3);
   return arrays;
 }
 
 async function getPriceOf(token) {
-  console.log(1);
+  console.log(token);
   const results = await createPriceArray(token);
-  console.log(2);
 
   console.log(results);
 
@@ -275,6 +268,7 @@ async function getPriceOf(token) {
   });
 
   const floatValue = parseFloat(sum / count);
+  console.log(floatValue, "\n");
   return floatValue;
 }
 
