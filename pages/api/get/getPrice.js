@@ -1,5 +1,5 @@
 // pages/api/get.js
-import { getCache } from "../../../helper/CacheHandler.js";
+import { getCache } from "../../../utils/CacheHandler.js";
 
 export default function handler(req, res) {
   // Retrieve data from the cache

@@ -1,24 +1,28 @@
 {
   "crons": [
     {
-      "path": "/api/update/updatePriceBitcoin",
+      "path": "/api/update/updatePrice?token=bitcoin",
       "schedule": "2 * * * *"
     },
     {
-      "path": "/api/update/updatePriceChainlink",
+      "path": "/api/update/updatePrice?token=chainlink",
       "schedule": "2 * * * *"
     },
     {
-      "path": "/api/update/updatePriceEthereum",
+      "path": "/api/update/updatePrice?token=ethereum",
       "schedule": "2 * * * *"
     },
     {
-      "path": "/api/update/updatePriceSolana",
+      "path": "/api/update/updatePrice?token=solana",
       "schedule": "2 * * * *"
     },
     {
-      "path": "/api/update/updatePriceMina",
+      "path": "/api/update/updatePrice?token=mina",
       "schedule": "2 * * * *"
+    },
+    {
+      "path": "/api/update/uploadToMinaIPFS",
+      "schedule": "* 2 * * *"
     }
   ]
 }

@@ -1,5 +1,5 @@
-const updateCache = require("../../../helper/CacheHandler.js");
-const getPriceOf = require("../../../helper/GetPriceOf.js");
+const updateCache = require("../../../../utils/CacheHandler.js");
+const getPriceOf = require("../../../../utils/GetPriceOf.js");
 
 async function PriceOf(token) {
   return new Promise((resolve) => {
@@ -9,7 +9,7 @@ async function PriceOf(token) {
 }
 
 export default async function handler(req, res) {
-  const authHeader = request.headers.get("authorization");
+  const authHeader = req.headers.authorization;
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return new Response("Unauthorized", {
       status: 401,
@@ -19,7 +19,7 @@ export default async function handler(req, res) {
   const token = "mina";
   const price = await PriceOf(token);
 
-  MINA_CACHE.set("mina_price", price);
+  updateCache(token, price);
 
-  res.status(200);
+  res.status(200).json({ status: "Success" });
 }
