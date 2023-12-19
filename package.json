@@ -22,9 +22,13 @@
     "mina-signer": "^2.1.1",
     "next": "14.0.1",
     "node-cache": "^5.1.2",
-    "o1js": "^0.14.0",
+    "o1js": "^0.14.2",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-icons": "^4.11.0"
+  },
+  "devDependencies": {
+    "@types/react": "18.2.45",
+    "typescript": "^5.3.3"
   }
 }

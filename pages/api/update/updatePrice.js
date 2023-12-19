@@ -1,4 +1,5 @@
 const getPriceOf = require("../../../utils/GetPriceOf.js");
+const { updateCache } = require("../../../utils/CacheHandler.js");
 
 async function PriceOf(token) {
   return new Promise((resolve) => {
@@ -17,6 +18,8 @@ export default async function handler(req, res) {
 
   const { token } = req.query;
   const price = await PriceOf(token);
+
+  await updateCache(token, price);
 
   res.status(200).json({ status: "Success", price: price });
 }
