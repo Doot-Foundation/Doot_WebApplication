@@ -9,7 +9,8 @@ async function updateCache(token, price) {
 }
 
 async function getCache(token) {
-  const key = TOKEN_TO_CACHE[token];
+  const key = TOKEN_TO_CACHE[token] || "NA";
+  if (key == "NA") return 0;
   return PRICE_CACHE.get(key);
 }
 
