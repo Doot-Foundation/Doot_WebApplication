@@ -1,8 +1,8 @@
 const MAIL = process.env.SUPABASE_USER;
 const PASS = process.env.SUPABASE_USER_PASS;
 
-import { supabase } from "../../../utils/InitSupabase.js";
-import { getCache } from "../../../utils/CacheHandler.js";
+import { supabase } from "../../../utils/helper/InitSupabase.js";
+import { getCache } from "../../../utils/helper/CacheHandler.js";
 
 export default async function handler(req, res) {
   // Retrieve data from the cache

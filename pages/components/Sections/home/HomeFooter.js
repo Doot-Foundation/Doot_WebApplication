@@ -1,6 +1,6 @@
 import { Flex, Box, Image, Text, Heading, Spacer } from "@chakra-ui/react";
 import { RiTwitterXLine, RiGithubFill } from "react-icons/ri";
-import { BsArrowUpRight } from "react-icons/bs";
+import { CgArrowTopRight } from "react-icons/cg";
 import Link from "next/link";
 
 export default function HomeFooter() {
@@ -55,9 +55,9 @@ export default function HomeFooter() {
             href="https://zkignite.minaprotocol.com/zkignite/dev4dev/refineproposals/suggestion/567/detail"
             target="_blank"
           >
-            <Flex direction={"row"} align={"center"} gap={1}>
+            <Flex direction={"row"} gap={1}>
               <Text>Read More</Text>
-              <BsArrowUpRight size={15} />
+              <CgArrowTopRight />
             </Flex>
           </Link>
         </Flex>

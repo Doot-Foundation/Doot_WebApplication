@@ -1,11 +1,16 @@
 const MAIL = process.env.SUPABASE_USER;
 const PASS = process.env.SUPABASE_USER_PASS;
 
-import { supabase } from "../../utils/InitSupabase.js";
+import { supabase } from "../../utils/helper/InitSupabase.js";
 import { Field, Poseidon, PublicKey } from "o1js";
 
 export default async function handler(req, res) {
   const { address } = req.query;
+
+  const authHeader = req.headers.authorization;
+  if (authHeader !== `Bearer ${process.env.API_INTERFACE_KEY}`) {
+    res.status(401).json("Unauthorized");
+  }
 
   await supabase.auth.signInWithPassword({
     email: MAIL,

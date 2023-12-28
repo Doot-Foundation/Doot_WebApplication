@@ -1,5 +1,5 @@
-const getPriceOf = require("../../../utils/GetPriceOf.js");
-const { updateCache } = require("../../../utils/CacheHandler.js");
+const getPriceOf = require("../../../utils/helper/GetPriceOf.js");
+const { updateCache } = require("../../../utils/helper/CacheHandler.js");
 
 async function PriceOf(token) {
   return new Promise((resolve) => {
@@ -11,9 +11,8 @@ async function PriceOf(token) {
 export default async function handler(req, res) {
   const authHeader = req.headers.authorization;
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return new Response("Unauthorized", {
-      status: 401,
-    });
+    res.status(401).json("Unauthorized");
+    return;
   }
 
   const { token } = req.query;
