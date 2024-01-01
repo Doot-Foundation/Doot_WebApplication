@@ -16,6 +16,21 @@ export default function Header() {
               _hover={{ color: "#94ffe5", cursor: "pointer" }}
             >
               <Link
+                href="/docs"
+                _hover={{
+                  textDecoration: "none",
+                }}
+              >
+                Docs
+              </Link>
+              <CgArrowTopRight />
+            </Flex>
+            <Flex
+              direction={"row"}
+              gap={1}
+              _hover={{ color: "#94ffe5", cursor: "pointer" }}
+            >
+              <Link
                 href="/feeds"
                 _hover={{
                   textDecoration: "none",
@@ -25,7 +40,11 @@ export default function Header() {
               </Link>
               <CgArrowTopRight />
             </Flex>
-            <Flex direction={"row"} gap={1} _hover={{ color: "#94ffe5" }}>
+            <Flex
+              direction={"row"}
+              gap={1}
+              _hover={{ color: "#94ffe5", cursor: "pointer" }}
+            >
               <Link
                 href="/dashboard"
                 _hover={{

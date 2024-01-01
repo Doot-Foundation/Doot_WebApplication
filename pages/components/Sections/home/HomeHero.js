@@ -119,24 +119,39 @@ export default function HomeHero() {
             <br />
             That's how we like our data feeds for the Mina Protocol.
           </Text>
-
-          <Button
-            alignItems={"center"}
-            justifyItems={"center"}
-            p={"5px 30px"}
-            borderRadius={20}
-            gap={2}
-            transition={"0.2s"}
-            _hover={{ gap: "5" }}
-            _active={{}}
-            background={
-              " linear-gradient(75deg, rgba(88,255,216,1) 16%, rgba(170,81,255,1) 100%);"
-            }
-            fontFamily={"Montserrat Variable"}
-          >
-            <Text fontWeight={"bold"}>TRY DOOT</Text>
-            <FaArrowRightLong />
-          </Button>
+          <Flex gap={5}>
+            <Button
+              alignItems={"center"}
+              justifyItems={"center"}
+              p={"5px 30px"}
+              borderRadius={20}
+              gap={2}
+              transition={"0.2s"}
+              _hover={{ gap: "5" }}
+              _active={{}}
+              background={
+                " linear-gradient(75deg, rgba(88,255,216,1) 16%, rgba(170,81,255,1) 100%);"
+              }
+              fontFamily={"Montserrat Variable"}
+            >
+              <Text fontWeight={"bold"}>TRY DOOT</Text>
+              <FaArrowRightLong />
+            </Button>{" "}
+            <Button
+              alignItems={"center"}
+              justifyItems={"center"}
+              p={"5px 30px"}
+              borderRadius={20}
+              gap={2}
+              transition={"0.2s"}
+              _hover={{ gap: "5" }}
+              _active={{}}
+              fontFamily={"Montserrat Variable"}
+            >
+              <Text fontWeight={"bold"}>Learn More</Text>
+              <FaArrowRightLong />
+            </Button>
+          </Flex>
         </Flex>
 
         {/* Features */}
@@ -146,7 +161,7 @@ export default function HomeHero() {
             <Box
               animation={`${blinking} 1.2s step-start infinite`}
               display={"inline "}
-              color={"#00ff90"}
+              color={"#0ce1ae"}
             >
               _
             </Box>
@@ -214,7 +229,7 @@ export default function HomeHero() {
               <Heading
                 letterSpacing={2}
                 size={"3xl"}
-                fontFamily={"montserrat  Variable"}
+                fontFamily={"Montserrat Variable"}
               >
                 TEST DOOT
               </Heading>
@@ -222,7 +237,7 @@ export default function HomeHero() {
             <Heading
               letterSpacing={2}
               size={"3xl"}
-              fontFamily={"montserrat Variable"}
+              fontFamily={"Montserrat Variable"}
               ml={200}
             >
               DATA FEEDS
