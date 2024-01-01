@@ -10,7 +10,11 @@ export default function Header() {
         <Spacer />
         <Flex direction={"row"} align={"center"}>
           <Flex direction={"row"} gap={10} mr={10}>
-            <Flex direction={"row"} gap={1} _hover={{ color: "purple.300" }}>
+            <Flex
+              direction={"row"}
+              gap={1}
+              _hover={{ color: "#94ffe5", cursor: "pointer" }}
+            >
               <Link
                 href="/feeds"
                 _hover={{
@@ -21,7 +25,7 @@ export default function Header() {
               </Link>
               <CgArrowTopRight />
             </Flex>
-            <Flex direction={"row"} gap={1} _hover={{ color: "purple.300" }}>
+            <Flex direction={"row"} gap={1} _hover={{ color: "#94ffe5" }}>
               <Link
                 href="/dashboard"
                 _hover={{

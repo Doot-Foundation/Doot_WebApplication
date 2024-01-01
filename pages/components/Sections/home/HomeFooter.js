@@ -6,7 +6,7 @@ import Link from "next/link";
 export default function HomeFooter() {
   return (
     <>
-      <Flex direction={"column"} p={20} position={"relative"}>
+      <Flex direction={"column"} position={"relative"}>
         <Box
           position={"absolute"}
           left={0}

@@ -14,11 +14,12 @@ export default function InformationCard({ children }) {
         w={"35%"}
         bg={`linear-gradient(0deg, rgba(5,3,0,1) 0%, rgba(45,0,88,1) 100%)`}
         borderRadius={10}
-        border="2px solid transparent"
-        transition={"0.5s"}
+        transition={"1s"}
+        border="2px solid #a364ff"
+        boxShadow="10px 10px 2px #6c35de"
         _hover={{
-          border: "2px solid #a364ff",
-          boxShadow: "10px 10px 2px purple",
+          border: "2px solid #00ce74",
+          boxShadow: "10px 10px 2px #16d07f",
         }}
       >
         {children}

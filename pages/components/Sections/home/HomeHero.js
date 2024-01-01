@@ -12,7 +12,7 @@ import { keyframes } from "@emotion/react";
 
 import axios from "axios";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 import { GiAllSeeingEye } from "react-icons/gi";
 import { MdOutlineJoinInner } from "react-icons/md";
@@ -33,13 +33,7 @@ export default function HomeHero() {
   const [result, setResult] = useState(null);
   const [mode, setMode] = useState("res");
 
-  const [firstRender, setFirstRender] = useState(false);
-
   console.log(asset);
-
-  useEffect(() => {
-    setFirstRender(true);
-  }, []);
 
   const blinking = keyframes`
   50% {
@@ -91,288 +85,310 @@ export default function HomeHero() {
 
   return (
     <>
-      {/* Opening */}
-      <Flex
-        direction={"column"}
-        maxW={"100%"}
-        gap={10}
-        p={10}
-        mb={10}
-        align={"center"}
-      >
-        <Heading
-          fontFamily={"Montserrat Variable"}
-          size={"4xl"}
-          textAlign={"center"}
-        >
-          Supercharged Oracle For The Mina Protocol
-        </Heading>
-        <Text
-          fontFamily={"Source Code Pro Variable"}
-          fontSize={"2xl"}
-          width={"100%"}
-          textAlign={"center"}
-        >
-          <Box as={"span"} color={"#6c35de"} fontSize={"3xl"} fontWeight={800}>
-            Verifiable, Transparent.
-          </Box>
-          <br />
-          That's how we like our data feeds for the Mina Protocol.
-        </Text>
-
-        <Button
-          alignItems={"center"}
-          justifyItems={"center"}
-          p={"5px 30px"}
-          borderRadius={20}
-          gap={2}
-          transition={"0.2s"}
-          _hover={{ gap: "5" }}
-          background={
-            "linear-gradient(100.5deg, rgb(148, 146, 236) 17.7%, rgb(245, 194, 194) 76.1%);"
-          }
-          fontFamily={"Montserrat Variable"}
-        >
-          <Text letterSpacing={1}>TRY DOOT</Text>
-          <FaArrowRightLong />
-        </Button>
-      </Flex>
-      {/* Features */}
-      <Flex direction={"column"} mt={120} align={"center"}>
-        <Heading size={"lg"} fontFamily={"Source Code Pro Variable"}>
-          for@developers:~${" "}
-          <Box
-            animation={`${blinking} 1.2s step-start infinite`}
-            display={"inline "}
-          >
-            _
-          </Box>
-        </Heading>
-        <Text fontSize={"xl"} fontFamily={"Source Code Pro Variable"}>
-          Who prioritize transparency, accuracy and verifiability.
-        </Text>
-
+      <Flex direction={"column"} gap={120} mb={150}>
+        {/* Opening */}
         <Flex
-          direction={"row"}
-          padding={"50px 180px"}
-          gap={5}
-          // on
-          // animation={`${slideIn} 1s ease-in-out forwards`}
-        >
-          <InformationCard>
-            <GiAllSeeingEye size={100} />
-            <Heading textAlign={"center"} fontFamily={"Montserrat Variable"}>
-              Asset Prices
-            </Heading>
-            <Text fontSize={20} textAlign={"center"}>
-              Comprehensive Mina-compatible price reference feeds encompassing
-              over 10 assets, currently operational on Berkeley Testnet,
-              ensuring availability and thorough testing for robustness.
-            </Text>
-          </InformationCard>
-          <Spacer />
-          <InformationCard>
-            <MdOutlineJoinInner size={100} />
-            <Heading textAlign={"center"} fontFamily={"Montserrat Variable"}>
-              Aggregated
-            </Heading>
-            <Text fontSize={20} textAlign={"center"}>
-              Pooling insights from diverse sources, our curated aggregation
-              method ensures a precise, unadulterated stream of information.
-              This allows us to leave no room for manipulation or failure.
-            </Text>
-          </InformationCard>
-          <Spacer />
-          <InformationCard>
-            <MdOutlineCleaningServices size={100} />
-            <Heading textAlign={"center"} fontFamily={"Montserrat Variable"}>
-              Filtered
-            </Heading>
-            <Text fontSize={20} textAlign={"center"}>
-              We meticulously eliminate outliers to extract the authentic value,
-              ensuring a signal devoid of disruptive noise that might otherwise
-              yield inaccurate outcomes.
-            </Text>
-          </InformationCard>
-        </Flex>
-      </Flex>
-      {/* Testing  */}
-      <Flex direction={"column"} alignItems={"left"}>
-        <Flex ml={200} mt={200} direction={"row"} align={"center"} gap={5}>
-          <Box
-            background={
-              "linear-gradient(90deg, #6c35de 0%,rgba(23,0,44,1) 100%)"
-            }
-            w={200}
-            h={5}
-          ></Box>
-          <Heading
-            letterSpacing={2}
-            size={"3xl"}
-            fontFamily={"montserrat  Variable"}
-          >
-            TEST DOOT
-          </Heading>
-        </Flex>{" "}
-        <Heading
-          letterSpacing={2}
-          size={"3xl"}
-          fontFamily={"montserrat Variable"}
-          ml={200}
-        >
-          DATA FEEDS
-        </Heading>
-      </Flex>
-      <Flex
-        direction={"row"}
-        align={"center"}
-        justify={"center"}
-        mt={50}
-        gap={5}
-      >
-        {/* Input Window  */}
-        <Flex
-          background={"linear-gradient(120deg,#2c0055 0%, #5126a9 100%)"}
           direction={"column"}
-          borderRadius={10}
-          p={5}
-          minH={400}
-          w={"22%"}
-          pos={"relative"}
+          maxW={"100%"}
+          gap={10}
+          p={10}
+          align={"center"}
         >
-          <Text fontSize={25}>Choose the asset and run the data feed.</Text>
-
-          <FormControl
-            fontFamily={"Source Code Pro Variable"}
-            mt={5}
-            position={"relative"}
+          <Heading
+            fontFamily={"Montserrat Variable"}
+            size={"4xl"}
+            textAlign={"center"}
+            w={"80%"}
           >
-            <AutoComplete
-              openOnFocus
-              value={asset}
-              onChange={(e) => setAsset(e)}
+            Supercharged Oracle For The Mina Protocol
+          </Heading>
+          <Text
+            fontFamily={"Source Code Pro Variable"}
+            fontSize={"2xl"}
+            width={"100%"}
+            textAlign={"center"}
+          >
+            <Box
+              as={"span"}
+              color={"#8c54ff"}
+              fontSize={"3xl"}
+              fontWeight={800}
             >
-              <Box
-                position={"absolute"}
-                top={0}
-                left={0}
-                borderRadius={10}
-                backgroundColor={"white"}
-                h={10}
-                w={"100%"}
-              ></Box>
-              <AutoCompleteInput
-                w={"100%"}
-                variant="filled"
-                placeholder="Select Asset"
-                color={"black"}
-              />
-              <AutoCompleteList>
-                {assets.map((asset, cid) => (
-                  <AutoCompleteItem
-                    key={`option-${cid}`}
-                    value={asset}
-                    color={"black"}
-                    textTransform="capitalize"
-                  >
-                    {asset}
-                  </AutoCompleteItem>
-                ))}
-              </AutoCompleteList>
-            </AutoComplete>
-          </FormControl>
+              Verifiable, Transparent.
+            </Box>
+            <br />
+            That's how we like our data feeds for the Mina Protocol.
+          </Text>
 
           <Button
-            colorScheme="orange"
-            position="absolute"
-            bottom={5}
-            onClick={handleSubmit}
-            fontFamily={"Source Code Pro Variable"}
+            alignItems={"center"}
+            justifyItems={"center"}
+            p={"5px 30px"}
+            borderRadius={20}
+            gap={2}
+            transition={"0.2s"}
+            _hover={{ gap: "5" }}
+            _active={{}}
+            background={
+              " linear-gradient(75deg, rgba(88,255,216,1) 16%, rgba(170,81,255,1) 100%);"
+            }
+            fontFamily={"Montserrat Variable"}
           >
-            RUN REQUEST
+            <Text fontWeight={"bold"}>TRY DOOT</Text>
+            <FaArrowRightLong />
           </Button>
         </Flex>
-        {/* Result Window */}
-        <Flex
-          direction={"column"}
-          h={400}
-          w={"50%"}
-          fontFamily={"Source Code Pro Variable"}
-        >
+
+        {/* Features */}
+        <Flex direction={"column"} align={"center"}>
+          <Heading size={"lg"} fontFamily={"Source Code Pro Variable"}>
+            for@developers:~${" "}
+            <Box
+              animation={`${blinking} 1.2s step-start infinite`}
+              display={"inline "}
+              color={"#00ff90"}
+            >
+              _
+            </Box>
+          </Heading>
+          <Text fontSize={"xl"} fontFamily={"Source Code Pro Variable"}>
+            Who prioritize transparency, accuracy and verifiability.
+          </Text>
+
           <Flex
-            gap={2}
-            background={
-              "linear-gradient(190deg, rgba(23,0,44,1) 0%, #5126a9 100%)"
-            }
-            p={3}
-            borderTopRadius={10}
+            direction={"row"}
+            padding={"50px 180px"}
+            gap={5}
+            // on
+            // animation={`${slideIn} 1s ease-in-out forwards`}
           >
-            <Box
-              borderRadius={"50%"}
-              boxSize={3}
-              backgroundColor={"green.300"}
-            ></Box>
-            <Box
-              borderRadius={"50%"}
-              boxSize={3}
-              backgroundColor={"orange"}
-            ></Box>
-            <Box borderRadius={"50%"} boxSize={3} backgroundColor={"red"}></Box>
+            <InformationCard>
+              <GiAllSeeingEye size={100} />
+              <Heading textAlign={"center"} fontFamily={"Montserrat Variable"}>
+                Asset Prices
+              </Heading>
+              <Text fontSize={20} textAlign={"center"}>
+                Comprehensive Mina-compatible price reference feeds encompassing
+                over 10 assets, currently operational on Berkeley Testnet,
+                ensuring availability and thorough testing for robustness.
+              </Text>
+            </InformationCard>
+            <Spacer />
+            <InformationCard>
+              <MdOutlineJoinInner size={100} />
+              <Heading textAlign={"center"} fontFamily={"Montserrat Variable"}>
+                Aggregated
+              </Heading>
+              <Text fontSize={20} textAlign={"center"}>
+                Pooling insights from diverse sources, our curated aggregation
+                method ensures a precise, unadulterated stream of information.
+                This allows us to leave no room for manipulation or failure.
+              </Text>
+            </InformationCard>
+            <Spacer />
+            <InformationCard>
+              <MdOutlineCleaningServices size={100} />
+              <Heading textAlign={"center"} fontFamily={"Montserrat Variable"}>
+                Filtered
+              </Heading>
+              <Text fontSize={20} textAlign={"center"}>
+                We meticulously eliminate outliers to extract the authentic
+                value, ensuring a signal devoid of disruptive noise that might
+                otherwise yield inaccurate outcomes.
+              </Text>
+            </InformationCard>
+          </Flex>
+        </Flex>
+
+        {/* Testing  */}
+        <Flex direction={"column"}>
+          <Flex direction={"column"} alignItems={"left"}>
+            <Flex ml={200} direction={"row"} align={"center"} gap={5}>
+              <Box
+                background={
+                  "linear-gradient(90deg, #6c35de 0%,rgba(23,0,44,1) 100%)"
+                }
+                w={200}
+                h={5}
+              ></Box>
+              <Heading
+                letterSpacing={2}
+                size={"3xl"}
+                fontFamily={"montserrat  Variable"}
+              >
+                TEST DOOT
+              </Heading>
+            </Flex>{" "}
+            <Heading
+              letterSpacing={2}
+              size={"3xl"}
+              fontFamily={"montserrat Variable"}
+              ml={200}
+            >
+              DATA FEEDS
+            </Heading>
           </Flex>
 
           <Flex
-            backgroundColor="#2c0055"
-            borderBottomRadius={10}
-            p="0 20px 20px 20px"
-            h={"100%"}
+            direction={"row"}
+            align={"center"}
+            justify={"center"}
+            mt={50}
+            gap={5}
           >
             <Flex
-              maxW={"100%"}
-              borderRadius={10}
-              backgroundColor={"#3f007a"}
+              background={"linear-gradient(120deg,#2c0055 0%, #5126a9 100%)"}
               direction={"column"}
-              w={"100%"}
+              borderRadius={10}
+              p={5}
+              minH={400}
+              w={"22%"}
+              pos={"relative"}
+            >
+              <Text fontSize={25}>Choose the asset and run the data feed.</Text>
+
+              <FormControl
+                fontFamily={"Source Code Pro Variable"}
+                mt={5}
+                position={"relative"}
+              >
+                <AutoComplete
+                  openOnFocus
+                  value={asset}
+                  onChange={(e) => setAsset(e)}
+                >
+                  <Box
+                    position={"absolute"}
+                    top={0}
+                    left={0}
+                    borderRadius={10}
+                    backgroundColor={"white"}
+                    h={10}
+                    w={"100%"}
+                  ></Box>
+                  <AutoCompleteInput
+                    w={"100%"}
+                    variant="filled"
+                    placeholder="Select Asset"
+                    color={"black"}
+                  />
+                  <AutoCompleteList>
+                    {assets.map((asset, cid) => (
+                      <AutoCompleteItem
+                        key={`option-${cid}`}
+                        value={asset}
+                        color={"black"}
+                        textTransform="capitalize"
+                      >
+                        {asset}
+                      </AutoCompleteItem>
+                    ))}
+                  </AutoCompleteList>
+                </AutoComplete>
+              </FormControl>
+
+              <Button
+                backgroundColor={"#00eab1"}
+                position="absolute"
+                bottom={5}
+                onClick={handleSubmit}
+                fontFamily={"Source Code Pro Variable"}
+                _hover={{
+                  backgroundColor: "#00bc8f",
+                }}
+              >
+                RUN REQUEST
+              </Button>
+            </Flex>
+            {/* Result Window */}
+            <Flex
+              direction={"column"}
+              h={400}
+              w={"50%"}
+              fontFamily={"Source Code Pro Variable"}
             >
               <Flex
-                direction={"row"}
-                borderBottom={"2px solid white"}
-                p={5}
-                pt={7}
-                pl={5}
-                gap={20}
-                ml={10}
-                mr={10}
+                gap={2}
+                background={
+                  "linear-gradient(190deg, rgba(23,0,44,1) 0%, #5126a9 100%)"
+                }
+                p={3}
+                borderTopRadius={10}
               >
                 <Box
-                  cursor={"pointer"}
-                  onClick={() => {
-                    setMode("res");
-                  }}
-                  fontWeight={mode == "res" ? 700 : 500}
-                >
-                  Response
-                </Box>
+                  borderRadius={"50%"}
+                  boxSize={3}
+                  backgroundColor={"green.300"}
+                ></Box>
                 <Box
-                  cursor={"pointer"}
-                  onClick={() => {
-                    setMode("req");
-                  }}
-                  fontWeight={mode == "req" ? 700 : 500}
-                >
-                  API Endpoint
-                </Box>
+                  borderRadius={"50%"}
+                  boxSize={3}
+                  backgroundColor={"orange"}
+                ></Box>
+                <Box
+                  borderRadius={"50%"}
+                  boxSize={3}
+                  backgroundColor={"red"}
+                ></Box>
               </Flex>
-              <Flex p={10} fontWeight={800}>
-                <Text
+
+              <Flex
+                backgroundColor="#2c0055"
+                borderBottomRadius={10}
+                p="0 20px 20px 20px"
+                h={"100%"}
+              >
+                <Flex
                   maxW={"100%"}
-                  hidden={mode == "req"}
-                  dangerouslySetInnerHTML={{
-                    __html: result,
-                  }}
-                ></Text>
-                <Text maxW={"100%"} hidden={mode == "res"}>
-                  {`https://doot.foundation/api/get/getPrice?token=${asset}`}
-                </Text>
+                  borderRadius={10}
+                  backgroundColor={"#3f007a"}
+                  direction={"column"}
+                  w={"100%"}
+                >
+                  <Flex
+                    direction={"row"}
+                    borderBottom={"2px solid white"}
+                    p={5}
+                    pt={7}
+                    pl={5}
+                    gap={20}
+                    ml={10}
+                    mr={10}
+                  >
+                    <Box
+                      cursor={"pointer"}
+                      onClick={() => {
+                        setMode("res");
+                      }}
+                      fontWeight={mode == "res" ? 900 : 500}
+                      color={"#0ce1ae"}
+                    >
+                      Response
+                    </Box>
+                    <Box
+                      cursor={"pointer"}
+                      onClick={() => {
+                        setMode("req");
+                      }}
+                      fontWeight={mode == "req" ? 900 : 500}
+                      color={"#0ce1ae"}
+                    >
+                      API Endpoint
+                    </Box>
+                  </Flex>
+                  <Flex p={10} fontWeight={800}>
+                    <Text
+                      maxW={"100%"}
+                      hidden={mode == "req"}
+                      dangerouslySetInnerHTML={{
+                        __html: result,
+                      }}
+                    ></Text>
+                    <Text maxW={"100%"} hidden={mode == "res"}>
+                      {`https://doot.foundation/api/get/getPrice?token=${asset}`}
+                    </Text>
+                  </Flex>
+                </Flex>
               </Flex>
             </Flex>
           </Flex>
