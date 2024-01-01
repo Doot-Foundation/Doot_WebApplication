@@ -33,7 +33,9 @@ export default async function handler(req, res) {
   await supabase.auth.signOut();
 
   if (cachedData) {
-    return res.status(200).json({ price: cachedData });
+    return res
+      .status(200)
+      .json({ price: cachedData, asset: token, timestamp: Date.now() });
   } else {
     return res.status(404).json({ message: "Cached data not found." });
   }

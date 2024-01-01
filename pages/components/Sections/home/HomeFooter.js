@@ -49,7 +49,9 @@ export default function HomeFooter() {
       <Flex direction={"column"} p={10} gap={2}>
         <Flex direction={"row"} align={"center"} gap={4}>
           <Image src="/static/images/Doot.png" boxSize={10} />
-          <Heading size={"lg"}>Doot</Heading>
+          <Heading size={"lg"} fontFamily={"Montserrat Variable"}>
+            Doot
+          </Heading>
           <Spacer />
           <Link
             href="https://zkignite.minaprotocol.com/zkignite/dev4dev/refineproposals/suggestion/567/detail"
