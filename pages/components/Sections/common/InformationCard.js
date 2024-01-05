@@ -11,10 +11,10 @@ export default function InformationCard({ children }) {
         pb={10}
         pl={5}
         pr={5}
-        w={"35%"}
+        maxW={"30%"}
         bg={`linear-gradient(0deg, rgba(5,3,0,1) 0%, rgba(45,0,88,1) 100%)`}
         borderRadius={10}
-        transition={"1s"}
+        transition={"0.5s"}
         border="2px solid #a364ff"
         boxShadow="10px 10px 2px #6c35de"
         _hover={{

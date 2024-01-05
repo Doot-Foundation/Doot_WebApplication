@@ -2,7 +2,8 @@ const MAIL = process.env.SUPABASE_USER;
 const PASS = process.env.SUPABASE_USER_PASS;
 
 import { supabase } from "../../utils/helper/InitSupabase.js";
-import { Field, Poseidon, PublicKey } from "o1js";
+
+import { v4 as uuidv4 } from "uuid";
 
 export default async function handler(req, res) {
   const { address } = req.query;
@@ -28,16 +29,11 @@ export default async function handler(req, res) {
     return;
   }
 
-  const salt = Field.from(Math.floor(Math.random() * 10000000000420));
-  const salt_hash = Poseidon.hash([salt]);
-  const fields_hash = Poseidon.hash(PublicKey.fromBase58(address).toFields());
-  const finalRandomness = Poseidon.hash([salt_hash, fields_hash])
-    .toString()
-    .padEnd(77, "0");
-
+  const assignedKey = uuidv4();
   await supabase
     .from("Auro_Login")
-    .insert([{ address: address, generated_key: finalRandomness }]);
+    .insert([{ address: address, generated_key: assignedKey }]);
+
   await supabase.auth.signOut();
 
   res.status(201).json({ message: "Created." });

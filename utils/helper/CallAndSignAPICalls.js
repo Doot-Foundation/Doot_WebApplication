@@ -1,11 +1,9 @@
 const axios = require("axios");
 const _ = require("lodash");
 
-const privateKey = process.env.ORACLE_KEY;
+const ORACLE_KEY = process.env.ORACLE_KEY;
 
-const Client = require("mina-signer");
-const client = new Client({ network: "testnet" });
-
+const { signatureClient } = require("./SignatureClient");
 const { CircuitString } = require("o1js");
 
 const { MULTIPLICATION_FACTOR } = require("../constants/info");
@@ -62,7 +60,7 @@ async function callSignAPICall(url, resultPath, headerName) {
   const fieldTimestamp = BigInt(Timestamp);
   const fieldPriceGenerationId = BigInt(1);
 
-  const signature = client.signFields(
+  const signature = signatureClient.signFields(
     [
       fieldURL,
       fieldPrice,
@@ -70,10 +68,16 @@ async function callSignAPICall(url, resultPath, headerName) {
       fieldTimestamp,
       fieldPriceGenerationId,
     ],
-    privateKey
+    ORACLE_KEY
   );
 
-  return [Price, Timestamp, signature.signature];
+  /// The data field is a BigInt and it gives TypeError: Do not know how to serialize a BigInt
+  /// at JSON.stringify (<anonymous>) when passing the final result as the response.
+  var JsonCompatibleSignature = {};
+  JsonCompatibleSignature["signature"] = signature.signature;
+  JsonCompatibleSignature["publicKey"] = signature.publicKey;
+  JsonCompatibleSignature["data"] = signature.data[0].toString();
+  return [Price, Timestamp, JsonCompatibleSignature, url];
 }
 
-module.exports = { callSignAPICall };
+module.exports = { callSignAPICall, processFloatString };

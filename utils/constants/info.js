@@ -8,6 +8,8 @@ const TOKEN_TO_CACHE = {
   bitcoin: "btc_cache",
 };
 
+const DOOT_ADDRESS = "";
+
 module.exports = {
   MULTIPLICATION_FACTOR,
   TOKEN_TO_CACHE,

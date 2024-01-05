@@ -1,4 +1,4 @@
-import { getCache } from "../../../utils/helper/CacheHandler.js";
+import { getAssetCache } from "../../../utils/helper/CacheHandler.js";
 
 const KEY = process.env.NEXT_PUBLIC_API_INTERFACE_KEY;
 
@@ -15,14 +15,14 @@ export default async function handler(req, res) {
     return;
   }
 
-  const cachedData = await getCache(token.toLowerCase());
+  const cachedData = await getAssetCache(token.toLowerCase());
   console.log(token);
   console.log(cachedData);
 
   if (cachedData) {
     return res
       .status(200)
-      .json({ Price: cachedData, Asset: token, Timestamp: Date.now() });
+      .json({ information: cachedData, asset: token, timestamp: Date.now() });
   } else {
     return res.status(404).json({ message: "Cached data not found." });
   }

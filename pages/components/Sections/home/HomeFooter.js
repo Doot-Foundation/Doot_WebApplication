@@ -13,6 +13,10 @@ import { CgArrowTopRight } from "react-icons/cg";
 import Link from "next/link";
 
 export default function HomeFooter() {
+  function sendEmail() {
+    window.location.href = "mailto:contact@doot.foundation";
+  }
+
   return (
     <>
       <Flex direction={"column"} gap={10} h={"fit-content"} mb={20}>
@@ -30,6 +34,7 @@ export default function HomeFooter() {
             fontFamily={"Source Code Pro Variable"}
             colorScheme="yellow"
             borderRadius={20}
+            onClick={sendEmail}
           >
             Contact Us
           </Button>
@@ -73,16 +78,15 @@ export default function HomeFooter() {
                 <RiGithubFill size={40} />
               </Box>
             </Link>{" "}
-            <Link href={"https://x.com/DootFoundation"} target="_blank">
-              <Box
-                borderRadius={"50%"}
-                border={"3px solid white"}
-                p={2}
-                bgColor={"#0a0a0a"}
-              >
-                <LuMailPlus size={40} />
-              </Box>
-            </Link>
+            <Box
+              cursor={"pointer"}
+              borderRadius={"50%"}
+              border={"3px solid white"}
+              p={2}
+              bgColor={"#0a0a0a"}
+            >
+              <LuMailPlus size={40} onClick={sendEmail} />
+            </Box>
           </Flex>
         </Flex>
         <Flex direction={"row"}>
@@ -132,9 +136,11 @@ export default function HomeFooter() {
                 Learn
               </Heading>
               <Flex direction={"column"} gap={2} color={"purple.100 "}>
-                <Link href="docs">Docs</Link>
-                <Link href="github">Github</Link>
-                <Link href="proposal">Proposal</Link>
+                <Link href="#">Docs</Link>
+                <Link href="https://github.com/Doot-Foundation">Github</Link>
+                <Link href="https://zkignite.minaprotocol.com/zkignite/dev4dev/refineproposals/suggestion/567/detail">
+                  Proposal
+                </Link>
               </Flex>
             </Flex>{" "}
             <Flex direction={"column"}>
@@ -147,7 +153,7 @@ export default function HomeFooter() {
                 Links
               </Heading>
               <Flex direction={"column"} gap={2} color={"purple.100 "}>
-                <Link href="/home">Home</Link>
+                <Link href="/">Home</Link>
                 <Link href="/feeds">Feeds</Link>
                 <Link href="/dashboard">Dashboard</Link>
               </Flex>
@@ -162,8 +168,10 @@ export default function HomeFooter() {
                 Contact
               </Heading>
               <Flex direction={"column"} gap={2} color={"purple.100 "}>
-                <Link href="ttwttier">Twitter</Link>
-                <Link href="email">Email</Link>
+                <Link href="https://x.com/DootFoundation">Twitter</Link>
+                <Link href="" onClick={sendEmail}>
+                  Email
+                </Link>
               </Flex>
             </Flex>
           </Flex>

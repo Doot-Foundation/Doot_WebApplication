@@ -25,3 +25,5 @@ export default async function handler(
 
   // res.status(200).json({ KEY: oracle_key.toBase58(), PUBLIC: oracle_public });
 }
+
+//LATEST MINA TRACKING UPDATED EVERY 2 HOURS - QmXqNayv2p92R4kVPQHi1rVpH18SW6wQjBdzjYSZKP7JoQ

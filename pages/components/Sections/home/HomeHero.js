@@ -6,6 +6,7 @@ import {
   Text,
   Button,
   FormControl,
+  Link,
 } from "@chakra-ui/react";
 
 import { keyframes } from "@emotion/react";
@@ -18,6 +19,8 @@ import { GiAllSeeingEye } from "react-icons/gi";
 import { MdOutlineJoinInner } from "react-icons/md";
 import { MdOutlineCleaningServices } from "react-icons/md";
 import { FaArrowRightLong } from "react-icons/fa6";
+import { GoVerified } from "react-icons/go";
+import { LuPartyPopper } from "react-icons/lu";
 
 import InformationCard from "../common/InformationCard";
 
@@ -75,7 +78,7 @@ export default function HomeHero() {
     Object.keys(obj).forEach((key) => {
       const value = obj[key];
       console.log(key, value);
-      formattedString += `&nbsp;&nbsp;&nbsp;&nbsp;${key}:<span style='color:orange;'>${value}</span>,<br>`;
+      formattedString += `&nbsp;&nbsp;&nbsp;&nbsp;${key} : <span style='color:orange;'>${value}</span>,<br>`;
     });
     formattedString += `<span style='color:yellow;'>}</span>`;
 
@@ -117,40 +120,44 @@ export default function HomeHero() {
               Verifiable, Transparent.
             </Box>
             <br />
-            That's how we like our data feeds for the Mina Protocol.
+            That's how we like our asset feeds for the Mina Protocol.
           </Text>
           <Flex gap={5}>
-            <Button
-              alignItems={"center"}
-              justifyItems={"center"}
-              p={"5px 30px"}
-              borderRadius={20}
-              gap={2}
-              transition={"0.2s"}
-              _hover={{ gap: "5" }}
-              _active={{}}
-              background={
-                " linear-gradient(75deg, rgba(88,255,216,1) 16%, rgba(170,81,255,1) 100%);"
-              }
-              fontFamily={"Montserrat Variable"}
-            >
-              <Text fontWeight={"bold"}>TRY DOOT</Text>
-              <FaArrowRightLong />
-            </Button>{" "}
-            <Button
-              alignItems={"center"}
-              justifyItems={"center"}
-              p={"5px 30px"}
-              borderRadius={20}
-              gap={2}
-              transition={"0.2s"}
-              _hover={{ gap: "5" }}
-              _active={{}}
-              fontFamily={"Montserrat Variable"}
-            >
-              <Text fontWeight={"bold"}>Learn More</Text>
-              <FaArrowRightLong />
-            </Button>
+            <Link href="https://docs.doot.foundation/" target="_blank">
+              <Button
+                alignItems={"center"}
+                justifyItems={"center"}
+                p={"5px 30px"}
+                borderRadius={20}
+                gap={2}
+                transition={"0.2s"}
+                _hover={{ gap: "5" }}
+                _active={{}}
+                background={
+                  " linear-gradient(75deg, rgba(88,255,216,1) 16%, rgba(170,81,255,1) 100%);"
+                }
+                fontFamily={"Montserrat Variable"}
+              >
+                <Text fontWeight={"bold"}>TRY DOOT</Text>
+                <FaArrowRightLong />
+              </Button>
+            </Link>
+            <Link href="https://docs.doot.foundation/" target="_blank">
+              <Button
+                alignItems={"center"}
+                justifyItems={"center"}
+                p={"5px 30px"}
+                borderRadius={20}
+                gap={2}
+                transition={"0.2s"}
+                _hover={{ gap: "5" }}
+                _active={{}}
+                fontFamily={"Montserrat Variable"}
+              >
+                <Text fontWeight={"bold"}>Learn More</Text>
+                <FaArrowRightLong />
+              </Button>
+            </Link>
           </Flex>
         </Flex>
 
@@ -166,44 +173,58 @@ export default function HomeHero() {
               _
             </Box>
           </Heading>
-          <Text fontSize={"xl"} fontFamily={"Source Code Pro Variable"}>
+          <Text fontSize={"xl"}>
             Who prioritize transparency, accuracy and verifiability.
           </Text>
 
           <Flex
             direction={"row"}
-            padding={"50px 180px"}
+            padding={"0px 140px"}
             gap={5}
+            mt={10}
             // on
             // animation={`${slideIn} 1s ease-in-out forwards`}
           >
             <InformationCard>
               <GiAllSeeingEye size={100} />
-              <Heading textAlign={"center"} fontFamily={"Montserrat Variable"}>
+              <Heading
+                textAlign={"center"}
+                fontFamily={"Manrope Variable"}
+                fontWeight={900}
+              >
                 Asset Prices
               </Heading>
               <Text fontSize={20} textAlign={"center"}>
-                Comprehensive Mina-compatible price reference feeds encompassing
-                over 10 assets, currently operational on Berkeley Testnet,
-                ensuring availability and thorough testing for robustness.
+                Mina-compatible asset feeds readily available for developers,
+                tracking several prominent assets. The accuracy of our final
+                results extends up to ten decimal places, providing developers
+                with highly precise data.
               </Text>
             </InformationCard>
             <Spacer />
             <InformationCard>
               <MdOutlineJoinInner size={100} />
-              <Heading textAlign={"center"} fontFamily={"Montserrat Variable"}>
+              <Heading
+                textAlign={"center"}
+                fontFamily={"Manrope Variable"}
+                fontWeight={900}
+              >
                 Aggregated
               </Heading>
               <Text fontSize={20} textAlign={"center"}>
                 Pooling insights from diverse sources, our curated aggregation
-                method ensures a precise, unadulterated stream of information.
-                This allows us to leave no room for manipulation or failure.
+                method ensures an unadulterated stream of information. This
+                allows us to leave no room for manipulation or failure.
               </Text>
             </InformationCard>
             <Spacer />
             <InformationCard>
               <MdOutlineCleaningServices size={100} />
-              <Heading textAlign={"center"} fontFamily={"Montserrat Variable"}>
+              <Heading
+                textAlign={"center"}
+                fontFamily={"Manrope Variable"}
+                fontWeight={900}
+              >
                 Filtered
               </Heading>
               <Text fontSize={20} textAlign={"center"}>
@@ -213,12 +234,51 @@ export default function HomeHero() {
               </Text>
             </InformationCard>
           </Flex>
+          <Flex direction={"row"} p={"50px"} justify={"center"} gap={10}>
+            <InformationCard>
+              <GoVerified size={100} strokeWidth={1} />
+              <Heading
+                textAlign={"center"}
+                fontFamily={"Manrope Variable"}
+                fontWeight={900}
+              >
+                Verify
+              </Heading>
+              <Text textAlign={"center"}>
+                Every phase of our process is publically accessible, providing
+                transparency and enabling independent verification.
+                <br />
+                Individuals interested in validating the computed can use our
+                intuitive user interface. Additionally, they can also leverage
+                the smart contracts deployed on the Mina's Berkeley Testnet for
+                further verification.
+              </Text>
+            </InformationCard>
+            <InformationCard>
+              <LuPartyPopper size={100} />
+              <Heading
+                textAlign={"center"}
+                fontFamily={"Manrope Variable"}
+                fontWeight={900}
+              >
+                Much More
+              </Heading>
+              <Text textAlign={"center"}>
+                We are commited to help streamline the developer experience for
+                Oracles on the Mina Protocol and let them focus on what matters
+                the most. In line with this objective, we are continuously
+                evolving and refining our offerings. Over the coming months, we
+                anticipate unveiling numerous exciting features and improvements
+                that will enhance the overall developer experience.
+              </Text>
+            </InformationCard>
+          </Flex>
         </Flex>
 
         {/* Testing  */}
         <Flex direction={"column"}>
           <Flex direction={"column"} alignItems={"left"}>
-            <Flex ml={200} direction={"row"} align={"center"} gap={5}>
+            <Flex ml={200} direction={"row"} align={"center"} gap={10}>
               <Box
                 background={
                   "linear-gradient(90deg, #6c35de 0%,rgba(23,0,44,1) 100%)"
@@ -227,7 +287,7 @@ export default function HomeHero() {
                 h={5}
               ></Box>
               <Heading
-                letterSpacing={2}
+                letterSpacing={3}
                 size={"3xl"}
                 fontFamily={"Montserrat Variable"}
               >
@@ -235,12 +295,12 @@ export default function HomeHero() {
               </Heading>
             </Flex>{" "}
             <Heading
-              letterSpacing={2}
+              letterSpacing={3}
               size={"3xl"}
               fontFamily={"Montserrat Variable"}
               ml={200}
             >
-              DATA FEEDS
+              ASSET FEEDS
             </Heading>
           </Flex>
 
@@ -260,7 +320,9 @@ export default function HomeHero() {
               w={"22%"}
               pos={"relative"}
             >
-              <Text fontSize={25}>Choose the asset and run the data feed.</Text>
+              <Text fontSize={25}>
+                Choose the asset and run the asset feed.
+              </Text>
 
               <FormControl
                 fontFamily={"Source Code Pro Variable"}

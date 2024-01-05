@@ -1,17 +1,36 @@
 const { TOKEN_TO_CACHE } = require("../constants/info");
-
 const NodeCache = require("node-cache");
-const PRICE_CACHE = new NodeCache();
 
-async function updateCache(token, price) {
+const ASSET_CACHE = new NodeCache({ stdTTL: 0 });
+// The historical cache will be called every 5 minutes and reference the ASSET_CACHE to
+// get information about the available assets.
+
+// The tracking cache will be called every 2 hours and reference the ASSET_CACHE to
+// get information and upload the information accordingly to Mina contracts and IPFS.\
+const HISTORICAL_CACHE = new NodeCache({ stdTTL: 600 });
+
+async function updateAssetCache(token, obj) {
   const key = TOKEN_TO_CACHE[token];
-  PRICE_CACHE.set(key, price);
+  ASSET_CACHE.set(key, obj);
 }
 
-async function getCache(token) {
+async function getAssetCache(token) {
   const key = TOKEN_TO_CACHE[token] || "NA";
   if (key == "NA") return 0;
-  return PRICE_CACHE.get(key);
+  return ASSET_CACHE.get(key);
 }
 
-module.exports = { updateCache, getCache };
+async function updateHistoricalCache(cid) {
+  HISTORICAL_CACHE.set("cid", cid);
+}
+
+async function getHistoricalCache() {
+  return HISTORICAL_CACHE.get("cid");
+}
+
+module.exports = {
+  updateAssetCache,
+  getAssetCache,
+  updateHistoricalCache,
+  getHistoricalCache,
+};

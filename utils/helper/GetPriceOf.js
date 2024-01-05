@@ -1,4 +1,11 @@
-const { callSignAPICall } = require("./CallAndSignAPICalls");
+const {
+  callSignAPICall,
+  processFloatString,
+} = require("./CallAndSignAPICalls");
+const { updateAssetCache } = require("./CacheHandler");
+
+const ORACLE_KEY = process.env.ORACLE_KEY;
+const { signatureClient } = require("./SignatureClient");
 
 import {
   CoinGekoSymbols,
@@ -18,7 +25,7 @@ async function getPriceCoinGecko(token) {
   const id = CoinGekoSymbols[token.toLowerCase()];
   const apiToCall = `https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=usd`;
   const resultPath = `data[${id}].usd`;
-  /// [Price, Timestamp, Signature]
+  /// [Price, Timestamp, Signature, Url]
   try {
     const results = await callSignAPICall(apiToCall, resultPath, "");
     return results;
@@ -188,13 +195,14 @@ function getMAD(array) {
 }
 
 // MODIFIED Z-SCORE OUTLIER MECHANISM
-async function removeOutliers(array, timestamps, signatures, threshold) {
+async function removeOutliers(array, timestamps, signatures, urls, threshold) {
   const median = getMedian(array);
   const mad = getMAD(array);
 
   var nonOutlierPrices = [];
   var nonOutlierTimestamps = [];
   var nonOutlierSignatures = [];
+  var nonOutlierUrls = [];
 
   for (let i = 0; i < array.length; i++) {
     if (isNaN(Number(array[i]))) continue;
@@ -204,13 +212,19 @@ async function removeOutliers(array, timestamps, signatures, threshold) {
       nonOutlierPrices.push(array[i]);
       nonOutlierTimestamps.push(timestamps[i]);
       nonOutlierSignatures.push(signatures[i]);
+      nonOutlierUrls.push(urls[i]);
     }
   }
 
-  return [nonOutlierPrices, nonOutlierSignatures];
+  return [
+    nonOutlierPrices,
+    nonOutlierSignatures,
+    nonOutlierTimestamps,
+    nonOutlierUrls,
+  ];
 }
 
-async function createPriceArray(token) {
+async function createAssetInfoArray(token) {
   const functions = [
     getPriceBinance,
     getPriceCMC,
@@ -228,6 +242,7 @@ async function createPriceArray(token) {
   var priceArray = [];
   var timestampArray = [];
   var signatureArray = [];
+  var urlArray = [];
 
   for (const func of functions) {
     const results = await func(token);
@@ -237,6 +252,7 @@ async function createPriceArray(token) {
       priceArray.push(floatValue);
       timestampArray.push(results[1]);
       signatureArray.push(results[2]);
+      urlArray.push(results[3]);
     }
   }
 
@@ -244,6 +260,7 @@ async function createPriceArray(token) {
     priceArray,
     timestampArray,
     signatureArray,
+    urlArray,
     2
   );
   return arrays;
@@ -251,7 +268,7 @@ async function createPriceArray(token) {
 
 async function getPriceOf(token) {
   console.log(token);
-  const results = await createPriceArray(token);
+  const results = await createAssetInfoArray(token);
 
   console.log(results);
 
@@ -267,9 +284,32 @@ async function getPriceOf(token) {
     resolve();
   });
 
-  const floatValue = parseFloat(sum / count);
-  console.log(floatValue, "\n");
-  return floatValue;
+  const meanPrice = parseFloat(sum / count);
+
+  const processedPrice = processFloatString(meanPrice);
+  const signedPrice = signatureClient.signFields(
+    [BigInt(processedPrice)],
+    ORACLE_KEY
+  );
+  var jsonCompatibleSignature = {};
+  jsonCompatibleSignature["signature"] = signedPrice.signature;
+  jsonCompatibleSignature["publicKey"] = signedPrice.publicKey;
+  jsonCompatibleSignature["data"] = signedPrice.data[0].toString();
+
+  const assetCacheObject = {
+    price: processedPrice,
+    decimals: 10,
+    signature: jsonCompatibleSignature,
+    urls: results[3],
+    prices_returned: results[0],
+    timestamps: results[2],
+    signatures: results[1],
+  };
+
+  await updateAssetCache(token, assetCacheObject);
+
+  console.log(meanPrice, processedPrice, "\n");
+  return meanPrice;
 }
 
 module.exports = getPriceOf;

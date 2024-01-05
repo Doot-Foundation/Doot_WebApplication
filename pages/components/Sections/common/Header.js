@@ -16,7 +16,8 @@ export default function Header() {
               _hover={{ color: "#94ffe5", cursor: "pointer" }}
             >
               <Link
-                href="/docs"
+                href="https://docs.doot.foundation/"
+                target="_blank"
                 _hover={{
                   textDecoration: "none",
                 }}
