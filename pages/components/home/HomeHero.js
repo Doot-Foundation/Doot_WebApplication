@@ -22,7 +22,7 @@ import { FaArrowRightLong } from "react-icons/fa6";
 import { GoVerified } from "react-icons/go";
 import { LuPartyPopper } from "react-icons/lu";
 
-import InformationCard from "../common/InformationCard";
+import InformationCard from "../common/InformationCardx";
 
 import {
   AutoComplete,
@@ -58,8 +58,15 @@ export default function HomeHero() {
           headers: headers,
         }
       );
-      console.log(response.data);
-      const finalString = await formatString(response.data);
+      console.log(response.data.information);
+      const finalObj = {
+        asset: response.data.asset,
+        price: response.data.information.price,
+        decimals: 10,
+        timestamp: response.data.timestamp,
+      };
+
+      const finalString = await formatString(finalObj);
       setResult(finalString);
     } catch (error) {
       console.error("Error fetching price:", error);
@@ -234,7 +241,14 @@ export default function HomeHero() {
               </Text>
             </InformationCard>
           </Flex>
-          <Flex direction={"row"} p={"50px"} justify={"center"} gap={10}>
+          <Flex
+            direction={"row"}
+            mt={10}
+            mb={10}
+            p={"0px 100px"}
+            justify={"center"}
+            gap={10}
+          >
             <InformationCard>
               <GoVerified size={100} strokeWidth={1} />
               <Heading
@@ -261,15 +275,14 @@ export default function HomeHero() {
                 fontFamily={"Manrope Variable"}
                 fontWeight={900}
               >
-                Much More
+                Much More!
               </Heading>
               <Text textAlign={"center"}>
                 We are commited to help streamline the developer experience for
                 Oracles on the Mina Protocol and let them focus on what matters
-                the most. In line with this objective, we are continuously
-                evolving and refining our offerings. Over the coming months, we
-                anticipate unveiling numerous exciting features and improvements
-                that will enhance the overall developer experience.
+                the most. In line with this objective, over the coming months,
+                we anticipate unveiling numerous exciting features and
+                improvements that will enhance the overall developer experience.
               </Text>
             </InformationCard>
           </Flex>

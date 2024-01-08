@@ -1,8 +1,8 @@
 import { Link, Flex, Image, Spacer } from "@chakra-ui/react";
-import ConnectButton from "./ConnectButton";
+import ConnectButton from "../common/ConnectButton";
 import { CgArrowTopRight } from "react-icons/cg";
 
-export default function Header() {
+export default function HomeHeader() {
   return (
     <>
       <Flex p="5% 7%">

@@ -6,8 +6,8 @@ import WalletError from "./WalletError";
 import { useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
-import { updateSigner } from "../../../../lib/redux/signerSlice";
-import { updateChain } from "../../../../lib/redux/chainSlice";
+import { updateSigner } from "../../../lib/redux/signerSlice";
+import { updateChain } from "../../../lib/redux/chainSlice";
 
 export default function ConnectButton() {
   const dispatch = useDispatch();
