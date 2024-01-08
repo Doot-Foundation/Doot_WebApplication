@@ -1,7 +1,9 @@
-import { Box, Flex, Heading, Text, Link } from "@chakra-ui/react";
+import { Box, Flex, Heading, Text } from "@chakra-ui/react";
 
-export default function FeedsHero({ page }) {
-  console.log(page);
+import TokenDescriptionBox from "./TokenDescriptionBox";
+import { SUPPORTED_TOKENS } from "../../../utils/constants/info";
+
+export default function FeedsHero() {
   return (
     <>
       <Box
@@ -23,6 +25,11 @@ export default function FeedsHero({ page }) {
           </Flex>
           <Flex>
             <Heading fontFamily={"Montserrat Variable"}>Popular Assets</Heading>
+            <Flex direction={"column"} gap={5} mt={10}>
+              {SUPPORTED_TOKENS.map((token, index) => {
+                return <TokenDescriptionBox key={index} token={token} />;
+              })}
+            </Flex>
           </Flex>
         </Flex>
       </Box>

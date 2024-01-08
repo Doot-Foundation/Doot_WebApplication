@@ -10,7 +10,10 @@ const TOKEN_TO_CACHE = {
 
 const DOOT_ADDRESS = "";
 
+const SUPPORTED_TOKENS = ["MINA", "ETH", "BTC", "LINK", "SOL"];
+
 module.exports = {
   MULTIPLICATION_FACTOR,
   TOKEN_TO_CACHE,
+  SUPPORTED_TOKENS,
 };
