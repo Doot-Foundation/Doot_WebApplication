@@ -3,10 +3,7 @@ const PASS = process.env.SUPABASE_USER_PASS;
 
 import { supabase } from "../../../utils/helper/InitSupabase.js";
 
-import { validate as uuidValidate } from "uuid";
-
 export default async function handler(req, res) {
-  const authHeader = req.headers.authorization;
   const { address } = req.query;
 
   await supabase.auth.signInWithPassword({
@@ -16,19 +13,17 @@ export default async function handler(req, res) {
 
   const { data: select_data, error: select_error } = await supabase
     .from("Auro_Login")
-    .select("generated_key")
+    .select("address")
     .eq("address", address);
 
   await supabase.auth.signOut();
 
-  if (
-    select_data.length == 0 ||
-    !uuidValidate(authHeader.split(" ")[1]) ||
-    "Bearer " + select_data[0].generated_key != authHeader
-  ) {
-    res.status(200).json({ status: false });
+  if (select_data.length != 0) {
+    res.status(200).json({ status_message: "Address_Exists", status: 1 });
     return;
   } else {
-    res.status(200).json({ status: true });
+    res
+      .status(200)
+      .json({ status_message: "Address_Does_Not_Exist", status: 0 });
   }
 }

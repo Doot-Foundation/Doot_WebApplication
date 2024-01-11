@@ -36,5 +36,5 @@ export default async function handler(req, res) {
 
   await supabase.auth.signOut();
 
-  res.status(201).json({ message: "Created." });
+  res.status(201).json({ message: "Created.", key: assignedKey });
 }

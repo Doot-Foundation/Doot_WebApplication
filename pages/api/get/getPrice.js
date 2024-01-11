@@ -2,8 +2,8 @@ const MAIL = process.env.SUPABASE_USER;
 const PASS = process.env.SUPABASE_USER_PASS;
 
 import { supabase } from "../../../utils/helper/InitSupabase.js";
-import { getAssetCache } from "../../../utils/helper/CacheHandler.js";
-
+import { TOKEN_TO_CACHE } from "../../../utils/constants/info.js";
+import { redis } from "../../../utils/helper/InitRedis.js";
 import { validate as uuidValidate } from "uuid";
 
 export default async function handler(req, res) {
@@ -32,12 +32,14 @@ export default async function handler(req, res) {
     return;
   }
 
-  const cachedData = await getAssetCache(token.toLowerCase());
+  const cachedData = JSON.parse(
+    await redis.get(TOKEN_TO_CACHE[token.toLowerCase()])
+  );
 
   if (cachedData) {
     return res
       .status(200)
-      .json({ price: cachedData, asset: token, timestamp: Date.now() });
+      .json({ price: cachedData.data, asset: token, timestamp: Date.now() });
   } else {
     return res.status(404).json({ message: "Cached data not found." });
   }

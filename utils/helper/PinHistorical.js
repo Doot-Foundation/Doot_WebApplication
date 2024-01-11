@@ -1,28 +1,42 @@
 const axios = require("axios");
-const { updateHistoricalCache, getHistoricalCache } = require("./CacheHandler");
 
 const JWT = process.env.PINATA_JWT;
 const GATEWAY = process.env.PINATA_GATEWAY;
 
-export default async function pinHistoricalObject(latestPrices) {
-  const previousCID = await getHistoricalCache();
+export default async function pinHistoricalObject(previousCID, latestPrices) {
+  // const previousCID = await getHistoricalCache();
   const res = await axios.get(`https://${GATEWAY}/ipfs/${previousCID}`);
 
-  const previousObject = res.data;
-  const previousTimestamp = previousObject.latest.timestamp;
-  const previousPrices = previousObject.latest.prices;
-  const previousHistorical = previousObject.historical;
+  let toUploadObject;
+  let isFirst;
 
-  const updatedHistorical = previousHistorical;
-  updatedHistorical[previousTimestamp] = previousPrices;
+  if (!res.status || res.status >= 300 || !res.data) {
+    isFirst = true;
+    toUploadObject = {
+      latest: {
+        timestamp: Date.now(),
+        prices: latestPrices,
+      },
+      historical: {},
+    };
+  } else {
+    isFirst = false;
+    const previousObject = res.data;
+    const previousTimestamp = previousObject.latest.timestamp;
+    const previousPrices = previousObject.latest.prices;
+    const previousHistorical = previousObject.historical;
 
-  const toUploadObject = {
-    latest: {
-      timestamp: Date.now(),
-      prices: latestPrices,
-    },
-    historical: updatedHistorical,
-  };
+    const updatedHistorical = previousHistorical;
+    updatedHistorical[previousTimestamp] = previousPrices;
+
+    toUploadObject = {
+      latest: {
+        timestamp: Date.now(),
+        prices: latestPrices,
+      },
+      historical: updatedHistorical,
+    };
+  }
 
   const pinataMetadata = JSON.stringify({
     name: `historical_${Date.now()}.json`,
@@ -42,19 +56,22 @@ export default async function pinHistoricalObject(latestPrices) {
       upload_options
     );
     const updatedCID = upload_res.data.IpfsHash;
-    await updateHistoricalCache(updatedCID);
 
-    const delete_options = {
-      headers: {
-        accept: "application/json",
-        authorization: `Bearer ${JWT}`,
-      },
-    };
+    if (!isFirst) {
+      const delete_options = {
+        headers: {
+          accept: "application/json",
+          authorization: `Bearer ${JWT}`,
+        },
+      };
 
-    await axios.delete(
-      `https://api.pinata.cloud/pinning/unpin/${previousCID}`,
-      delete_options
-    );
+      await axios.delete(
+        `https://api.pinata.cloud/pinning/unpin/${previousCID}`,
+        delete_options
+      );
+    }
+
+    return updatedCID;
   } catch (error) {
     console.log(error);
   }

@@ -1,10 +1,11 @@
+const { TOKEN_TO_CACHE } = require("../../../utils/constants/info.js");
+const { redis } = require("../../../utils/helper/InitRedis.js");
 const getPriceOf = require("../../../utils/helper/GetPriceOf.js");
-const { updateAssetCache } = require("../../../utils/helper/CacheHandler.js");
 
 async function PriceOf(token) {
   return new Promise((resolve) => {
-    const value = getPriceOf(token);
-    resolve(value);
+    const results = getPriceOf(token);
+    resolve(results);
   });
 }
 
@@ -16,13 +17,13 @@ export default async function handler(req, res) {
   }
 
   const { token } = req.query;
-  const price = await PriceOf(token.toLowerCase());
+  const results = await PriceOf(token.toLowerCase());
 
-  // await updateAssetCache(token, price);
+  await redis.set(TOKEN_TO_CACHE[token], JSON.stringify(results[1]));
 
   res.status(200).json({
     status: `Updated ${token} Successfully!`,
-    price: price,
+    price: results[0],
     timestamp: Date.now(),
   });
 }

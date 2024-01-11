@@ -1,4 +1,5 @@
-import { getAssetCache } from "../../../utils/helper/CacheHandler.js";
+const { TOKEN_TO_CACHE } = require("../../../utils/constants/info");
+const { redis } = require("../../../utils/helper/InitRedis");
 
 const KEY = process.env.NEXT_PUBLIC_API_INTERFACE_KEY;
 
@@ -7,17 +8,14 @@ export default async function handler(req, res) {
   const authHeader = req.headers.authorization;
   const { token } = req.query;
 
-  console.log(authHeader, KEY);
-  console.log(authHeader == "Bearer " + KEY);
-
   if ("Bearer " + KEY != authHeader) {
     res.status(401).json("Unauthorized.");
     return;
   }
 
-  const cachedData = await getAssetCache(token.toLowerCase());
-  console.log(token);
-  console.log(cachedData);
+  const cachedData = JSON.parse(
+    await redis.get(TOKEN_TO_CACHE[token.toLowerCase()])
+  );
 
   if (cachedData) {
     return res

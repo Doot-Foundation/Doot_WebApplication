@@ -22,7 +22,7 @@ import { FaArrowRightLong } from "react-icons/fa6";
 import { GoVerified } from "react-icons/go";
 import { LuPartyPopper } from "react-icons/lu";
 
-import InformationCard from "../common/InformationCardx";
+import InformationCard from "../common/InformationCard";
 
 import {
   AutoComplete,

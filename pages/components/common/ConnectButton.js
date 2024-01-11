@@ -5,23 +5,21 @@ import WalletError from "./WalletError";
 
 import { useState } from "react";
 
-import { useDispatch, useSelector } from "react-redux";
-import { updateSigner } from "../../../lib/redux/signerSlice";
-import { updateChain } from "../../../lib/redux/chainSlice";
+import { useContext } from "react";
+import { SignerContext, ChainContext } from "../../../lib/context/contexts";
 
 export default function ConnectButton() {
-  const dispatch = useDispatch();
-  const signer = useSelector((state) => state.signer.address);
-  const chainInfo = useSelector((state) => state.chain);
+  const { signer, setSigner } = useContext(SignerContext);
+  const { chain, setChain } = useContext(ChainContext);
 
   const [showWalletPopup, setShowWalletPopup] = useState(false);
+
+  console.log(signer);
 
   if (typeof window === "undefined") {
   } else {
     window.mina?.on("chainChanged", (network) => {
-      dispatch(
-        updateChain({ chainId: network.chainId, chainName: network.name })
-      );
+      setChain({ chainId: network.chainId, chainName: network.name });
     });
   }
 
@@ -31,10 +29,8 @@ export default function ConnectButton() {
     } else {
       const account = await window.mina.requestAccounts();
       const network = await window.mina.requestNetwork();
-      dispatch(updateSigner(account[0]));
-      dispatch(
-        updateChain({ chainId: network.chainId, chainName: network.name })
-      );
+      setSigner(account[0]);
+      setChain({ chainId: network.chainId, chainName: network.name });
     }
   };
 
@@ -45,20 +41,20 @@ export default function ConnectButton() {
   return (
     <>
       <Flex direction={"row"} gap={2}>
-        {signer != "0x00" ? (
+        {signer != null ? (
           <Button fontWeight={300}>
             <Flex direction={"row"} justify={"center"} align={"center"} gap={2}>
               <Image src="/static/images/mina.png" boxSize={4} />
-              {chainInfo.chainName}
+              {chain.chainName}
             </Flex>
             <RiArrowDownSLine />
           </Button>
         ) : null}
         <Button
-          colorScheme={signer == 0x00 ? "purple" : "orange"}
+          colorScheme={signer == null ? "purple" : "orange"}
           onClick={handleConnection}
         >
-          {signer == "0x00" ? (
+          {signer == null ? (
             <>Connect</>
           ) : (
             signer.slice(0, 4) + "..." + signer.slice(-4)

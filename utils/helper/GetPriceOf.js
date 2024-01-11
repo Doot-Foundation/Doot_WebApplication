@@ -2,7 +2,6 @@ const {
   callSignAPICall,
   processFloatString,
 } = require("./CallAndSignAPICalls");
-const { updateAssetCache } = require("./CacheHandler");
 
 const ORACLE_KEY = process.env.ORACLE_KEY;
 const { signatureClient } = require("./SignatureClient");
@@ -306,10 +305,8 @@ async function getPriceOf(token) {
     signatures: results[1],
   };
 
-  await updateAssetCache(token, assetCacheObject);
-
   console.log(meanPrice, processedPrice, "\n");
-  return meanPrice;
+  return [meanPrice, assetCacheObject];
 }
 
 module.exports = getPriceOf;
