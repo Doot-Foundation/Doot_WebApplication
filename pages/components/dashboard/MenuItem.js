@@ -1,17 +1,20 @@
-import { Button } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
 
-export default function MenuItem({ children, page, setPage }) {
+export default function MenuItem({ children }) {
   return (
     <>
-      <Button
+      <Flex
+        fontWeight={600}
         bgColor={"transparent"}
         color={"white"}
-        _hover={{}}
+        _hover={{ cursor: "pointer" }}
+        fontFamily={"Manrope Variable"}
         _active={{}}
-        onClick={() => setPage(page)}
+        align="center"
+        gap={2}
       >
         {children}
-      </Button>
+      </Flex>
     </>
   );
 }

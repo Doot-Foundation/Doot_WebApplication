@@ -6,7 +6,7 @@ import HomeFooter from "./components/home/HomeFooter";
 import BackgroundImageComponent from "./components/common/BackgroundImageComponent";
 
 import { SignerContext, ChainContext } from "../lib/context/contexts";
-import { useEffect } from "react";
+import { useEffect, useContext } from "react";
 
 export default function Home() {
   const { setSigner } = useContext(SignerContext);
