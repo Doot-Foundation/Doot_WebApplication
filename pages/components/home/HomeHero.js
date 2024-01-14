@@ -36,8 +36,6 @@ export default function HomeHero() {
   const [result, setResult] = useState(null);
   const [mode, setMode] = useState("res");
 
-  console.log(asset);
-
   const blinking = keyframes`
   50% {
     opacity: 0;

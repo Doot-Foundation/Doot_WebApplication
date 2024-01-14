@@ -1,9 +1,11 @@
 import { Box, Flex, Heading, Text } from "@chakra-ui/react";
 
 import TokenDescriptionBox from "./TokenDescriptionBox";
-import { SUPPORTED_TOKENS } from "../../../utils/constants/info";
+import { TOKEN_TO_CACHE } from "../../../utils/constants/info";
 
 export default function FeedsHero() {
+  const tokens = Object.keys(TOKEN_TO_CACHE);
+
   return (
     <>
       <Box
@@ -20,13 +22,13 @@ export default function FeedsHero() {
               Doot Asset Feeds
             </Heading>
             <Text fontSize={"lg"}>
-              Explore our asset feeds accessible for the Mina Protocol
+              Explore our asset feeds available on the Mina Protocol
             </Text>
           </Flex>
-          <Flex>
+          <Flex direction={"column"}>
             <Heading fontFamily={"Montserrat Variable"}>Popular Assets</Heading>
-            <Flex direction={"column"} gap={5} mt={10}>
-              {SUPPORTED_TOKENS.map((token, index) => {
+            <Flex direction={"column"} gap={5} mt={10} justify={"left"}>
+              {tokens.map((token, index) => {
                 return <TokenDescriptionBox key={index} token={token} />;
               })}
             </Flex>

@@ -17,6 +17,7 @@
     "@fontsource-variable/montserrat": "^5.0.16",
     "@fontsource-variable/source-code-pro": "^5.0.16",
     "@supabase/supabase-js": "^2.39.0",
+    "api": "^6.1.1",
     "axios": "^1.6.0",
     "dotenv": "^16.3.1",
     "framer-motion": "^10.16.4",

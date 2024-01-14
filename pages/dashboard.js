@@ -2,7 +2,6 @@ import DashboardHero from "./components/dashboard/DashboardHero";
 import DashboardLayout from "./components/dashboard/DashboardLayout";
 
 import { SignerContext, ChainContext } from "../lib/context/contexts";
-
 import { useEffect, useContext } from "react";
 
 export default function Dashboard() {
@@ -10,7 +9,7 @@ export default function Dashboard() {
   const { setChain } = useContext(ChainContext);
 
   async function init() {
-    if (window.mina) {
+    if (window && window.mina) {
       const account = await window.mina.requestAccounts();
       const network = await window.mina.requestNetwork();
       setSigner(account[0]);

@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { TOKEN_TO_CACHE } from "../../../utils/constants/info.js";
+import { TOKEN_TO_CACHE } from "../../../utils/constants/info_2.ts";
 import { redis } from "../../../utils/helper/InitRedis.js";
 import { PrivateKey } from "o1js";
 

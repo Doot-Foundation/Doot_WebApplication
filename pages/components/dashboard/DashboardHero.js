@@ -11,6 +11,7 @@ import {
   ModalFooter,
   Button,
   useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 
 import { useEffect, useState, useContext } from "react";
@@ -27,13 +28,13 @@ import ConnectButton from "../common/ConnectButton";
 
 export default function DashboardHero() {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const toast = useToast();
 
   const key = process.env.NEXT_PUBLIC_API_INTERFACE_KEY;
   const { signer } = useContext(SignerContext);
 
-  const [page, setPage] = useState("profile");
-  const [userStatus, setUserStatus] = useState(undefined);
-  const [userDetails, setUserDetails] = useState(undefined);
+  const [userStatus, setUserStatus] = useState(null);
+  const [userDetails, setUserDetails] = useState(null);
 
   useEffect(() => {
     if (signer) checkUserStatus();
@@ -54,7 +55,7 @@ export default function DashboardHero() {
     }
   }
 
-  if (userStatus == 1 && userDetails == undefined) {
+  if (userStatus != 1 && userDetails == null) {
     getUserDetails();
   }
 
@@ -71,41 +72,38 @@ export default function DashboardHero() {
       .get(`/api/addUser?address=${signer}`, {
         headers: headers,
       })
-      .then((res) => {
-        console.log(res.data);
-      });
+      .then((res) => {});
   };
 
   async function getUserDetails() {
-    const timestamp = Date.now();
-    const toVerifyMessage = `Sign this message to prove you have access to this wallet in order to sign in to doot.foundation/dashboard. This won't cost you any Mina. Timestamp:${timestamp}`;
-    const signedObj = await window.mina?.signMessage({
-      message: toVerifyMessage,
-    });
-
-    signedObj.timestamp = timestamp;
-    const finalObj = JSON.stringify(signedObj);
-
-    const headers = {
-      Authorization: "Bearer " + key,
-      Signed: finalObj,
-    };
-
-    await axios
-      .get(
-        `/api/get/getUserInformation?address=${signer}&timestamp=${timestamp}`,
-        {
-          headers: headers,
-        }
-      )
-      .then((res) => {
-        console.log(res.data);
-        const data = JSON.parse(res.data);
-        setUserDetails(data);
+    if (typeof window !== "undefined" && window.mina) {
+      const timestamp = Date.now();
+      const toVerifyMessage = `Sign this message to prove you have access to this wallet in order to sign in to doot.foundation/dashboard. This won't cost you any Mina. Timestamp:${timestamp}`;
+      const signedObj = await window.mina.signMessage({
+        message: toVerifyMessage,
       });
-  }
 
-  if (userDetails) console.log(userDetails);
+      signedObj.timestamp = timestamp;
+      const finalObj = JSON.stringify(signedObj);
+
+      const headers = {
+        Authorization: "Bearer " + key,
+        Signed: finalObj,
+      };
+
+      await axios
+        .get(
+          `/api/get/getUserInformation?address=${signer}&timestamp=${timestamp}`,
+          {
+            headers: headers,
+          }
+        )
+        .then((res) => {
+          const data = JSON.parse(res.data);
+          setUserDetails(data);
+        });
+    } else return;
+  }
 
   return (
     <>

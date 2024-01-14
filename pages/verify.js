@@ -1,6 +1,6 @@
-import VerifyLayout from "./components/dashboard/verify/VerifyLayout";
-import VerifyHeader from "./components/dashboard/verify/VerifyHeader";
-import VerifyHero from "./components/dashboard/verify/VerifyHero";
+import VerifyLayout from "./components/verify/VerifyLayout";
+import VerifyHeader from "./components/verify/VerifyHeader";
+import VerifyHero from "./components/verify/VerifyHero";
 
 export default function Verify() {
   return (

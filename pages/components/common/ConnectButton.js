@@ -14,8 +14,6 @@ export default function ConnectButton() {
 
   const [showWalletPopup, setShowWalletPopup] = useState(false);
 
-  console.log(signer);
-
   if (typeof window === "undefined") {
   } else {
     window.mina?.on("chainChanged", (network) => {

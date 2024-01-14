@@ -1,8 +1,6 @@
 import { Flex, Box } from "@chakra-ui/react";
 
 export default function BackgroundImageComponent({ children, imageURL }) {
-  console.log(imageURL);
-
   return (
     <>
       <Flex position={"relative"} h={"fit-content"} direction={"column"}>

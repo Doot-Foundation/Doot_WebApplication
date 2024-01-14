@@ -15,15 +15,20 @@ export default async function handler(req, res) {
 
   const obj = {};
   const keys = Object.keys(TOKEN_TO_CACHE);
-  keys.forEach(async (item) => {
-    const data = await redis.get(item);
+
+  for (const item of keys) {
+    const data = await redis.get(TOKEN_TO_CACHE[item]);
     obj[`${item}`] = JSON.parse(data);
-  });
+  }
 
-  const cid = await redis.get("historical_cid");
-  const updatedCID = await pinHistoricalObject(cid, obj);
+  console.log(obj);
 
-  await redis.set("historical_cid", updatedCID);
+  const cid = await redis.get(HISTORICAL_CACHE);
+  console.log("cid", cid);
 
-  res.status(200).json({ data: obj });
+  // const updatedCID = await pinHistoricalObject(cid, obj);
+  // console.log(updatedCID);
+  // await redis.set(HISTORICAL_CACHE, updatedCID);
+
+  // res.status(200).json({ latest: updatedCID });
 }

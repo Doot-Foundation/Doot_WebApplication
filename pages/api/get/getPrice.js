@@ -36,10 +36,10 @@ export default async function handler(req, res) {
     await redis.get(TOKEN_TO_CACHE[token.toLowerCase()])
   );
 
+  console.log(cachedData);
+
   if (cachedData) {
-    return res
-      .status(200)
-      .json({ price: cachedData.data, asset: token, timestamp: Date.now() });
+    return res.status(200).json({ data: cachedData });
   } else {
     return res.status(404).json({ message: "Cached data not found." });
   }
