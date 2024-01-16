@@ -29,7 +29,7 @@ async function getPriceCoinGecko(token) {
     const results = await callSignAPICall(apiToCall, resultPath, "");
     return results;
   } catch (error) {
-    console.error("Error fetching ETH price coin gecko:", error.message);
+    console.error("Error coin gecko");
     return [0, 0, ""];
   }
 }
@@ -43,7 +43,7 @@ async function getPriceBinance(token) {
     const results = await callSignAPICall(apiToCall, resultPath, "");
     return results;
   } catch (error) {
-    console.error("Error fetching price binance:", error.message);
+    console.error("Error binance");
     return [0, 0, ""];
   }
 }
@@ -58,7 +58,7 @@ async function getPriceCMC(token) {
     const results = await callSignAPICall(apiToCall, resultPath, header);
     return results;
   } catch (error) {
-    console.error("Error fetching price cmc:", error.message);
+    console.error("Error coin market cap");
     return [0, 0, ""];
   }
 }
@@ -72,7 +72,7 @@ async function getPriceCryptoCompare(token) {
     const results = await callSignAPICall(apiToCall, resultPath, "");
     return results;
   } catch (error) {
-    console.error("Error fetching price crypto compare:", error.message);
+    console.error("Error crypto compare");
     return [0, 0, ""];
   }
 }
@@ -87,7 +87,7 @@ async function getPriceCoinAPI(token) {
     const results = await callSignAPICall(apiToCall, resultPath, header);
     return results;
   } catch (error) {
-    console.error("Error fetching  price coin api:", error.message);
+    console.error("Error coin api");
     return [0, 0, ""];
   }
 }
@@ -101,7 +101,7 @@ async function getPricePaprika(token) {
     const results = await callSignAPICall(apiToCall, resultPath, "");
     return results;
   } catch (error) {
-    console.error("Error fetching price paprika:", error.message);
+    console.error("Error price paprika");
     return [0, 0, ""];
   }
 }
@@ -115,7 +115,7 @@ async function getPriceMessari(token) {
     const results = await callSignAPICall(apiToCall, resultPath, "");
     return results;
   } catch (error) {
-    console.error("Error fetching price messari:", error.message);
+    console.error("Error messari");
     return [0, 0, ""];
   }
 }
@@ -129,7 +129,7 @@ async function getPriceCoinCap(token) {
     const results = await callSignAPICall(apiToCall, resultPath, "");
     return results;
   } catch (error) {
-    console.error("Error fetching price coin cap:", error.message);
+    console.error("Error coin cap");
     return [0, 0, ""];
   }
 }
@@ -143,7 +143,7 @@ async function getPriceCoinlore(token) {
     const results = await callSignAPICall(apiToCall, resultPath, "");
     return results;
   } catch (error) {
-    console.error("Error fetching price coin lore:", error.message);
+    console.error("Error coin lore");
     return [0, 0, ""];
   }
 }
@@ -160,7 +160,7 @@ async function getPriceCoinRanking(token) {
     const results = await callSignAPICall(apiToCall, resultPath, header);
     return results;
   } catch (error) {
-    console.error("Error fetching price coin ranking:", error.message);
+    console.error("Error coin ranking");
     return [0, 0, ""];
   }
 }
@@ -174,7 +174,7 @@ async function getPriceCoinCodex(token) {
     const results = await callSignAPICall(apiToCall, resultPath, "");
     return results;
   } catch (error) {
-    console.error("Error fetching price coin codex:", error.message);
+    console.error("Error coin codex");
     return [0, 0, ""];
   }
 }
