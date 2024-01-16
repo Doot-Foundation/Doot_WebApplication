@@ -22,7 +22,7 @@ import { FaArrowRightLong } from "react-icons/fa6";
 import { GoVerified } from "react-icons/go";
 import { LuPartyPopper } from "react-icons/lu";
 
-import InformationCard from "../common/InformationCard";
+import InformationCard from "./InformationCard";
 
 import {
   AutoComplete,
@@ -46,7 +46,6 @@ export default function HomeHero() {
   const handleSubmit = async () => {
     try {
       const key = process.env.NEXT_PUBLIC_API_INTERFACE_KEY;
-      console.log(key);
       const headers = {
         Authorization: "Bearer " + key,
       };
@@ -56,7 +55,6 @@ export default function HomeHero() {
           headers: headers,
         }
       );
-      console.log(response.data.information);
       const finalObj = {
         asset: response.data.asset,
         price: response.data.information.price,
@@ -82,12 +80,10 @@ export default function HomeHero() {
 
     Object.keys(obj).forEach((key) => {
       const value = obj[key];
-      console.log(key, value);
       formattedString += `&nbsp;&nbsp;&nbsp;&nbsp;${key} : <span style='color:orange;'>${value}</span>,<br>`;
     });
     formattedString += `<span style='color:yellow;'>}</span>`;
 
-    console.log(formattedString);
     return formattedString;
   }
 

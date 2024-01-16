@@ -47,15 +47,14 @@ export default function Profile({ info }) {
             direction={"row"}
             gap={3}
             align={"center"}
-            bgColor={"white"}
             w={"fit-content"}
-            color={"black"}
             p={3}
+            bgColor={"white"}
             borderRadius={10}
             fontWeight={800}
           >
-            <PiUserRectangle size={30} />
-            <Text color={"darkorange"}>{publicKey}</Text>
+            <PiUserRectangle color="#6c35de" size={30} />
+            <Text color={"black"}>{publicKey}</Text>
           </Flex>
           <Flex gap={5}>
             <Flex
@@ -108,7 +107,7 @@ export default function Profile({ info }) {
           <Flex mt={5} maxW={"fit-content"} minW={"70%"} direction={"column"}>
             <Flex
               p={2}
-              bgColor={"gray"}
+              bgColor={"#6c35de"}
               w={"100%"}
               gap={1}
               textAlign={"left"}

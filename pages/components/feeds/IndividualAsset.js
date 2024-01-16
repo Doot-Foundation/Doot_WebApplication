@@ -25,6 +25,7 @@ export default function IndividualAsset({ token }) {
   const axios = require("axios");
   const [latest, setLatest] = useState(null);
   const [ipfsData, setIPFSData] = useState(null);
+  const [ipfsLatest, setIPFSLatest] = useState(null);
   const [ipfsHistorical, setIPFSHistorical] = useState(null);
 
   const toast = useToast();
@@ -114,8 +115,12 @@ export default function IndividualAsset({ token }) {
 
   useEffect(() => {
     if (ipfsData) {
-      console.log(ipfsData);
+      const toPush = ipfsData.latest.prices[SYMBOL_TO_TOKEN[token]];
+      toPush.timestamp = ipfsData.latest.timestamp.toString();
+      const latestArr = new Array();
+      latestArr.push(toPush);
 
+      setIPFSLatest(latestArr);
       produceHistoricalForToken(ipfsData.historical);
     }
   }, [ipfsData]);
@@ -127,8 +132,8 @@ export default function IndividualAsset({ token }) {
           {token} / USD
         </Heading>
         <Text mb={5} fontSize={"sm"}>
-          (Disclaimer : The Price Displayed And The Data Are Different Because
-          Of Conversion)
+          (Disclaimer : The Price Displayed And The Data Might Be Different
+          Because Of Conversion)
         </Text>
         <Flex direction={"row"} mb={100} gap={10}>
           <Flex
@@ -194,14 +199,7 @@ export default function IndividualAsset({ token }) {
                     <Text fontFamily={"Montserrat Variable"} fontWeight={400}>
                       Data
                     </Text>
-                    <Text
-                      onClick={handleCopyPublicKey}
-                      fontFamily={"Manrope Variable"}
-                      fontWeight={800}
-                      _hover={{
-                        cursor: "pointer",
-                      }}
-                    >
+                    <Text fontFamily={"Manrope Variable"} fontWeight={800}>
                       {latest.signature.data}
                     </Text>
                     <Box w="100%" borderBottom={"1px dashed gray"} mt={3} />
@@ -299,11 +297,21 @@ export default function IndividualAsset({ token }) {
             </Tr>
           </Thead>
           <Tbody>
+            {ipfsLatest &&
+              ipfsLatest.map((item, key) => {
+                return (
+                  <>
+                    <HistoricalItem key={key} index={key} item={item} />
+                    <Box mb={5}></Box>
+                  </>
+                );
+              })}
+
             {ipfsHistorical &&
               ipfsHistorical.map((item, key) => {
                 return (
                   <>
-                    <HistoricalItem key={key} index={key} item={item} />
+                    <HistoricalItem key={key} index={key + 1} item={item} />
                     <Box mb={5}></Box>
                   </>
                 );

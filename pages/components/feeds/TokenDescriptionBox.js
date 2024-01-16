@@ -14,7 +14,6 @@ export default function TokenDescriptionBox({ token }) {
   const [normalizedPrice, setNormalizedPrice] = useState(null);
 
   function normalizePrice(str) {
-    console.log(str);
     let num = parseInt(str);
     num = num / Math.pow(10, 10);
     num = Math.round(num * 100) / 100;

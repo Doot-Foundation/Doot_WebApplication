@@ -1,6 +1,5 @@
 import {
   Flex,
-  Heading,
   Link,
   Spacer,
   Modal,
@@ -11,7 +10,7 @@ import {
   ModalFooter,
   Button,
   useDisclosure,
-  useToast,
+  Image,
 } from "@chakra-ui/react";
 
 import { useEffect, useState, useContext } from "react";
@@ -28,7 +27,6 @@ import ConnectButton from "../common/ConnectButton";
 
 export default function DashboardHero() {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const toast = useToast();
 
   const key = process.env.NEXT_PUBLIC_API_INTERFACE_KEY;
   const { signer } = useContext(SignerContext);
@@ -55,9 +53,11 @@ export default function DashboardHero() {
     }
   }
 
-  if (userStatus != 1 && userDetails == null) {
-    getUserDetails();
-  }
+  useEffect(() => {
+    if (userStatus == 1 && userDetails == null) {
+      getUserDetails();
+    }
+  }, [userStatus, userDetails]);
 
   const handleOnboard = async () => {
     onClose();
@@ -110,14 +110,13 @@ export default function DashboardHero() {
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent color={"black"} mt={200} fontFamily={"Manrope Variable"}>
-          <ModalHeader>Good to see you here! :D</ModalHeader>
+          <ModalHeader>Good to see you here :D</ModalHeader>
           <ModalBody>
-            It looks like you are a new user and we would love to onboard you
-            and help obtain your key to the gateway of amazing asset feeds for
-            the Mina Protocol by Doot.
+            It looks like you are a new user! We would love to onboard and help
+            you get started using Doot for the Mina Protocol.
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={handleOnboard}>
+            <Button colorScheme="purple" mr={3} onClick={handleOnboard}>
               Onboard
             </Button>
           </ModalFooter>
@@ -133,10 +132,8 @@ export default function DashboardHero() {
           gap={100}
           p={10}
         >
-          <Link href="/" p={3} bgColor={"white"} borderRadius={20} mt={10}>
-            <Heading fontFamily="Montserrat Variable" color={"#6b1bff"}>
-              Doot
-            </Heading>
+          <Link href="/" mt={10}>
+            <Image src="/static/images/Doot.png" boxSize={24} />
           </Link>
           <Flex>
             <MenuItem>

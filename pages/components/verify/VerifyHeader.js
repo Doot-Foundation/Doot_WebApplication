@@ -1,1 +1,3 @@
-export default function VerifyHeader() {}
+export default function VerifyHeader() {
+  return <></>;
+}

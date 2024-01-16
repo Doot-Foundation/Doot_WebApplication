@@ -9,7 +9,7 @@ export default async function handler(req, res) {
   const { address } = req.query;
 
   const authHeader = req.headers.authorization;
-  if (authHeader !== `Bearer ${process.env.API_INTERFACE_KEY}`) {
+  if (authHeader !== `Bearer ${process.env.NEXT_PUBLIC_API_INTERFACE_KEY}`) {
     res.status(401).json("Unauthorized");
   }
 

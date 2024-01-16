@@ -49,8 +49,16 @@ export default function ConnectButton() {
           </Button>
         ) : null}
         <Button
-          colorScheme={signer == null ? "purple" : "orange"}
+          colorScheme={!signer ? "purple" : null}
+          bgColor={signer ? "#00eab1" : null}
           onClick={handleConnection}
+          _hover={
+            signer
+              ? {
+                  backgroundColor: "#00bc8f",
+                }
+              : null
+          }
         >
           {signer == null ? (
             <>Connect</>
