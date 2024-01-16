@@ -25,7 +25,6 @@ export default function IndividualAsset({ token }) {
   const axios = require("axios");
   const [latest, setLatest] = useState(null);
   const [ipfsData, setIPFSData] = useState(null);
-  const [ipfsLatest, setIPFSLatest] = useState(null);
   const [ipfsHistorical, setIPFSHistorical] = useState(null);
 
   const toast = useToast();
@@ -117,24 +116,20 @@ export default function IndividualAsset({ token }) {
     if (ipfsData) {
       console.log(ipfsData);
 
-      setIPFSLatest(ipfsData.latest.prices[SYMBOL_TO_TOKEN[token]]);
       produceHistoricalForToken(ipfsData.historical);
     }
   }, [ipfsData]);
 
   return (
     <>
-      <Flex
-        direction={"column"}
-        pl={20}
-        minH={"100%"}
-        minW={"100%"}
-        gap={7}
-        pr={20}
-      >
+      <Flex direction={"column"} pl={20} minH={"100%"} minW={"100%"} pr={20}>
         <Heading fontSize={"6xl"} fontFamily={"Montserrat Variable"}>
           {token} / USD
         </Heading>
+        <Text mb={5} fontSize={"sm"}>
+          (Disclaimer : The Price Displayed And The Data Are Different Because
+          Of Conversion)
+        </Text>
         <Flex direction={"row"} mb={100} gap={10}>
           <Flex
             direction={"column"}
@@ -197,6 +192,22 @@ export default function IndividualAsset({ token }) {
                   </Flex>
                   <Flex direction={"column"}>
                     <Text fontFamily={"Montserrat Variable"} fontWeight={400}>
+                      Data
+                    </Text>
+                    <Text
+                      onClick={handleCopyPublicKey}
+                      fontFamily={"Manrope Variable"}
+                      fontWeight={800}
+                      _hover={{
+                        cursor: "pointer",
+                      }}
+                    >
+                      {latest.signature.data}
+                    </Text>
+                    <Box w="100%" borderBottom={"1px dashed gray"} mt={3} />
+                  </Flex>
+                  <Flex direction={"column"}>
+                    <Text fontFamily={"Montserrat Variable"} fontWeight={400}>
                       Oracle Public Key
                     </Text>
                     <Text
@@ -238,7 +249,7 @@ export default function IndividualAsset({ token }) {
                     p={5}
                     borderRadius={10}
                     src={`/static/data_providers/${provider}.png`}
-                    boxSize={24}
+                    boxSize={28}
                   />
                 );
               })}
