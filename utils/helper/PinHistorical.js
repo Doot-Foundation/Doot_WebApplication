@@ -1,7 +1,7 @@
 const axios = require("axios");
 
 const JWT = process.env.PINATA_JWT;
-const GATEWAY = process.env.PINATA_GATEWAY;
+const GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
 
 export default async function pinHistoricalObject(previousCID, latestPrices) {
   // const previousCID = await getHistoricalCache();
@@ -9,7 +9,7 @@ export default async function pinHistoricalObject(previousCID, latestPrices) {
   let isFirst;
   let toUploadObject;
 
-  if (previousCID == "null") {
+  if (previousCID == "NULL") {
     isFirst = true;
     toUploadObject = {
       latest: {
@@ -20,6 +20,7 @@ export default async function pinHistoricalObject(previousCID, latestPrices) {
     };
   } else {
     isFirst = false;
+    console.log("endpoint :", `https://${GATEWAY}/ipfs/${previousCID}`);
 
     const res = await axios.get(`https://${GATEWAY}/ipfs/${previousCID}`);
     const previousObject = res.data;
@@ -39,83 +40,42 @@ export default async function pinHistoricalObject(previousCID, latestPrices) {
     };
   }
 
-  const minimalExample = {
-    latest: {
-      timestamp: "234432904",
-      prices: {
-        mina: {
-          price: "459724021176787",
-          decimals: "10",
-          signature: {
-            signature:
-              "7mXQm1biXBP5iTEAYR1nECAAHiJ1CARkJJzjxZrw8y5k8J7jGUtwFGYzf7xJwZAUFCA1gZRsEDqw6v5iGz74x241DeCHom3a",
-            publicKey:
-              "B62qrbTTZmzf13czouLTatRA5mPmJXyQETa4JyWxNn4BrAANBDAhhHX",
-            data: "459724021176787",
-          },
-          urls: [
-            "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=BTC&convert=USD",
-            "https://rest.coinapi.io/v1/exchangerate/BTC/USD",
-            "https://api.coincap.io/v2/assets/bitcoin",
-            "https://api.coinlore.net/api/ticker/?id=90",
-            "https://min-api.cryptocompare.com/data/price?fsym=BTC&tsyms=USD",
-            "https://data.messari.io/api/v1/assets/bitcoin/metrics",
-          ],
-          prices_returned: [
-            "45968.51676052421",
-            "45970.726141344254",
-            "45977.10982921453",
-            "45973.22",
-            "45974.2",
-            "45970.63997498975",
-          ],
-          timestamps: [
-            "1704855658",
-            "1704855658",
-            "1704855659",
-            "1704855662",
-            "1704855663",
-            "1704855665",
-          ],
-          signatures: [
-            {
-              signature: "as",
-              publicKey: "0assa",
-              data: "21340",
-            },
-            {
-              signature: "as",
-              publicKey: "0assa",
-              data: "21340",
-            },
-            {
-              signature: "as",
-              publicKey: "0assa",
-              data: "21340",
-            },
-            {
-              signature: "as",
-              publicKey: "0assa",
-              data: "21340",
-            },
-            {
-              signature: "as",
-              publicKey: "0assa",
-              data: "21340",
-            },
-            {
-              signature: "as",
-              publicKey: "0assa",
-              data: "21340",
-            },
-          ],
-        },
-      },
+  console.log(toUploadObject);
+
+  const timestamp = Date.now();
+  const options = {
+    method: "POST",
+    headers: {
+      accept: "application/json",
+      "content-type": "application/json",
+      authorization: `Bearer ${JWT}`,
     },
-    historical: {},
+    body: JSON.stringify({
+      pinataContent: toUploadObject,
+      pinataMetadata: { name: `historical_${timestamp}.json` },
+    }),
   };
 
-  console.log(JSON.stringify(minimalExample));
+  const response = await fetch(
+    "https://api.pinata.cloud/pinning/pinJSONToIPFS",
+    options
+  );
+  const data = await response.json();
+  console.log(data);
 
-  return "asd";
+  if (!isFirst) {
+    const options = {
+      method: "DELETE",
+      headers: { accept: "application/json", authorization: `Bearer ${JWT}` },
+    };
+
+    const deleteResponse = fetch(
+      `https://api.pinata.cloud/pinning/unpin/${previousCID}`,
+      options
+    );
+    const deleteData = await deleteResponse.json();
+    console.log(`DELETED PREVIOUS AT ${previousCID}\n`, deleteData);
+  }
+
+  return data.IpfsHash;
 }

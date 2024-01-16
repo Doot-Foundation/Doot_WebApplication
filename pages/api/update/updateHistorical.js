@@ -21,14 +21,10 @@ export default async function handler(req, res) {
     obj[`${item}`] = JSON.parse(data);
   }
 
-  console.log(obj);
-
   const cid = await redis.get(HISTORICAL_CACHE);
-  console.log("cid", cid);
 
-  // const updatedCID = await pinHistoricalObject(cid, obj);
-  // console.log(updatedCID);
-  // await redis.set(HISTORICAL_CACHE, updatedCID);
+  const updatedCID = await pinHistoricalObject(cid, obj);
+  await redis.set(HISTORICAL_CACHE, updatedCID);
 
-  // res.status(200).json({ latest: updatedCID });
+  res.status(200).json({ latest: updatedCID });
 }

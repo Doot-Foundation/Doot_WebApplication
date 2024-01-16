@@ -13,9 +13,7 @@ export default async function handler(req, res) {
     return;
   }
 
-  const cachedData = JSON.parse(
-    await redis.get(TOKEN_TO_CACHE[token.toLowerCase()])
-  );
+  const cachedData = await redis.get(TOKEN_TO_CACHE[token.toLowerCase()]);
 
   if (cachedData) {
     return res

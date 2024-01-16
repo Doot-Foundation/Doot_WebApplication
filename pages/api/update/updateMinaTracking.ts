@@ -15,7 +15,10 @@ if (key) {
   oracle_key = PrivateKey.fromBase58(key);
   oracle_public = oracle_key.toPublicKey().toBase58();
 }
-// const publicKey = PrivateKey(privateKey).toPublicKey().toString();
+
+async function uploadToMina(obj: { [key: string]: any }): Promise<boolean> {
+  return true;
+}
 
 export default async function handler(
   req: NextApiRequest,
@@ -29,9 +32,14 @@ export default async function handler(
   const Obj: { [key: string]: any } = {};
   const keys: string[] = Object.keys(TOKEN_TO_CACHE);
   keys.forEach(async (key: string) => {
-    const data = JSON.parse(await redis.get(TOKEN_TO_CACHE[key]));
-    const asset: string = data.asset;
-    Obj[`${asset}`] = data.information;
+    const data: { [key: string]: string } | null = await redis.get(
+      TOKEN_TO_CACHE[key]
+    );
+
+    if (data) {
+      const asset: string = data.asset;
+      Obj[`${asset}`] = data.information;
+    }
   });
 
   console.log(Obj);

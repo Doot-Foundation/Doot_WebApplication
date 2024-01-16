@@ -1,13 +1,9 @@
-const Redis = require("ioredis");
+const HOST = process.env.REDIS_REST_HOST;
+const PASSWORD = process.env.REDIS_REST_TOKEN;
 
-const HOST = process.env.REDIS_HOST;
-const PASSWORD = process.env.REDIS_PASSWORD;
-const PORT = process.env.REDIS_PORT;
+import { Redis } from "@upstash/redis";
 
-const redis = new Redis({
-  host: HOST,
-  port: PORT,
-  password: PASSWORD,
+export const redis = new Redis({
+  url: HOST,
+  token: PASSWORD,
 });
-
-module.exports = { redis };
