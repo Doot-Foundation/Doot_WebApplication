@@ -1,7 +1,7 @@
 import { Flex, Spacer, Image, Text, Link } from "@chakra-ui/react";
 import { CgArrowTopRight } from "react-icons/cg";
 
-export default function FeedsHeader({ setPage }) {
+export default function FeedsHeader() {
   return (
     <>
       <Flex p={"2% 8% 5% 8%"} align={"center"}>
@@ -17,7 +17,6 @@ export default function FeedsHeader({ setPage }) {
         >
           <Flex
             gap={1}
-            onClick={() => setPage("verify")}
             direction={"row"}
             _hover={{ color: "#94ffe5", cursor: "pointer" }}
           >
