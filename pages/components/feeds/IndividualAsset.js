@@ -4,13 +4,7 @@ import {
   Heading,
   Text,
   useToast,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
   Wrap,
-  Tooltip,
   Image,
   Spacer,
 } from "@chakra-ui/react";
@@ -19,7 +13,8 @@ import {
   SYMBOL_TO_TOKEN,
   ENDPOINT_TO_DATA_PROVIDER,
 } from "../../../utils/constants/info";
-import HistoricalItem from "./HistoricalItem";
+
+import HistoricalTable from "./HistoricalTable";
 
 export default function IndividualAsset({ token }) {
   const axios = require("axios");
@@ -271,53 +266,12 @@ export default function IndividualAsset({ token }) {
         <Text pb={5} mb={5} fontSize={"sm"}>
           (The prices are considered upto the 10th decimal)
         </Text>
-        <Table
-          variant="simple"
-          p={5}
-          bgcolor={"white"}
-          color={"black"}
-          borderRadius={20}
-        >
-          <Thead>
-            <Tr>
-              <Th>SNo</Th>
-              <Tooltip label="Signature over the aggregated price.">
-                <Th>Agg. Signature</Th>
-              </Tooltip>
-              <Tooltip label="The aggregated price after removing outliers.">
-                <Th>Agg. Price</Th>
-              </Tooltip>
-              <Tooltip label="Timestamp when the aggregated price was calculated.">
-                <Th>Agg. Timestamp</Th>
-              </Tooltip>
-              <Th>Provider</Th>
-              <Th>Price</Th>
-              <Th>Signature</Th>
-              <Th>Timestamp</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {ipfsLatest &&
-              ipfsLatest.map((item, key) => {
-                return (
-                  <>
-                    <HistoricalItem key={key} index={key} item={item} />
-                    <Box mb={5}></Box>
-                  </>
-                );
-              })}
-
-            {ipfsHistorical &&
-              ipfsHistorical.map((item, key) => {
-                return (
-                  <>
-                    <HistoricalItem key={key} index={key + 1} item={item} />
-                    <Box mb={5}></Box>
-                  </>
-                );
-              })}
-          </Tbody>
-        </Table>
+        {ipfsHistorical && ipfsLatest && (
+          <HistoricalTable
+            ipfsHistorical={ipfsHistorical}
+            ipfsLatest={ipfsLatest}
+          />
+        )}
       </Flex>
     </>
   );
