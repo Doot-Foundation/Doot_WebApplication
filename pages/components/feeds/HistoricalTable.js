@@ -94,7 +94,7 @@ export default function HistoricalTable({ ipfsHistorical, ipfsLatest }) {
               const limit = timestamps.length;
 
               return Array.from({ length: limit }).map((_, x) => (
-                <Tr fontFamily={"Manrope Variable"} p={2} key={x}>
+                <Tr key={`${key}-${x}`} fontFamily={"Manrope Variable"} p={2}>
                   <Td>{key + 1}</Td>
                   <Td
                     _hover={{ cursor: "pointer" }}

@@ -238,6 +238,7 @@ export default function IndividualAsset({ token }) {
               {providers.map((provider, index) => {
                 return (
                   <Image
+                    key={index}
                     bgColor={"white"}
                     p={5}
                     borderRadius={10}

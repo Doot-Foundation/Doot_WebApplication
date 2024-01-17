@@ -351,6 +351,7 @@ export default function HomeHero() {
                     w={"100%"}
                   ></Box>
                   <AutoCompleteInput
+                    id={1}
                     w={"100%"}
                     variant="filled"
                     placeholder="Select Asset"

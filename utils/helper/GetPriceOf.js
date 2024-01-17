@@ -290,6 +290,9 @@ async function getPriceOf(token) {
     [BigInt(processedPrice)],
     ORACLE_KEY
   );
+
+  console.log(signedPrice);
+
   var jsonCompatibleSignature = {};
   jsonCompatibleSignature["signature"] = signedPrice.signature;
   jsonCompatibleSignature["publicKey"] = signedPrice.publicKey;

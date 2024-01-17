@@ -18,7 +18,7 @@ export default async function handler(req, res) {
 
   for (const item of keys) {
     const data = await redis.get(TOKEN_TO_CACHE[item]);
-    obj[`${item}`] = JSON.parse(data);
+    obj[`${item}`] = data;
   }
 
   const cid = await redis.get(HISTORICAL_CACHE);

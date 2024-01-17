@@ -58,16 +58,9 @@ async function callSignAPICall(url, resultPath, headerName) {
   const fieldPrice = BigInt(processFloatString(Price));
   const fieldDecimals = BigInt(MULTIPLICATION_FACTOR);
   const fieldTimestamp = BigInt(Timestamp);
-  const fieldPriceGenerationId = BigInt(1);
 
   const signature = signatureClient.signFields(
-    [
-      fieldURL,
-      fieldPrice,
-      fieldDecimals,
-      fieldTimestamp,
-      fieldPriceGenerationId,
-    ],
+    [fieldURL, fieldPrice, fieldDecimals, fieldTimestamp],
     ORACLE_KEY
   );
 
