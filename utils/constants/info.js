@@ -25,8 +25,9 @@ const HISTORICAL_CACHE = "historical_cid";
 const MINA_CACHE = "mina_cid";
 
 const ORACLE_PUBLIC_KEY =
-  "B62qrbTTZmzf13czouLTatRA5mPmJXyQETa4JyWxNn4BrAANBDAhhHX";
-const DOOT_ADDRESS = "B62qpEYLESLdp52WAJX819GHLrduBzKPVmB2okAXbsELw5dYgVViCWV";
+  "B62qjm48BJuzaZmu2wA5YaZeKknkovbx9kDmu8E83jcYsg4sPgTDgPF";
+const DOOT_PUBLIC_KEY =
+  "B62qooPe7vSdPg2qzFbt12ubwoBCCMHJhqVqfR4Ypz9gi347wTBFnW2";
 
 const PROVIDERS = [
   "Binance",
@@ -107,7 +108,7 @@ module.exports = {
   PROVIDERS,
   TOKEN_TO_CACHE,
   SUPPORTED_TOKENS,
-  DOOT_ADDRESS,
+  DOOT_PUBLIC_KEY,
   ORACLE_PUBLIC_KEY,
   HISTORICAL_CACHE,
   ENDPOINT_TO_DATA_PROVIDER,
