@@ -1,11 +1,8 @@
-import pinHistoricalObject from "../../../utils/helper/PinHistorical";
+import pinMinaObject from "../../../utils/helper/PinMina.ts";
 
-const {
-  TOKEN_TO_CACHE,
-  HISTORICAL_CACHE,
-} = require("../../../utils/constants/info");
+const { TOKEN_TO_CACHE, MINA_CACHE } = require("../../../utils/constants/info");
 const { redis } = require("../../../utils/helper/InitRedis");
-``;
+
 export default async function handler(req, res) {
   const authHeader = req.headers.authorization;
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -21,10 +18,8 @@ export default async function handler(req, res) {
     obj[`${item}`] = data;
   }
 
-  const cid = await redis.get(HISTORICAL_CACHE);
-
-  const updatedCID = await pinHistoricalObject(cid, obj);
-  await redis.set(HISTORICAL_CACHE, updatedCID);
+  const updatedCID = await pinMinaObject(obj);
+  await redis.set(MINA_CACHE, updatedCID);
 
   res.status(200).json({ latest: updatedCID });
 }

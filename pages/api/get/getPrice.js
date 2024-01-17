@@ -9,25 +9,23 @@ import { validate as uuidValidate } from "uuid";
 export default async function handler(req, res) {
   // Retrieve data from the cache
   const authHeader = req.headers.authorization;
-  const { address, token } = req.query;
+  const { token } = req.query;
 
   await supabase.auth.signInWithPassword({
     email: MAIL,
     password: PASS,
   });
 
+  const key = authHeader.split(" ")[1];
+
   const { data: select_data, error: select_error } = await supabase
     .from("Auro_Login")
     .select("generated_key")
-    .eq("address", address);
+    .eq("generated_key", key);
 
   await supabase.auth.signOut();
 
-  if (
-    select_data.length == 0 ||
-    "Bearer " + select_data[0].generated_key != authHeader ||
-    !uuidValidate(authHeader.split(" ")[1])
-  ) {
+  if (select_data.length == 0 || !uuidValidate(key)) {
     res.status(401).json("Unauthorized.");
     return;
   }

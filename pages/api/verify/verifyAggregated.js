@@ -18,8 +18,6 @@ export default function handler(req, res) {
     else res.status(200).json({ status: 1 });
   } catch (err) {
     res.status(200).json({ status: 0 });
+    return;
   }
-
-  res.status(200).json({ status: 0 });
-  return;
 }
