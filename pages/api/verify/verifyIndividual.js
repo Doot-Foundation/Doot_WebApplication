@@ -5,7 +5,6 @@ const { CircuitString } = require("o1js");
 
 export default function handler(req, res) {
   const { price, signature, url, decimals, timestamp } = req.query;
-
   try {
     const fieldURL = BigInt(CircuitString.fromString(url).hash());
     const fieldPrice = BigInt(price);
@@ -26,7 +25,4 @@ export default function handler(req, res) {
   } catch (err) {
     res.status(200).json({ status: 0 });
   }
-
-  res.status(200).json({ status: 0 });
-  return;
 }
