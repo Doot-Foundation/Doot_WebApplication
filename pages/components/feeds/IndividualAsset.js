@@ -18,6 +18,8 @@ import HistoricalTable from "./HistoricalTable";
 
 export default function IndividualAsset({ token }) {
   const axios = require("axios");
+  const GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
+
   const [latest, setLatest] = useState(null);
   const [ipfsData, setIPFSData] = useState(null);
   const [ipfsLatest, setIPFSLatest] = useState(null);
@@ -66,14 +68,16 @@ export default function IndividualAsset({ token }) {
   }
 
   async function getCID() {
-    const GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
-
     const response = await axios.get("/api/get/getLatestHistorical");
     const cid = response.data.cid;
 
-    const ipfsData = await axios.get(`https://${GATEWAY}/ipfs/${cid}`);
-
-    setIPFSData(ipfsData.data);
+    try {
+      const ipfsData = await axios.get(`https://${GATEWAY}/ipfs/${cid}`);
+      setIPFSData(ipfsData.data);
+    } catch (err) {
+      const ipfsData = await axios.get(`https://ipfs.io/ipfs/${cid}`);
+      setIPFSData(ipfsData.data);
+    }
   }
 
   const handleCopySignature = async () => {
