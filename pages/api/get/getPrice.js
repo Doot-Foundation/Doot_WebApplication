@@ -16,25 +16,30 @@ export default async function handler(req, res) {
     password: PASS,
   });
 
-  const key = authHeader.split(" ")[1];
+  if (authHeader) {
+    const key = authHeader.split(" ")[1];
 
-  const { data: select_data, error: select_error } = await supabase
-    .from("Auro_Login")
-    .select("generated_key")
-    .eq("generated_key", key);
+    const { data: select_data, error: select_error } = await supabase
+      .from("Auro_Login")
+      .select("generated_key")
+      .eq("generated_key", key);
 
-  await supabase.auth.signOut();
+    await supabase.auth.signOut();
 
-  if (select_data.length == 0 || !uuidValidate(key)) {
-    res.status(401).json("Unauthorized.");
+    if (select_data.length == 0 || !uuidValidate(key)) {
+      res.status(401).json("Unauthorized.");
+      return;
+    }
+
+    const cachedData = await redis.get(TOKEN_TO_CACHE[token.toLowerCase()]);
+
+    if (cachedData) {
+      res.status(200).json({ data: cachedData });
+    } else {
+      res.status(404).json({ message: "Cached data not found." });
+    }
     return;
   }
 
-  const cachedData = await redis.get(TOKEN_TO_CACHE[token.toLowerCase()]);
-
-  if (cachedData) {
-    return res.status(200).json({ data: cachedData });
-  } else {
-    return res.status(404).json({ message: "Cached data not found." });
-  }
+  return;
 }
