@@ -68,7 +68,7 @@ export default function IndividualAsset({ token }) {
   }
 
   async function getCID() {
-    const response = await axios.get("/api/get/getLatestHistorical");
+    const response = await axios.get("/api/get/getLatestCID");
     const cid = response.data.cid;
 
     try {
