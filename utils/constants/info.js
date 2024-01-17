@@ -27,7 +27,7 @@ const MINA_CACHE = "mina_cid";
 const ORACLE_PUBLIC_KEY =
   "B62qjm48BJuzaZmu2wA5YaZeKknkovbx9kDmu8E83jcYsg4sPgTDgPF";
 const DOOT_PUBLIC_KEY =
-  "B62qooPe7vSdPg2qzFbt12ubwoBCCMHJhqVqfR4Ypz9gi347wTBFnW2";
+  "B62qn6RBn2JZTkkagnUhn7EEZTbv4cnTMWyT9w9vEyJgbAbc3TofPSN";
 
 const PROVIDERS = [
   "Binance",

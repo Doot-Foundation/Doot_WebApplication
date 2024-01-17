@@ -9,18 +9,20 @@ export default async function pinHistoricalObject(previousCID, latestPrices) {
   let isFirst;
   let toUploadObject;
 
+  const timestamp = Date.now();
+
   if (previousCID == "NULL") {
     isFirst = true;
     toUploadObject = {
       latest: {
-        timestamp: Date.now(),
+        timestamp: timestamp,
         prices: latestPrices,
       },
       historical: {},
     };
   } else {
     isFirst = false;
-    console.log("endpoint :", `https://${GATEWAY}/ipfs/${previousCID}`);
+    // console.log("endpoint :", `https://${GATEWAY}/ipfs/${previousCID}`);
 
     const res = await axios.get(`https://${GATEWAY}/ipfs/${previousCID}`);
     const previousObject = res.data;
@@ -33,7 +35,7 @@ export default async function pinHistoricalObject(previousCID, latestPrices) {
 
     toUploadObject = {
       latest: {
-        timestamp: Date.now(),
+        timestamp: timestamp,
         prices: latestPrices,
       },
       historical: updatedHistorical,
@@ -42,7 +44,6 @@ export default async function pinHistoricalObject(previousCID, latestPrices) {
 
   console.log(toUploadObject);
 
-  const timestamp = Date.now();
   const options = {
     method: "POST",
     headers: {
@@ -63,19 +64,23 @@ export default async function pinHistoricalObject(previousCID, latestPrices) {
   const data = await response.json();
   console.log(data);
 
-  if (!isFirst) {
-    const options = {
-      method: "DELETE",
-      headers: { accept: "application/json", authorization: `Bearer ${JWT}` },
-    };
+  // if (!isFirst) {
+  //   try {
+  //     const options = {
+  //       method: "DELETE",
+  //       headers: { accept: "application/json", authorization: `Bearer ${JWT}` },
+  //     };
 
-    const deleteResponse = fetch(
-      `https://api.pinata.cloud/pinning/unpin/${previousCID}`,
-      options
-    );
-    const deleteData = await deleteResponse.json();
-    console.log(`DELETED PREVIOUS AT ${previousCID}\n`, deleteData);
-  }
+  //     const deleteResponse = await fetch(
+  //       `https://api.pinata.cloud/pinning/unpin/${previousCID}`,
+  //       options
+  //     );
+  //     const deleteData = await deleteResponse.json();
+  //     console.log(`DELETED PREVIOUS AT ${previousCID}\n`, deleteData);
+  //   } catch (error) {
+  //     console.log("Delete Unsuccessful");
+  //   }
+  // }
 
   return data.IpfsHash;
 }

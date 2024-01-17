@@ -68,7 +68,7 @@ export default function IndividualAsset({ token }) {
   async function getCID() {
     const GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
 
-    const response = await axios.get("/api/get/getLatestCID");
+    const response = await axios.get("/api/get/getLatestHistorical");
     const cid = response.data.cid;
 
     const ipfsData = await axios.get(`https://${GATEWAY}/ipfs/${cid}`);

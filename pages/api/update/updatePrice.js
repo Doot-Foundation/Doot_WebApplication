@@ -19,7 +19,7 @@ export default async function handler(req, res) {
   const { token } = req.query;
   const results = await PriceOf(token.toLowerCase());
 
-  await redis.set(TOKEN_TO_CACHE[token], JSON.stringify(results[1]));
+  await redis.set(TOKEN_TO_CACHE[token], results[1]);
 
   res.status(200).json({
     status: `Updated ${token} Successfully!`,
