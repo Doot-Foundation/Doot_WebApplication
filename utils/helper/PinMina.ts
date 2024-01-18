@@ -13,7 +13,6 @@ import {
   CircuitString,
   MerkleMap,
   Field,
-  fetchAccount,
 } from "o1js";
 
 async function frameKey(key: CircuitString) {
@@ -26,7 +25,7 @@ export default async function pinMinaObject(obj: { [key: string]: any }) {
   );
   Mina.setActiveInstance(Berkeley);
 
-  await Doot.compile();
+  // await Doot.compile();
 
   const transactionFee = 100_000_000;
 
@@ -126,7 +125,6 @@ export default async function pinMinaObject(obj: { [key: string]: any }) {
     const currentSecret = Field.from(await zkapp.secretToken.get()).toString();
 
     var txn;
-    var res;
     if (currentSecret == "0") {
       console.log("Init");
       txn = await Mina.transaction(
@@ -146,9 +144,9 @@ export default async function pinMinaObject(obj: { [key: string]: any }) {
         }
       );
       await txn.prove();
-      txn.sign([oracle]).send();
+      await txn.sign([oracle]).send();
+      console.log("Sent TXN.");
     }
-    console.log("TXN SENT. NOT WAITING!!!");
     return ipfs;
   }
   // console.log(toUploadObject);

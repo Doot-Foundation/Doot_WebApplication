@@ -17,7 +17,7 @@ export default async function getMinaDetails(): Promise<
   );
   Mina.setActiveInstance(Berkeley);
 
-  await Doot.compile();
+  // await Doot.compile();
 
   var doot;
   var dootPub;

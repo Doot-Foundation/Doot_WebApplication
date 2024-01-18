@@ -102,6 +102,11 @@
     "isolatedModules": true,
     "jsx": "preserve"
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "../other_files/GenerateVerificationKey.ts"
+  ],
   "exclude": ["node_modules"]
 }
