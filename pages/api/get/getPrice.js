@@ -27,19 +27,16 @@ export default async function handler(req, res) {
     await supabase.auth.signOut();
 
     if (select_data.length == 0 || !uuidValidate(key)) {
-      res.status(401).json("Unauthorized.");
-      return;
+      return res.status(401).json("Unauthorized.");
     }
 
     const cachedData = await redis.get(TOKEN_TO_CACHE[token.toLowerCase()]);
 
     if (cachedData) {
-      res.status(200).json({ data: cachedData });
+      return res.status(200).json({ data: cachedData });
     } else {
-      res.status(404).json({ message: "Cached data not found." });
+      return res.status(404).json({ message: "Cached data not found." });
     }
-    return;
   }
-
-  return;
+  return res.status(401).json("Unauthrized Auth.");
 }

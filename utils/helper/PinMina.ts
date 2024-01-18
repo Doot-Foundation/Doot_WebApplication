@@ -134,7 +134,7 @@ export default async function pinMinaObject(obj: { [key: string]: any }) {
     var txn;
     var res;
     if (currentSecret == "0") {
-      console.log("Inside Init");
+      console.log("Init");
       txn = await Mina.transaction(
         { sender: oraclePub, fee: transactionFee },
         () => {
@@ -144,7 +144,7 @@ export default async function pinMinaObject(obj: { [key: string]: any }) {
       await txn.prove();
       res = await txn.sign([oracle]).send();
     } else {
-      console.log("Inside Update");
+      console.log("Update");
       txn = await Mina.transaction(
         { sender: oraclePub, fee: transactionFee },
         () => {
@@ -154,8 +154,7 @@ export default async function pinMinaObject(obj: { [key: string]: any }) {
       await txn.prove();
       res = await txn.sign([oracle]).send();
     }
-    console.log(res);
-    console.log(res.hash());
+    console.log("Txn Hash :", res.hash());
 
     return ipfs;
   }

@@ -9,8 +9,7 @@ export default async function handler(req, res) {
   const { token } = req.query;
 
   if ("Bearer " + KEY != authHeader) {
-    res.status(401).json("Unauthorized.");
-    return;
+    return res.status(401).json("Unauthorized.");
   }
 
   const cachedData = await redis.get(TOKEN_TO_CACHE[token.toLowerCase()]);

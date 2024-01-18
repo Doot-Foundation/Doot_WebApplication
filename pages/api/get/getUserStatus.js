@@ -19,10 +19,11 @@ export default async function handler(req, res) {
   await supabase.auth.signOut();
 
   if (select_data.length != 0) {
-    res.status(200).json({ status_message: "Address_Exists", status: 1 });
-    return;
+    return res
+      .status(200)
+      .json({ status_message: "Address_Exists", status: 1 });
   } else {
-    res
+    return res
       .status(200)
       .json({ status_message: "Address_Does_Not_Exist", status: 0 });
   }
