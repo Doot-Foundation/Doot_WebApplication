@@ -28,5 +28,10 @@
       "path": "/api/update/updateHistorical",
       "schedule": "*/30 * * * *"
     }
-  ]
+  ],
+  "functions": {
+    "api/update/updateMina.js": {
+      "maxDuration": 60
+    }
+  }
 }
