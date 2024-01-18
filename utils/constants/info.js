@@ -23,6 +23,7 @@ const TOKEN_TO_CACHE = {
 };
 const HISTORICAL_CACHE = "historical_cid";
 const MINA_CACHE = "mina_cid";
+const VERIFICATION_KEY_CACHE = "doot_verification_key";
 
 const ORACLE_PUBLIC_KEY =
   "B62qjm48BJuzaZmu2wA5YaZeKknkovbx9kDmu8E83jcYsg4sPgTDgPF";
@@ -107,6 +108,7 @@ module.exports = {
   MULTIPLICATION_FACTOR,
   PROVIDERS,
   TOKEN_TO_CACHE,
+  VERIFICATION_KEY_CACHE,
   SUPPORTED_TOKENS,
   DOOT_PUBLIC_KEY,
   ORACLE_PUBLIC_KEY,

@@ -25,7 +25,7 @@ export default async function pinMinaObject(obj: { [key: string]: any }) {
   );
   Mina.setActiveInstance(Berkeley);
 
-  await Doot.compile();
+  // await Doot.compile();
 
   const transactionFee = 100_000_000;
 
@@ -125,7 +125,6 @@ export default async function pinMinaObject(obj: { [key: string]: any }) {
     const currentSecret = Field.from(await zkapp.secretToken.get()).toString();
 
     var txn;
-    var res;
     if (currentSecret == "0") {
       console.log("Init");
       txn = await Mina.transaction(
