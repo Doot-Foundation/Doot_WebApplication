@@ -13,7 +13,6 @@ import {
   CircuitString,
   MerkleMap,
   Field,
-  fetchAccount,
 } from "o1js";
 
 async function frameKey(key: CircuitString) {
@@ -146,9 +145,9 @@ export default async function pinMinaObject(obj: { [key: string]: any }) {
         }
       );
       await txn.prove();
-      txn.sign([oracle]).send();
+      await txn.sign([oracle]).send();
+      console.log("Sent TXN.");
     }
-    console.log("TXN SENT. NOT WAITING!!!");
     return ipfs;
   }
   // console.log(toUploadObject);
