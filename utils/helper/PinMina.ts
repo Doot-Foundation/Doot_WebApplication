@@ -12,7 +12,6 @@ import {
   PrivateKey,
   CircuitString,
   MerkleMap,
-  fetchAccount,
   Field,
 } from "o1js";
 
@@ -26,7 +25,7 @@ export default async function pinMinaObject(obj: { [key: string]: any }) {
   );
   Mina.setActiveInstance(Berkeley);
 
-  // await Doot.compile();
+  await Doot.compile();
 
   const transactionFee = 100_000_000;
 
@@ -44,9 +43,6 @@ export default async function pinMinaObject(obj: { [key: string]: any }) {
     oraclePub = oracle.toPublicKey();
 
     const zkAppPublicKey = dootPub;
-
-    const { provers } = await Doot.compile();
-    console.log(provers);
 
     const zkapp = new Doot(zkAppPublicKey);
 
