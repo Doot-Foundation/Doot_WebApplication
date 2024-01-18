@@ -17,8 +17,6 @@ export default async function getMinaDetails(): Promise<
   );
   Mina.setActiveInstance(Berkeley);
 
-  // await Doot.compile();
-
   var doot;
   var dootPub;
 
@@ -30,6 +28,7 @@ export default async function getMinaDetails(): Promise<
       publicKey: doot.toPublicKey(),
     };
     await fetchAccount(accountInfo);
+
     const zkAppPublicKey = dootPub;
     const zkapp = new Doot(zkAppPublicKey);
 

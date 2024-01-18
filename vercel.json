@@ -1,4 +1,10 @@
 {
+  "functions": {
+    "pages/api/update/*": {
+      "memory": 3008,
+      "maxDuration": 300
+    }
+  },
   "crons": [
     {
       "path": "/api/update/updatePrice?token=bitcoin",
