@@ -8,6 +8,8 @@ export default async function handler(req, res) {
   const authHeader = req.headers.authorization;
   const { token } = req.query;
 
+  console.log(req.headers);
+  console.log(authHeader);
   console.log(KEY, authHeader);
 
   if ("Bearer " + KEY != authHeader) {
