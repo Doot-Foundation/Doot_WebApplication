@@ -30,7 +30,7 @@
     }
   ],
   "functions": {
-    "api/update/updateMina.js": {
+    "api/update/*": {
       "memory": 3008,
       "maxDuration": 30
     }
