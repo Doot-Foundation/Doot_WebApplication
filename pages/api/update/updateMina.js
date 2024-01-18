@@ -4,7 +4,7 @@ const { TOKEN_TO_CACHE, MINA_CACHE } = require("../../../utils/constants/info");
 const { redis } = require("../../../utils/helper/InitRedis");
 
 export const config = {
-  maxDuration: 60,
+  maxDuration: 120,
 };
 
 export default async function handler(req, res) {
