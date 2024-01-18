@@ -142,7 +142,7 @@ export default async function pinMinaObject(obj: { [key: string]: any }) {
         }
       );
       await txn.prove();
-      res = await txn.sign([oracle]).send();
+      txn.sign([oracle]).send();
     } else {
       console.log("Update");
       txn = await Mina.transaction(
@@ -152,10 +152,9 @@ export default async function pinMinaObject(obj: { [key: string]: any }) {
         }
       );
       await txn.prove();
-      res = await txn.sign([oracle]).send();
+      txn.sign([oracle]).send();
     }
-    console.log("Txn Hash :", res.hash());
-
+    console.log("TXN SENT. NOT WAITING!!!");
     return ipfs;
   }
   // console.log(toUploadObject);
