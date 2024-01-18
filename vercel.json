@@ -30,7 +30,7 @@
     }
   ],
   "functions": {
-    "api/update/updateMina.js": {
+    "api/update/updateMina": {
       "maxDuration": 60
     }
   }

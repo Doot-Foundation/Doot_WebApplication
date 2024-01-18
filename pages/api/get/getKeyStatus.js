@@ -18,6 +18,6 @@ export default async function handler(req, res) {
 
   await supabase.auth.signOut();
 
-  if (select_data[0].length == 0) res.status(200).json({ valid: true });
-  else res.status(200).json({ valid: false });
+  if (select_data[0].length == 0) return res.status(200).json({ valid: true });
+  else return res.status(200).json({ valid: false });
 }

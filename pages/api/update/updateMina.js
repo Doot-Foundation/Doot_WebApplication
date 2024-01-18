@@ -3,6 +3,10 @@ import pinMinaObject from "../../../utils/helper/PinMina.ts";
 const { TOKEN_TO_CACHE, MINA_CACHE } = require("../../../utils/constants/info");
 const { redis } = require("../../../utils/helper/InitRedis");
 
+export const config = {
+  maxDuration: 60,
+};
+
 export default async function handler(req, res) {
   const authHeader = req.headers.authorization;
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -21,5 +25,5 @@ export default async function handler(req, res) {
   const updatedCID = await pinMinaObject(obj);
   await redis.set(MINA_CACHE, updatedCID);
 
-  res.status(200).json({ latest: updatedCID });
+  return res.status(200).json({ latest: updatedCID });
 }

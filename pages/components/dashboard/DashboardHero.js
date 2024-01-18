@@ -39,13 +39,8 @@ export default function DashboardHero() {
   }, [signer]);
 
   async function checkUserStatus() {
-    const headers = {
-      Authorization: "Bearer " + key,
-    };
     try {
-      const res = await axios.get(`/api/get/getUserStatus?address=${signer}`, {
-        headers: headers,
-      });
+      const res = await axios.get(`/api/get/getUserStatus?address=${signer}`);
       setUserStatus(res.data.status);
       if (res.data.status == 0) onOpen();
     } catch (error) {
@@ -72,7 +67,9 @@ export default function DashboardHero() {
       .get(`/api/addUser?address=${signer}`, {
         headers: headers,
       })
-      .then((res) => {});
+      .then((res) => {
+        window.location.reload();
+      });
   };
 
   async function getUserDetails() {

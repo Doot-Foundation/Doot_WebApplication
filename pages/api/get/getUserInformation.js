@@ -32,8 +32,9 @@ export default async function handler(req, res) {
     const diffMins = diffMillis / (1000 * 60);
 
     if (diffMins > 60) {
-      res.status(401).json({ status: "Timestamp out of the accepted range." });
-      return;
+      return res
+        .status(401)
+        .json({ status: "Timestamp out of the accepted range." });
     }
 
     const toVerifyMessage = `Sign this message to prove you have access to this wallet in order to sign in to doot.foundation/dashboard. This won't cost you any Mina. Timestamp:${timestamp}`;
@@ -46,8 +47,7 @@ export default async function handler(req, res) {
     const originsVerified = signatureClient.verifyMessage(verifyBody);
 
     if (!originsVerified) {
-      res.status(401).json({ status: "Signature Failed." });
-      return;
+      return res.status(401).json({ status: "Signature Failed." });
     }
 
     await supabase.auth.signInWithPassword({
@@ -63,10 +63,9 @@ export default async function handler(req, res) {
     await supabase.auth.signOut();
 
     if (select_data.length == 1) {
-      res.status(200).json(JSON.stringify(select_data[0]));
-      return;
+      return res.status(200).json(JSON.stringify(select_data[0]));
     } else {
-      res.status(200).json({ data: null });
+      return res.status(200).json({ data: null });
     }
   }
 }
