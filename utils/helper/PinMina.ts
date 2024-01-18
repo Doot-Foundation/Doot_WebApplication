@@ -12,6 +12,7 @@ import {
   PrivateKey,
   CircuitString,
   MerkleMap,
+  fetchAccount,
   Field,
 } from "o1js";
 
@@ -43,6 +44,9 @@ export default async function pinMinaObject(obj: { [key: string]: any }) {
     oraclePub = oracle.toPublicKey();
 
     const zkAppPublicKey = dootPub;
+
+    const { provers } = await Doot.compile();
+    console.log(provers);
 
     const zkapp = new Doot(zkAppPublicKey);
 
