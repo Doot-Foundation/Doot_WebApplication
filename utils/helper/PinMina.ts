@@ -43,12 +43,6 @@ export default async function pinMinaObject(obj: { [key: string]: any }) {
     dootPub = doot.toPublicKey();
     oraclePub = oracle.toPublicKey();
 
-    const accountInfo: any = {
-      publicKey: doot.toPublicKey(),
-    };
-    const fetchRes = await fetchAccount(accountInfo);
-    console.log(fetchRes);
-
     const zkAppPublicKey = dootPub;
 
     const zkapp = new Doot(zkAppPublicKey);
