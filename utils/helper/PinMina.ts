@@ -13,6 +13,7 @@ import {
   CircuitString,
   MerkleMap,
   Field,
+  fetchAccount,
 } from "o1js";
 
 async function frameKey(key: CircuitString) {
@@ -41,6 +42,11 @@ export default async function pinMinaObject(obj: { [key: string]: any }) {
     oracle = PrivateKey.fromBase58(ORACLE_KEY);
     dootPub = doot.toPublicKey();
     oraclePub = oracle.toPublicKey();
+
+    const accountInfo = {
+      publicKey: dootPub,
+    };
+    await fetchAccount(accountInfo);
 
     const zkAppPublicKey = dootPub;
 
