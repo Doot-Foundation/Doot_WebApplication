@@ -60,10 +60,11 @@ export default async function sendMinaTxn(array: string[]) {
           }
         );
       }
-
+      console.log("Reached 6");
       await txn.prove();
-      await txn.sign([oracle]).send();
-      console.log("Sent Successfully!");
+      console.log("Reached 7");
+      txn.sign([oracle]).send();
+      console.log("Sent!");
       return true;
     }
   } catch (err) {
