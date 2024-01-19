@@ -1,11 +1,10 @@
-import pinMinaObject from "../../../utils/helper/PinMina.ts";
+import pinMinaObject from "../../../utils/helper/PinMinaObject.ts";
 
-const { TOKEN_TO_CACHE, MINA_CACHE } = require("../../../utils/constants/info");
-const { redis } = require("../../../utils/helper/InitRedis");
-
-export const config = {
-  maxDuration: 300,
-};
+const {
+  TOKEN_TO_CACHE,
+  MINA_CACHE,
+} = require("../../../utils/constants/info.js");
+const { redis } = require("../../../utils/helper/InitRedis.js");
 
 export default async function handler(req, res) {
   const authHeader = req.headers.authorization;
@@ -22,8 +21,9 @@ export default async function handler(req, res) {
     obj[`${item}`] = data;
   }
 
-  const updatedCID = await pinMinaObject(obj);
-  await redis.set(MINA_CACHE, updatedCID);
+  const results = await pinMinaObject(obj);
+  //RESULTS : [IPFSHASH,COMMITMENT]
+  await redis.set(MINA_CACHE, results);
 
-  return res.status(200).json({ latest: updatedCID });
+  return res.status(200).json({ latest: results });
 }
