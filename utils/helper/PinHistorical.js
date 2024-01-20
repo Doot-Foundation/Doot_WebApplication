@@ -3,6 +3,20 @@ const axios = require("axios");
 const JWT = process.env.PINATA_JWT;
 const GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
 
+function removeOldTimestamps(obj) {
+  const currentTime = new Date();
+  const oneDay = 24 * 60 * 60 * 1000; // One day in milliseconds
+
+  Object.keys(obj.historical).forEach((key) => {
+    let timestamp = new Date(Number(key));
+    let diff = currentTime - timestamp;
+
+    if (diff > oneDay) {
+      delete obj.historical[key];
+    }
+  });
+}
+
 export default async function pinHistoricalObject(previousCID, latestPrices) {
   // const previousCID = await getHistoricalCache();
 
@@ -42,7 +56,8 @@ export default async function pinHistoricalObject(previousCID, latestPrices) {
     };
   }
 
-  console.log(toUploadObject);
+  removeOldTimestamps(toUploadObject);
+  console.log("Removed Older Timestamps!");
 
   const options = {
     method: "POST",

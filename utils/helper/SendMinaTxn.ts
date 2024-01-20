@@ -3,7 +3,6 @@ const DOOT_KEY: string | undefined = process.env.DOOT_KEY;
 const MINA_SECRET: string | undefined = process.env.MINA_SECRET;
 
 import { Doot, IpfsCID } from "./Doot";
-import { DootFileSystem, fetchFiles } from "./LoadCache";
 import { Mina, PrivateKey, Field, fetchAccount } from "o1js";
 
 export default async function sendMinaTxn(array: string[]) {
@@ -38,8 +37,7 @@ export default async function sendMinaTxn(array: string[]) {
     console.log("Reached 4");
     console.log(performance.now());
 
-    const cacheFiles = await fetchFiles();
-    await Doot.compile({ cache: DootFileSystem(cacheFiles) });
+    await Doot.compile();
     const zkapp = new Doot(dootPub);
 
     console.log("Reached 5");
