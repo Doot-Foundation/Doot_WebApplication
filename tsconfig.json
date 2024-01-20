@@ -106,7 +106,8 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "../other_files/GenerateVerificationKey.ts"
+    "../other_files/GenerateVerificationKey.ts",
+    "utils/helper/LoadCache.js"
   ],
   "exclude": ["node_modules"]
 }
