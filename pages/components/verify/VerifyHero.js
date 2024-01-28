@@ -68,7 +68,7 @@ export default function VerifyHero() {
         });
       else
         toast({
-          title: "Verificatino Failed!!!",
+          title: "Verification Failed!!!",
           description: "The Signature Did Not Originate From The Oracle Keys.",
           duration: "7000",
           status: "error",

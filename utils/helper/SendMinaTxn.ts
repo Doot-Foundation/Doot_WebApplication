@@ -29,8 +29,12 @@ export default async function sendMinaTxn(array: string[]) {
     console.log("Reached 3");
     console.log(performance.now());
 
-    const accountInfo = {
+    let accountInfo = {
       publicKey: dootPub,
+    };
+    await fetchAccount(accountInfo);
+    accountInfo = {
+      publicKey: oraclePub,
     };
     await fetchAccount(accountInfo);
 

@@ -1,12 +1,15 @@
 const JWT = process.env.PINATA_JWT;
-
+import unpin from "./Unpin";
 import { Poseidon, CircuitString, MerkleMap, Field } from "o1js";
 
 async function frameKey(key: CircuitString) {
   return Poseidon.hash(key.toFields());
 }
 
-export default async function pinMinaObject(obj: { [key: string]: any }) {
+export default async function pinMinaObject(
+  obj: { [key: string]: any },
+  previousCID: string
+) {
   const Map = new MerkleMap();
 
   const minaKey = await frameKey(CircuitString.fromString("Mina"));
@@ -78,5 +81,8 @@ export default async function pinMinaObject(obj: { [key: string]: any }) {
   );
   const data = await response.json();
   const IPFS = data.IpfsHash;
+
+  await unpin(previousCID, "Mina");
+
   return [IPFS, COMMITMENT.toString()];
 }
