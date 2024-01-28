@@ -21,7 +21,8 @@ export default async function handler(req, res) {
     obj[`${item}`] = data;
   }
 
-  const results = await pinMinaObject(obj);
+  const previousData = await redis.get(MINA_CACHE);
+  const results = await pinMinaObject(obj, previousData[0]);
   //RESULTS : [IPFSHASH,COMMITMENT]
   await redis.set(MINA_CACHE, results);
 

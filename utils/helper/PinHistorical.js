@@ -1,7 +1,8 @@
 const axios = require("axios");
-
 const JWT = process.env.PINATA_JWT;
 const GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
+
+import unpin from "./Unpin";
 
 function removeOldTimestamps(obj) {
   const currentTime = new Date();
@@ -56,6 +57,8 @@ export default async function pinHistoricalObject(previousCID, latestPrices) {
     };
   }
 
+  console.log("IsFirst :", isFirst);
+
   removeOldTimestamps(toUploadObject);
   console.log("Removed Older Timestamps!");
 
@@ -79,23 +82,7 @@ export default async function pinHistoricalObject(previousCID, latestPrices) {
   const data = await response.json();
   console.log(data);
 
-  // if (!isFirst) {
-  //   try {
-  //     const options = {
-  //       method: "DELETE",
-  //       headers: { accept: "application/json", authorization: `Bearer ${JWT}` },
-  //     };
-
-  //     const deleteResponse = await fetch(
-  //       `https://api.pinata.cloud/pinning/unpin/${previousCID}`,
-  //       options
-  //     );
-  //     const deleteData = await deleteResponse.json();
-  //     console.log(`DELETED PREVIOUS AT ${previousCID}\n`, deleteData);
-  //   } catch (error) {
-  //     console.log("Delete Unsuccessful");
-  //   }
-  // }
+  await unpin(previousCID, "Historical");
 
   return data.IpfsHash;
 }
