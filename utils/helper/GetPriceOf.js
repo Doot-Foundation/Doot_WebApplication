@@ -269,8 +269,6 @@ async function getPriceOf(token) {
   console.log(token);
   const results = await createAssetInfoArray(token);
 
-  console.log(results);
-
   const prices = results[0];
   let sum = 0;
   let count = 0;
@@ -291,7 +289,7 @@ async function getPriceOf(token) {
     ORACLE_KEY
   );
 
-  console.log(signedPrice);
+  console.log("Signed :", signedPrice);
 
   var jsonCompatibleSignature = {};
   jsonCompatibleSignature["signature"] = signedPrice.signature;
@@ -308,7 +306,7 @@ async function getPriceOf(token) {
     signatures: results[1],
   };
 
-  console.log(meanPrice, processedPrice, "\n");
+  console.log("Mean :", meanPrice, "\n", "Processed :", processedPrice, "\n");
   return [meanPrice, assetCacheObject];
 }
 
