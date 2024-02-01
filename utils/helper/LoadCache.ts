@@ -58,18 +58,15 @@ export const DootFileSystem = (files: any): Cache => ({
     // read current uniqueId, return data if it matches
     if (!files[persistentId]) {
       console.log("read");
-      console.log({ persistentId, uniqueId, dataType });
       return undefined;
     }
 
     const currentId = files[persistentId].header;
     if (currentId !== uniqueId) {
-      console.log("current id did not match persistent id");
       return undefined;
     }
 
     if (dataType === "string") {
-      console.log("found in cache", { persistentId, uniqueId, dataType });
       return new TextEncoder().encode(files[persistentId].data);
     }
 
@@ -77,7 +74,6 @@ export const DootFileSystem = (files: any): Cache => ({
   },
   write({ persistentId, uniqueId, dataType }: any, data: any) {
     console.log("write");
-    console.log({ persistentId, uniqueId, dataType });
   },
   canWrite: true,
 });
