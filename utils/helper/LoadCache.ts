@@ -3,17 +3,11 @@ import { Cache } from "o1js";
 const cacheFiles = [
   { name: "srs-fp-65536", type: "string" },
   { name: "srs-fq-32768", type: "string" },
-  { name: "step-pk-doot-init", type: "string" },
-  { name: "step-pk-doot-initbase", type: "string" },
-  { name: "step-pk-doot-updatebase", type: "string" },
-  { name: "step-pk-doot-updateindividual", type: "string" },
-  { name: "step-pk-doot-verify", type: "string" },
   { name: "step-vk-doot-init", type: "string" },
   { name: "step-vk-doot-initbase", type: "string" },
   { name: "step-vk-doot-updatebase", type: "string" },
   { name: "step-vk-doot-updateindividual", type: "string" },
   { name: "step-vk-doot-verify", type: "string" },
-  { name: "wrap-pk-doot", type: "string" },
   { name: "wrap-vk-doot", type: "string" },
 ];
 
