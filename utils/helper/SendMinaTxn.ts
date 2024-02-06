@@ -19,7 +19,7 @@ export default async function sendMinaTxn(array: string[]) {
     const dootPub = doot.toPublicKey();
 
     const Berkeley = Mina.Network(
-      "https://proxy.berkeley.minaexplorer.com/graphql"
+      "https://api.minascan.io/node/berkeley/v1/graphql"
     );
     Mina.setActiveInstance(Berkeley);
 
