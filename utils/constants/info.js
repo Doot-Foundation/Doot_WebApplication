@@ -27,7 +27,7 @@ const MINA_CACHE = "mina_cid";
 const ORACLE_PUBLIC_KEY =
   "B62qjm48BJuzaZmu2wA5YaZeKknkovbx9kDmu8E83jcYsg4sPgTDgPF";
 const DOOT_PUBLIC_KEY =
-  "B62qn6RBn2JZTkkagnUhn7EEZTbv4cnTMWyT9w9vEyJgbAbc3TofPSN";
+  "B62qjaQEw1PcdETvJyLMtKxYgz8GAXv3cGeJ575Cgf3Hpw5qybr1jFE";
 
 const PROVIDERS = [
   "Binance",
@@ -101,6 +101,7 @@ const SYMBOL_TO_TOKEN = {
 };
 
 module.exports = {
+  DOOT_PUBLIC_KEY,
   TOKEN_TO_SYMBOL,
   MINA_CACHE,
   SYMBOL_TO_TOKEN,
@@ -108,7 +109,6 @@ module.exports = {
   PROVIDERS,
   TOKEN_TO_CACHE,
   SUPPORTED_TOKENS,
-  DOOT_PUBLIC_KEY,
   ORACLE_PUBLIC_KEY,
   HISTORICAL_CACHE,
   ENDPOINT_TO_DATA_PROVIDER,

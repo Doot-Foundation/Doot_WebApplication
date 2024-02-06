@@ -32,7 +32,7 @@
     },
     {
       "path": "/api/update/updateMinaTxn",
-      "schedule": "10 */2 * * *"
+      "schedule": "1 */2 * * *"
     },
     {
       "path": "/api/update/updateHistorical",
