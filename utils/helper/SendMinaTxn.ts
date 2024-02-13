@@ -1,6 +1,7 @@
 const ORACLE_KEY: string | undefined = process.env.ORACLE_KEY;
 const DOOT_KEY: string | undefined = process.env.DOOT_KEY;
 const MINA_SECRET: string | undefined = process.env.MINA_SECRET;
+const ENDPOINT: string | undefined = process.env.NEXT_PUBLIC_MINA_ENDPOINT;
 
 import { Doot, IpfsCID } from "./Doot";
 import { Mina, PrivateKey, Field, fetchAccount } from "o1js";
@@ -8,7 +9,7 @@ import { DootFileSystem, fetchFiles } from "./LoadCache";
 
 export default async function sendMinaTxn(array: string[]) {
   console.log(array);
-  if (ORACLE_KEY && DOOT_KEY && MINA_SECRET) {
+  if (ORACLE_KEY && DOOT_KEY && MINA_SECRET && ENDPOINT) {
     const COMMITMENT = Field.from(array[1]);
     const IPFS_HASH: IpfsCID = IpfsCID.fromString(array[0]);
     const SECRET: Field = Field.from(MINA_SECRET);
@@ -18,9 +19,7 @@ export default async function sendMinaTxn(array: string[]) {
     const oraclePub = oracle.toPublicKey();
     const dootPub = doot.toPublicKey();
 
-    const Berkeley = Mina.Network(
-      "https://api.minascan.io/node/berkeley/v1/graphql"
-    );
+    const Berkeley = Mina.Network(ENDPOINT);
     Mina.setActiveInstance(Berkeley);
 
     let accountInfo = {
