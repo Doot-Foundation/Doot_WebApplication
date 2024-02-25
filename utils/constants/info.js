@@ -10,6 +10,12 @@ import {
   CoinLoreSymbols,
   CoinRankingSymbols,
   CoinCodexSymbols,
+  KuCoinSymbols,
+  HuobiSymbols,
+  ByBitSymbols,
+  UpBitSymbols,
+  CexIOSymbols,
+  SwapZoneSymbols,
 } from "./symbols";
 
 const MULTIPLICATION_FACTOR = 10;

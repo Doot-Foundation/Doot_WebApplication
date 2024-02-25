@@ -35,6 +35,8 @@ async function callSignAPICall(url, resultPath, headerName) {
       ? process.env.COIN_API_KEY
       : headerName == "x-access-token"
       ? process.env.COIN_RANKING_KEY
+      : headerName == "x-api-key"
+      ? process.env.SWAP_ZONE_KEY
       : "";
   API_KEY = API_KEY.replace(/^'(.*)'$/, "$1");
 
@@ -51,7 +53,10 @@ async function callSignAPICall(url, resultPath, headerName) {
 
   const price = _.get(response, resultPath);
 
-  const Price = String(price);
+  var Price;
+  if (headerName == "x-api-key") Price = String(price / 100);
+  else Price = String(price);
+
   const Timestamp = getTimestamp(response.headers["date"]);
 
   const fieldURL = BigInt(CircuitString.fromString(url).hash());

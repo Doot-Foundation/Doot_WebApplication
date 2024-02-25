@@ -18,6 +18,12 @@ import {
   CoinLoreSymbols,
   CoinRankingSymbols,
   CoinCodexSymbols,
+  KuCoinSymbols,
+  HuobiSymbols,
+  ByBitSymbols,
+  UpBitSymbols,
+  CexIOSymbols,
+  SwapZoneSymbols,
 } from "../constants/symbols";
 
 async function getPriceCoinGecko(token) {
@@ -169,6 +175,89 @@ async function getPriceCoinCodex(token) {
   const id = CoinCodexSymbols[token.toLowerCase()];
   const apiToCall = `https://coincodex.com/api/coincodex/get_coin/${id}`;
   const resultPath = `data.last_price_usd`;
+
+  try {
+    const results = await callSignAPICall(apiToCall, resultPath, "");
+    return results;
+  } catch (error) {
+    console.error("Error coin codex");
+    return [0, 0, ""];
+  }
+}
+async function getPriceKuCoin(token) {
+  const id = KuCoinSymbols[token.toLowerCase()];
+  const apiToCall = `https://api.kucoin.com/api/v1/market/orderbook/level1?symbol=${id}-USDT`;
+  const resultPath = `data.data.price`;
+
+  try {
+    const results = await callSignAPICall(apiToCall, resultPath, "");
+    return results;
+  } catch (error) {
+    console.error("Error coin codex");
+    return [0, 0, ""];
+  }
+}
+async function getPriceHuobi(token) {
+  const id = HuobiSymbols[token.toLowerCase()];
+  const apiToCall = `https://api.huobi.pro/market/history/trade?symbol=${id}usdt&size=1`;
+  const resultPath = `data.data[0].data[0].price`;
+
+  try {
+    const results = await callSignAPICall(apiToCall, resultPath, "");
+    return results;
+  } catch (error) {
+    console.error("Error coin codex");
+    return [0, 0, ""];
+  }
+}
+async function getPriceByBit(token) {
+  const id = ByBitSymbols[token.toLowerCase()];
+  const apiToCall = `https://api.bybit.com/derivatives/v3/public/tickers?symbol=${id}USDT`;
+  const resultPath = `data.result.list[0].prevPrice1h`;
+
+  try {
+    const results = await callSignAPICall(apiToCall, resultPath, "");
+    return results;
+  } catch (error) {
+    console.error("Error coin codex");
+    return [0, 0, ""];
+  }
+}
+
+//THEY RETURN PRICES WEIRD
+async function getPriceUpBit(token) {
+  const id = UpBitSymbols[token.toLowerCase()];
+  const apiToCall = `https://api.upbit.com/v1/ticker?markets=${id}`;
+  const resultPath = `data[0].trade_price`;
+
+  try {
+    const results = await callSignAPICall(apiToCall, resultPath, "");
+    return results;
+  } catch (error) {
+    console.error("Error coin codex");
+    return [0, 0, ""];
+  }
+}
+
+async function getPriceCexIO(token) {
+  const id = CexIOSymbols[token.toLowerCase()];
+  const apiToCall = `https://cex.io/api/last_price/${id}/USD`;
+  const resultPath = `data.lprice`;
+
+  try {
+    const results = await callSignAPICall(apiToCall, resultPath, "");
+    return results;
+  } catch (error) {
+    console.error("Error coin codex");
+    return [0, 0, ""];
+  }
+}
+
+/// MULTIPLIED BY 100
+async function getPriceSwapZone(token) {
+  const id = SwapZoneSymbols[token.toLowerCase()];
+  const apiToCall = `https://api.swapzone.io/v1/exchange/get-rate?from=${id}&to=usdc&amount=100&rateType=all&availableInUSA=false&chooseRate=best&noRefundAddress=false`;
+  const resultPath = `data.amountTo`;
 
   try {
     const results = await callSignAPICall(apiToCall, resultPath, "");
