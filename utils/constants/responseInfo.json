@@ -99,5 +99,25 @@
     "lowest_52_week_price": 1870000.0,
     "lowest_52_week_date": "2023-03-10",
     "timestamp": 1708751357023
+  },
+  "CEX.io": {
+    "url": "https://cex.io/api/last_price/ETH/USD",
+    "lprice": "3083.75",
+    "curr1": "ETH",
+    "curr2": "USD"
+  },
+  "Swapzone": {
+    "url": "https://api.swapzone.io/v1/exchange/get-rate?from=eth&to=usdc&amount=100&rateType=all&availableInUSA=false&chooseRate=best&noRefundAddress=false",
+    "adapter": "exolix",
+    "from": "eth",
+    "fromNetwork": "ETH",
+    "to": "usdc",
+    "toNetwork": "ETH",
+    "amountFrom": 100,
+    "amountTo": 307626.587005,
+    "minAmount": 0.023302,
+    "maxAmount": null,
+    "quotaId": "5e6261376f2ca202169de5b8",
+    "time": 5
   }
 }

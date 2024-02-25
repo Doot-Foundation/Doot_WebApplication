@@ -118,21 +118,21 @@ const UpBitSymbols = {
   solana: "KRW-SOL",
 };
 
-// const GateIOSymbols = {
-//   ethereum: "ETH_USDT",
-//   bitcoin: "BTC_USDT",
-//   mina: "MINA_USDT",
-//   chainlink: "LINK_USDT",
-//   solana: "SOL_USDT",
-// };
+const CexIOSymbols = {
+  ethereum: "ETH",
+  bitcoin: "BTC",
+  mina: "MINA",
+  chainlink: "LINK",
+  solana: "SOL",
+};
 
-// const HtxSymbols = {
-//   ethereum: "ethusdt",
-//   bitcoin: "btcusdt",
-//   mina: "minausdt",
-//   chainlink: "linkusdt",
-//   solana: "solusdt",
-// };
+const SwapZoneSymbols = {
+  ethereum: "eth",
+  bitcoin: "btc",
+  mina: "mina",
+  chainlink: "link",
+  solana: "sol",
+};
 
 module.exports = {
   CoinGekoSymbols,
@@ -150,6 +150,6 @@ module.exports = {
   HuobiSymbols,
   ByBitSymbols,
   UpBitSymbols,
-  // GateIOSymbols,
-  // HtxSymbols,
+  CexIOSymbols,
+  SwapZoneSymbols,
 };
