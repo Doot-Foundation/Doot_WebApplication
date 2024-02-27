@@ -21,7 +21,6 @@ import {
   KuCoinSymbols,
   HuobiSymbols,
   ByBitSymbols,
-  UpBitSymbols,
   CexIOSymbols,
   SwapZoneSymbols,
 } from "../constants/symbols";
@@ -193,7 +192,7 @@ async function getPriceKuCoin(token) {
     const results = await callSignAPICall(apiToCall, resultPath, "");
     return results;
   } catch (error) {
-    console.error("Error coin codex");
+    console.error("Error kucoin");
     return [0, 0, ""];
   }
 }
@@ -206,7 +205,7 @@ async function getPriceHuobi(token) {
     const results = await callSignAPICall(apiToCall, resultPath, "");
     return results;
   } catch (error) {
-    console.error("Error coin codex");
+    console.error("Error huobi");
     return [0, 0, ""];
   }
 }
@@ -219,25 +218,25 @@ async function getPriceByBit(token) {
     const results = await callSignAPICall(apiToCall, resultPath, "");
     return results;
   } catch (error) {
-    console.error("Error coin codex");
+    console.error("Error bybit");
     return [0, 0, ""];
   }
 }
 
-//THEY RETURN PRICES WEIRD
-async function getPriceUpBit(token) {
-  const id = UpBitSymbols[token.toLowerCase()];
-  const apiToCall = `https://api.upbit.com/v1/ticker?markets=${id}`;
-  const resultPath = `data[0].trade_price`;
+//THEY RETURN PRICES IN KOREAN WON
+// async function getPriceUpBit(token) {
+//   const id = UpBitSymbols[token.toLowerCase()];
+//   const apiToCall = `https://api.upbit.com/v1/ticker?markets=${id}`;
+//   const resultPath = `data[0].trade_price`;
 
-  try {
-    const results = await callSignAPICall(apiToCall, resultPath, "");
-    return results;
-  } catch (error) {
-    console.error("Error coin codex");
-    return [0, 0, ""];
-  }
-}
+//   try {
+//     const results = await callSignAPICall(apiToCall, resultPath, "");
+//     return results;
+//   } catch (error) {
+//     console.error("Error upbit");
+//     return [0, 0, ""];
+//   }
+// }
 
 async function getPriceCexIO(token) {
   const id = CexIOSymbols[token.toLowerCase()];
@@ -248,7 +247,7 @@ async function getPriceCexIO(token) {
     const results = await callSignAPICall(apiToCall, resultPath, "");
     return results;
   } catch (error) {
-    console.error("Error coin codex");
+    console.error("Error cexio");
     return [0, 0, ""];
   }
 }
@@ -256,14 +255,15 @@ async function getPriceCexIO(token) {
 /// MULTIPLIED BY 100
 async function getPriceSwapZone(token) {
   const id = SwapZoneSymbols[token.toLowerCase()];
-  const apiToCall = `https://api.swapzone.io/v1/exchange/get-rate?from=${id}&to=usdc&amount=100&rateType=all&availableInUSA=false&chooseRate=best&noRefundAddress=false`;
+  const apiToCall = `https://api.swapzone.io/v1/exchange/get-rate?from=${id}&to=usdc&amount=100`;
   const resultPath = `data.amountTo`;
+  const header = "x-api-key";
 
   try {
-    const results = await callSignAPICall(apiToCall, resultPath, "");
+    const results = await callSignAPICall(apiToCall, resultPath, header);
     return results;
   } catch (error) {
-    console.error("Error coin codex");
+    console.error("Error swapzone");
     return [0, 0, ""];
   }
 }
@@ -304,6 +304,8 @@ async function removeOutliers(array, timestamps, signatures, urls, threshold) {
     }
   }
 
+  console.log("\nData Points Considered :", nonOutlierPrices.length);
+
   return [
     nonOutlierPrices,
     nonOutlierSignatures,
@@ -325,6 +327,12 @@ async function createAssetInfoArray(token) {
     getPriceCryptoCompare,
     getPriceMessari,
     getPricePaprika,
+    getPriceKuCoin,
+    getPriceHuobi,
+    getPriceByBit,
+    // getPriceUpBit,
+    getPriceCexIO,
+    getPriceSwapZone,
   ];
 
   var priceArray = [];
@@ -355,6 +363,7 @@ async function createAssetInfoArray(token) {
 }
 
 async function getPriceOf(token) {
+  console.log("\n");
   console.log(token);
   const results = await createAssetInfoArray(token);
 
@@ -378,7 +387,7 @@ async function getPriceOf(token) {
     ORACLE_KEY
   );
 
-  console.log("Signed :", signedPrice);
+  console.log("\nSigned :", signedPrice);
 
   var jsonCompatibleSignature = {};
   jsonCompatibleSignature["signature"] = signedPrice.signature;
@@ -395,7 +404,8 @@ async function getPriceOf(token) {
     signatures: results[1],
   };
 
-  console.log("Mean :", meanPrice, "\n", "Processed :", processedPrice, "\n");
+  console.log("Mean :", meanPrice);
+  console.log("Processed :", processedPrice, "\n");
   return [meanPrice, assetCacheObject];
 }
 

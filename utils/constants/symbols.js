@@ -87,35 +87,27 @@ const CoinCodexSymbols = {
 };
 
 const KuCoinSymbols = {
-  ethereum: "ETH-USDT",
-  bitcoin: "BTC-USDT",
-  mina: "MINA-USDT",
-  solana: "SOL-USDT",
-  chainlink: "LINK-USDT",
+  ethereum: "ETH",
+  bitcoin: "BTC",
+  mina: "MINA",
+  solana: "SOL",
+  chainlink: "LINK",
 };
 
 const HuobiSymbols = {
-  ethereum: "ethusdt",
-  bitcoin: "btcusdt",
-  mina: "minausdt",
-  chainlink: "linkusdt",
-  solana: "solusdt",
+  ethereum: "eth",
+  bitcoin: "btc",
+  mina: "mina",
+  chainlink: "link",
+  solana: "sol",
 };
 
 const ByBitSymbols = {
-  ethereum: "ETHUSDT",
-  bitcoin: "BTCUSDT",
-  mina: "MINAUSDT",
-  chainlink: "LINKUSDT",
-  solana: "SOLUSDC",
-};
-
-const UpBitSymbols = {
-  ethereum: "KRW-ETH",
-  bitcoin: "KRW-BTC",
-  mina: "KRW-MINA",
-  chainlink: "KRW-LINK",
-  solana: "KRW-SOL",
+  ethereum: "ETH",
+  bitcoin: "BTC",
+  mina: "MINA",
+  chainlink: "LINK",
+  solana: "SOL",
 };
 
 const CexIOSymbols = {
@@ -149,7 +141,6 @@ module.exports = {
   KuCoinSymbols,
   HuobiSymbols,
   ByBitSymbols,
-  UpBitSymbols,
   CexIOSymbols,
   SwapZoneSymbols,
 };

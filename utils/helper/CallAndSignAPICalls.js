@@ -52,13 +52,11 @@ async function callSignAPICall(url, resultPath, headerName) {
   header = null;
 
   const price = _.get(response, resultPath);
-
   var Price;
   if (headerName == "x-api-key") Price = String(price / 100);
   else Price = String(price);
 
   const Timestamp = getTimestamp(response.headers["date"]);
-
   const fieldURL = BigInt(CircuitString.fromString(url).hash());
   const fieldPrice = BigInt(processFloatString(Price));
   const fieldDecimals = BigInt(MULTIPLICATION_FACTOR);
