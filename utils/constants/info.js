@@ -107,8 +107,8 @@ function DATA_PROVIDER_TO_ENDPOINT(provider, token) {
     KuCoin: `https://api.kucoin.com/api/v1/market/orderbook/level1?symbol=${kucoin_id}-USDT`,
     Huobi: `https://api.huobi.pro/market/history/trade?symbol=${huobi_id}usdt&size=1`,
     ByBit: `https://api.bybit.com/derivatives/v3/public/tickers?symbol=${bybit_id}USDT`,
-    Cexio: `https://cex.io/api/last_price/${cexio_id}/USD`,
-    SwapZone: `https://api.swapzone.io/v1/exchange/get-rate?from=${swapzone_id}&to=usdc&amount=100`,
+    "Cex.io": `https://cex.io/api/last_price/${cexio_id}/USD`,
+    SwapZone: `https://api.swapzone.io/v1/exchange/get-rate?from=${swapzone_id}&to=usdc&amount=1000`,
   };
 
   return obj[provider];

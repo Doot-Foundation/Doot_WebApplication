@@ -35,8 +35,10 @@ export default function IndividualAsset({ token }) {
 
     for (const timestamp of timestamps) {
       const data = historicalObj[timestamp][SYMBOL_TO_TOKEN[token]];
-      data.timestamp = timestamp;
-      tokenHistoricalArray.push(data);
+      if (data) {
+        data.timestamp = timestamp;
+        tokenHistoricalArray.push(data);
+      }
     }
 
     setIPFSHistorical(tokenHistoricalArray);
@@ -114,6 +116,7 @@ export default function IndividualAsset({ token }) {
 
   useEffect(() => {
     if (ipfsData) {
+      console.log(ipfsData);
       const toPush = ipfsData.latest.prices[SYMBOL_TO_TOKEN[token]];
       toPush.timestamp = ipfsData.latest.timestamp.toString();
       const latestArr = new Array();
@@ -164,7 +167,7 @@ export default function IndividualAsset({ token }) {
                         Providers
                       </Text>
                       <Heading fontFamily={"Manrope Variable"} size={"lg"}>
-                        {latest.urls.length}/11
+                        {latest.urls.length}/16
                       </Heading>
                     </Flex>
                     <Spacer />

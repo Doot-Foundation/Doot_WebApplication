@@ -137,8 +137,8 @@ const CoinCodexSymbols = {
   ripple: "xrp",
   dogecoin: "doge",
   polygon: "matic",
-  avalanche: "",
-  cardano: "",
+  avalanche: "avax",
+  cardano: "ada",
 };
 
 const KuCoinSymbols = {

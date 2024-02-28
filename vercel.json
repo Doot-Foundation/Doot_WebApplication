@@ -27,6 +27,26 @@
       "schedule": "*/10 * * * *"
     },
     {
+      "path": "/api/update/updatePrice?token=ripple",
+      "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/update/updatePrice?token=dogecoin",
+      "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/update/updatePrice?token=matic",
+      "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/update/updatePrice?token=avalanche",
+      "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/update/updatePrice?token=cardano",
+      "schedule": "*/10 * * * *"
+    },
+    {
       "path": "/api/update/updateMinaPin",
       "schedule": "0 */2 * * *"
     },
