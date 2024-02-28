@@ -121,11 +121,11 @@ const CoinRankingSymbols = {
   chainlink: "VLqpJwogdhHNb",
   mina: "",
   solana: "zNZHO_Sjf",
-  ripple: "",
-  dogecoin: "",
-  polygon: "",
-  avalanche: "",
-  cardano: "",
+  ripple: "-l8Mn2pVlRs-p",
+  dogecoin: "a91GCGd_u96cF",
+  polygon: "uW2tk-ILY0ii",
+  avalanche: "dvUj0CzDZ",
+  cardano: "qzawljRxB5bYu",
 };
 
 const CoinCodexSymbols = {
@@ -134,9 +134,9 @@ const CoinCodexSymbols = {
   chainlink: "link",
   mina: "mina",
   solana: "sol",
-  ripple: "",
-  dogecoin: "",
-  polygon: "",
+  ripple: "xrp",
+  dogecoin: "doge",
+  polygon: "matic",
   avalanche: "",
   cardano: "",
 };
@@ -147,11 +147,11 @@ const KuCoinSymbols = {
   mina: "MINA",
   solana: "SOL",
   chainlink: "LINK",
-  ripple: "",
-  dogecoin: "",
-  polygon: "",
-  avalanche: "",
-  cardano: "",
+  ripple: "XRP",
+  dogecoin: "DOGE",
+  polygon: "MATIC",
+  avalanche: "AVAX",
+  cardano: "ADA",
 };
 
 const HuobiSymbols = {
@@ -160,11 +160,11 @@ const HuobiSymbols = {
   mina: "mina",
   chainlink: "link",
   solana: "sol",
-  ripple: "",
-  dogecoin: "",
-  polygon: "",
-  avalanche: "",
-  cardano: "",
+  ripple: "xrp",
+  dogecoin: "doge",
+  polygon: "matic",
+  avalanche: "avax",
+  cardano: "ada",
 };
 
 const ByBitSymbols = {
@@ -173,11 +173,11 @@ const ByBitSymbols = {
   mina: "MINA",
   chainlink: "LINK",
   solana: "SOL",
-  ripple: "",
-  dogecoin: "",
-  polygon: "",
-  avalanche: "",
-  cardano: "",
+  ripple: "XRP",
+  dogecoin: "DOGE",
+  polygon: "MATIC",
+  avalanche: "AVAX",
+  cardano: "ADA",
 };
 
 const CexIOSymbols = {
@@ -186,11 +186,11 @@ const CexIOSymbols = {
   mina: "MINA",
   chainlink: "LINK",
   solana: "SOL",
-  ripple: "",
-  dogecoin: "",
-  polygon: "",
-  avalanche: "",
-  cardano: "",
+  ripple: "XRP",
+  dogecoin: "DOGE",
+  polygon: "MATIC",
+  avalanche: "AVAX",
+  cardano: "ADA",
 };
 
 const SwapZoneSymbols = {
@@ -199,11 +199,11 @@ const SwapZoneSymbols = {
   mina: "mina",
   chainlink: "link",
   solana: "sol",
-  ripple: "",
-  dogecoin: "",
-  polygon: "",
-  avalanche: "",
-  cardano: "",
+  ripple: "xrp",
+  dogecoin: "doge",
+  polygon: "matic",
+  avalanche: "avax",
+  cardano: "ada",
 };
 
 module.exports = {

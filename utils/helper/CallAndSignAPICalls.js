@@ -53,7 +53,7 @@ async function callSignAPICall(url, resultPath, headerName) {
 
   const price = _.get(response, resultPath);
   var Price;
-  if (headerName == "x-api-key") Price = String(price / 100);
+  if (headerName == "x-api-key") Price = String(price / 1000);
   else Price = String(price);
 
   const Timestamp = getTimestamp(response.headers["date"]);

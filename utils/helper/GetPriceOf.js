@@ -252,10 +252,10 @@ async function getPriceCexIO(token) {
   }
 }
 
-/// MULTIPLIED BY 100
+/// MULTIPLIED BY 1000 because of doge
 async function getPriceSwapZone(token) {
   const id = SwapZoneSymbols[token.toLowerCase()];
-  const apiToCall = `https://api.swapzone.io/v1/exchange/get-rate?from=${id}&to=usdc&amount=100`;
+  const apiToCall = `https://api.swapzone.io/v1/exchange/get-rate?from=${id}&to=usdc&amount=1000`;
   const resultPath = `data.amountTo`;
   const header = "x-api-key";
 
