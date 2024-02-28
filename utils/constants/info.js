@@ -13,7 +13,6 @@ import {
   KuCoinSymbols,
   HuobiSymbols,
   ByBitSymbols,
-  UpBitSymbols,
   CexIOSymbols,
   SwapZoneSymbols,
 } from "./symbols";
@@ -26,6 +25,11 @@ const TOKEN_TO_CACHE = {
   solana: "sol_cache",
   mina: "mina_cache",
   bitcoin: "btc_cache",
+  ripple: "xrp_cache",
+  cardano: "ada_cache",
+  avalanche: "avax_cache",
+  dogecoin: "doge_cache",
+  polygon: "matic_cache",
 };
 const HISTORICAL_CACHE = "historical_cid";
 const MINA_CACHE = "mina_cid";
@@ -47,6 +51,11 @@ const PROVIDERS = [
   "Coin Ranking",
   "Coin Codex",
   "Coin Gecko",
+  "KuCoin",
+  "Huobi",
+  "ByBit",
+  "Cex.io",
+  "SwapZone",
 ];
 const ENDPOINT_TO_DATA_PROVIDER = {
   binance: "Binance",
@@ -60,6 +69,11 @@ const ENDPOINT_TO_DATA_PROVIDER = {
   coinranking: "Coin Ranking",
   coincodex: "Coin Codex",
   coingecko: "Coin Gecko",
+  kucoin: "KuCoin",
+  huobi: "Huobi",
+  bybit: "ByBit",
+  cexio: "Cex.io",
+  swapzone: "Swapzone",
 };
 function DATA_PROVIDER_TO_ENDPOINT(provider, token) {
   const binance_id = BinanceSymbols[token.toLowerCase()];
@@ -73,6 +87,11 @@ function DATA_PROVIDER_TO_ENDPOINT(provider, token) {
   const coinlore_id = CoinLoreSymbols[token.toLowerCase()];
   const coinranking_id = CoinRankingSymbols[token.toLowerCase()];
   const coincodex_id = CoinCodexSymbols[token.toLowerCase()];
+  const kucoin_id = KuCoinSymbols[token.toLowerCase()];
+  const huobi_id = HuobiSymbols[token.toLowerCase()];
+  const bybit_id = ByBitSymbols[token.toLowerCase()];
+  const cexio_id = CexIOSymbols[token.toLowerCase()];
+  const swapzone_id = SwapZoneSymbols[token.toLowerCase()];
   const obj = {
     Binance: `https://api.binance.com/api/v3/ticker/price?symbol=${binance_id}USDT`,
     CMC: `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=${cmc_id}&convert=USD`,
@@ -85,18 +104,39 @@ function DATA_PROVIDER_TO_ENDPOINT(provider, token) {
     "Coin Ranking": `https://api.coinranking.com/v2/coin/${coinranking_id}/price`,
     "Coin Codex": `https://coincodex.com/api/coincodex/get_coin/${coincodex_id}`,
     "Coin Gecko": `https://api.coingecko.com/api/v3/simple/price?ids=${ciongecko_id}&vs_currencies=usd`,
+    KuCoin: `https://api.kucoin.com/api/v1/market/orderbook/level1?symbol=${kucoin_id}-USDT`,
+    Huobi: `https://api.huobi.pro/market/history/trade?symbol=${huobi_id}usdt&size=1`,
+    ByBit: `https://api.bybit.com/derivatives/v3/public/tickers?symbol=${bybit_id}USDT`,
+    Cexio: `https://cex.io/api/last_price/${cexio_id}/USD`,
+    SwapZone: `https://api.swapzone.io/v1/exchange/get-rate?from=${swapzone_id}&to=usdc&amount=100`,
   };
 
   return obj[provider];
 }
 
-const SUPPORTED_TOKENS = ["MINA", "ETH", "BTC", "LINK", "SOL"];
+const SUPPORTED_TOKENS = [
+  "MINA",
+  "ETH",
+  "BTC",
+  "LINK",
+  "SOL",
+  "XRP",
+  "ADA",
+  "AVAX",
+  "DOGE",
+  "MATIC",
+];
 const TOKEN_TO_SYMBOL = {
   mina: "MINA",
   ethereum: "ETH",
   chainlink: "LINK",
   solana: "SOL",
   bitcoin: "BTC",
+  ripple: "XRP",
+  avalanche: "AVAX",
+  cardano: "ADA",
+  dogecoin: "DOGE",
+  polygon: "MATIC",
 };
 const SYMBOL_TO_TOKEN = {
   MINA: "mina",
@@ -104,6 +144,11 @@ const SYMBOL_TO_TOKEN = {
   LINK: "chainlink",
   SOL: "solana",
   BTC: "bitcoin",
+  XRP: "ripple",
+  AVAX: "avalanche",
+  ADA: "cardano",
+  DOGE: "dogecoin",
+  MATIC: "polygon",
 };
 
 module.exports = {
