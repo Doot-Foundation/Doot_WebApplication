@@ -18,6 +18,11 @@ import {
   CoinLoreSymbols,
   CoinRankingSymbols,
   CoinCodexSymbols,
+  KuCoinSymbols,
+  HuobiSymbols,
+  ByBitSymbols,
+  CexIOSymbols,
+  SwapZoneSymbols,
 } from "../constants/symbols";
 
 async function getPriceCoinGecko(token) {
@@ -178,6 +183,90 @@ async function getPriceCoinCodex(token) {
     return [0, 0, ""];
   }
 }
+async function getPriceKuCoin(token) {
+  const id = KuCoinSymbols[token.toLowerCase()];
+  const apiToCall = `https://api.kucoin.com/api/v1/market/orderbook/level1?symbol=${id}-USDT`;
+  const resultPath = `data.data.price`;
+
+  try {
+    const results = await callSignAPICall(apiToCall, resultPath, "");
+    return results;
+  } catch (error) {
+    console.error("Error kucoin");
+    return [0, 0, ""];
+  }
+}
+async function getPriceHuobi(token) {
+  const id = HuobiSymbols[token.toLowerCase()];
+  const apiToCall = `https://api.huobi.pro/market/history/trade?symbol=${id}usdt&size=1`;
+  const resultPath = `data.data[0].data[0].price`;
+
+  try {
+    const results = await callSignAPICall(apiToCall, resultPath, "");
+    return results;
+  } catch (error) {
+    console.error("Error huobi");
+    return [0, 0, ""];
+  }
+}
+async function getPriceByBit(token) {
+  const id = ByBitSymbols[token.toLowerCase()];
+  const apiToCall = `https://api.bybit.com/derivatives/v3/public/tickers?symbol=${id}USDT`;
+  const resultPath = `data.result.list[0].prevPrice1h`;
+
+  try {
+    const results = await callSignAPICall(apiToCall, resultPath, "");
+    return results;
+  } catch (error) {
+    console.error("Error bybit");
+    return [0, 0, ""];
+  }
+}
+
+//THEY RETURN PRICES IN KOREAN WON
+// async function getPriceUpBit(token) {
+//   const id = UpBitSymbols[token.toLowerCase()];
+//   const apiToCall = `https://api.upbit.com/v1/ticker?markets=${id}`;
+//   const resultPath = `data[0].trade_price`;
+
+//   try {
+//     const results = await callSignAPICall(apiToCall, resultPath, "");
+//     return results;
+//   } catch (error) {
+//     console.error("Error upbit");
+//     return [0, 0, ""];
+//   }
+// }
+
+async function getPriceCexIO(token) {
+  const id = CexIOSymbols[token.toLowerCase()];
+  const apiToCall = `https://cex.io/api/last_price/${id}/USD`;
+  const resultPath = `data.lprice`;
+
+  try {
+    const results = await callSignAPICall(apiToCall, resultPath, "");
+    return results;
+  } catch (error) {
+    console.error("Error cexio");
+    return [0, 0, ""];
+  }
+}
+
+/// MULTIPLIED BY 1000 because of doge
+async function getPriceSwapZone(token) {
+  const id = SwapZoneSymbols[token.toLowerCase()];
+  const apiToCall = `https://api.swapzone.io/v1/exchange/get-rate?from=${id}&to=usdc&amount=1000`;
+  const resultPath = `data.amountTo`;
+  const header = "x-api-key";
+
+  try {
+    const results = await callSignAPICall(apiToCall, resultPath, header);
+    return results;
+  } catch (error) {
+    console.error("Error swapzone");
+    return [0, 0, ""];
+  }
+}
 
 function getMedian(array) {
   const sorted = array.slice().sort((a, b) => a - b);
@@ -215,6 +304,8 @@ async function removeOutliers(array, timestamps, signatures, urls, threshold) {
     }
   }
 
+  console.log("\nData Points Considered :", nonOutlierPrices.length);
+
   return [
     nonOutlierPrices,
     nonOutlierSignatures,
@@ -236,6 +327,12 @@ async function createAssetInfoArray(token) {
     getPriceCryptoCompare,
     getPriceMessari,
     getPricePaprika,
+    getPriceKuCoin,
+    getPriceHuobi,
+    getPriceByBit,
+    // getPriceUpBit,
+    getPriceCexIO,
+    getPriceSwapZone,
   ];
 
   var priceArray = [];
@@ -266,6 +363,7 @@ async function createAssetInfoArray(token) {
 }
 
 async function getPriceOf(token) {
+  console.log("\n");
   console.log(token);
   const results = await createAssetInfoArray(token);
 
@@ -289,7 +387,7 @@ async function getPriceOf(token) {
     ORACLE_KEY
   );
 
-  console.log("Signed :", signedPrice);
+  console.log("\nSigned :", signedPrice);
 
   var jsonCompatibleSignature = {};
   jsonCompatibleSignature["signature"] = signedPrice.signature;
@@ -306,7 +404,8 @@ async function getPriceOf(token) {
     signatures: results[1],
   };
 
-  console.log("Mean :", meanPrice, "\n", "Processed :", processedPrice, "\n");
+  console.log("Mean :", meanPrice);
+  console.log("Processed :", processedPrice, "\n");
   return [meanPrice, assetCacheObject];
 }
 

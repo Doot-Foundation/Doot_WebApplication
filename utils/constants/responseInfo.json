@@ -1,0 +1,123 @@
+{
+  "KuCoin": {
+    "url": "https://api.kucoin.com/api/v1/market/orderbook/level1?symbol=BTC-USDT",
+    "code": "200000",
+    "data": {
+      "time": 1708748086896,
+      "sequence": "5173545040",
+      "price": "2937.17",
+      "size": "0.000243",
+      "bestBid": "2937.44",
+      "bestBidSize": "8.3195078",
+      "bestAsk": "2937.45",
+      "bestAskSize": "4.7073703"
+    }
+  },
+  "Houbi": {
+    "url": "https://api.huobi.pro/market/history/trade?symbol=ethusdt&size=1",
+    "ch": "market.ethusdt.trade.detail",
+    "status": "ok",
+    "ts": 1708748295515,
+    "data": [
+      {
+        "id": 158424235446,
+        "ts": 1708748295207,
+        "data": [
+          {
+            "id": 1584242354461001616997712307,
+            "ts": 1708748295207,
+            "trade-id": 102455665978,
+            "amount": 0.0038,
+            "price": 2941.41,
+            "direction": "sell"
+          }
+        ]
+      }
+    ]
+  },
+  "ByBit": {
+    "url": "https://api.bybit.com/derivatives/v3/public/tickers?symbol=ETHUSDT",
+    "retCode": 0,
+    "retMsg": "OK",
+    "result": {
+      "category": "",
+      "list": [
+        {
+          "symbol": "ETHUSDT",
+          "bidPrice": "2947.93",
+          "askPrice": "2947.94",
+          "lastPrice": "2947.94",
+          "lastTickDirection": "ZeroPlusTick",
+          "prevPrice24h": "2952.72",
+          "price24hPcnt": "-0.001618",
+          "highPrice24h": "2969.90",
+          "lowPrice24h": "2905.27",
+          "prevPrice1h": "2934.27",
+          "markPrice": "2947.87",
+          "indexPrice": "2946.85",
+          "openInterest": "530222.31",
+          "turnover24h": "1946306278.7753",
+          "volume24h": "663049.9800",
+          "fundingRate": "0.0001",
+          "nextFundingTime": "1708761600000",
+          "predictedDeliveryPrice": "",
+          "basisRate": "",
+          "deliveryFeeRate": "",
+          "deliveryTime": "0",
+          "openInterestValue": "1563026440.98"
+        }
+      ]
+    },
+    "retExtInfo": {},
+    "time": 1708751054795
+  },
+  "UpBit": {
+    "url": "https://api.upbit.com/v1/ticker?markets=KRW-ETH",
+    "market": "KRW-ETH",
+    "trade_date": "20240224",
+    "trade_time": "050917",
+    "trade_date_kst": "20240224",
+    "trade_time_kst": "140917",
+    "trade_timestamp": 1708751357006,
+    "opening_price": 4078000.0,
+    "high_price": 4115000.0,
+    "low_price": 4051000.0,
+    "trade_price": 4107000.0,
+    "prev_closing_price": 4076000.0,
+    "change": "RISE",
+    "change_price": 31000.0,
+    "change_rate": 0.0076054956,
+    "signed_change_price": 31000.0,
+    "signed_change_rate": 0.0076054956,
+    "trade_volume": 0.12174336,
+    "acc_trade_price": 24534198867.26531,
+    "acc_trade_price_24h": 81955202598.3553,
+    "acc_trade_volume": 6017.32578579,
+    "acc_trade_volume_24h": 20013.31965385,
+    "highest_52_week_price": 4200000.0,
+    "highest_52_week_date": "2024-02-22",
+    "lowest_52_week_price": 1870000.0,
+    "lowest_52_week_date": "2023-03-10",
+    "timestamp": 1708751357023
+  },
+  "CEX.io": {
+    "url": "https://cex.io/api/last_price/ETH/USD",
+    "lprice": "3083.75",
+    "curr1": "ETH",
+    "curr2": "USD"
+  },
+  "Swapzone": {
+    "url": "https://api.swapzone.io/v1/exchange/get-rate?from=eth&to=usdc&amount=100&rateType=all&availableInUSA=false&chooseRate=best&noRefundAddress=false",
+    "adapter": "exolix",
+    "from": "eth",
+    "fromNetwork": "ETH",
+    "to": "usdc",
+    "toNetwork": "ETH",
+    "amountFrom": 100,
+    "amountTo": 307626.587005,
+    "minAmount": 0.023302,
+    "maxAmount": null,
+    "quotaId": "5e6261376f2ca202169de5b8",
+    "time": 5
+  }
+}

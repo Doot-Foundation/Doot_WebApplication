@@ -4,6 +4,11 @@ const CoinGekoSymbols = {
   chainlink: "chainlink",
   mina: "mina-protocol",
   solana: "solana",
+  ripple: "ripple",
+  dogecoin: "dogecoin",
+  polygon: "matic-network",
+  avalanche: "avalanche-2",
+  cardano: "cardano",
 };
 
 const BinanceSymbols = {
@@ -12,6 +17,11 @@ const BinanceSymbols = {
   chainlink: "LINK",
   mina: "MINA",
   solana: "SOL",
+  ripple: "XRP",
+  dogecoin: "DOGE",
+  polygon: "MATIC",
+  avalanche: "AVAX",
+  cardano: "ADA",
 };
 
 const CMCSymbols = {
@@ -20,6 +30,11 @@ const CMCSymbols = {
   chainlink: "LINK",
   mina: "MINA",
   solana: "SOL",
+  ripple: "XRP",
+  dogecoin: "DOGE",
+  polygon: "MATIC",
+  avalanche: "AVAX",
+  cardano: "ADA",
 };
 
 const CryptoCompareSymbols = {
@@ -28,6 +43,11 @@ const CryptoCompareSymbols = {
   chainlink: "LINK",
   mina: "MINA",
   solana: "SOL",
+  ripple: "XRP",
+  dogecoin: "DOGE",
+  polygon: "MATIC",
+  avalanche: "AVAX",
+  cardano: "ADA",
 };
 
 const CoinAPISymbols = {
@@ -36,6 +56,11 @@ const CoinAPISymbols = {
   chainlink: "LINK",
   mina: "MINA",
   solana: "SOL",
+  ripple: "XRP",
+  dogecoin: "DOGE",
+  polygon: "MATIC",
+  avalanche: "AVAX",
+  cardano: "ADA",
 };
 
 const PricePaprikeSymbols = {
@@ -44,6 +69,11 @@ const PricePaprikeSymbols = {
   chainlink: "link-chainlink",
   mina: "mina-mina-protocol",
   solana: "sol-solana",
+  ripple: "xrpchain-ripple-chain",
+  dogecoin: "doge-dogecoin",
+  polygon: "matic-polygon",
+  avalanche: "avax-avalanche",
+  cardano: "ada-cardano",
 };
 
 const PriceMessariSymbols = {
@@ -52,6 +82,11 @@ const PriceMessariSymbols = {
   chainlink: "link",
   mina: "mina",
   solana: "solana",
+  ripple: "xrp",
+  dogecoin: "doge",
+  polygon: "matic",
+  avalanche: "avalanche",
+  cardano: "cardano",
 };
 
 const CoinCapSymbols = {
@@ -60,6 +95,11 @@ const CoinCapSymbols = {
   chainlink: "chainlink",
   mina: "mina",
   solana: "solana",
+  ripple: "xrp",
+  dogecoin: "dogecoin",
+  polygon: "polygon",
+  avalanche: "avalanche",
+  cardano: "cardano",
 };
 
 const CoinLoreSymbols = {
@@ -68,6 +108,11 @@ const CoinLoreSymbols = {
   chainlink: 2751,
   mina: 62645,
   solana: 48543,
+  ripple: 58,
+  dogecoin: 2,
+  polygon: 33536,
+  avalanche: 44883,
+  cardano: 257,
 };
 
 const CoinRankingSymbols = {
@@ -76,6 +121,11 @@ const CoinRankingSymbols = {
   chainlink: "VLqpJwogdhHNb",
   mina: "",
   solana: "zNZHO_Sjf",
+  ripple: "-l8Mn2pVlRs-p",
+  dogecoin: "a91GCGd_u96cF",
+  polygon: "uW2tk-ILY0ii",
+  avalanche: "dvUj0CzDZ",
+  cardano: "qzawljRxB5bYu",
 };
 
 const CoinCodexSymbols = {
@@ -84,6 +134,76 @@ const CoinCodexSymbols = {
   chainlink: "link",
   mina: "mina",
   solana: "sol",
+  ripple: "xrp",
+  dogecoin: "doge",
+  polygon: "matic",
+  avalanche: "avax",
+  cardano: "ada",
+};
+
+const KuCoinSymbols = {
+  ethereum: "ETH",
+  bitcoin: "BTC",
+  mina: "MINA",
+  solana: "SOL",
+  chainlink: "LINK",
+  ripple: "XRP",
+  dogecoin: "DOGE",
+  polygon: "MATIC",
+  avalanche: "AVAX",
+  cardano: "ADA",
+};
+
+const HuobiSymbols = {
+  ethereum: "eth",
+  bitcoin: "btc",
+  mina: "mina",
+  chainlink: "link",
+  solana: "sol",
+  ripple: "xrp",
+  dogecoin: "doge",
+  polygon: "matic",
+  avalanche: "avax",
+  cardano: "ada",
+};
+
+const ByBitSymbols = {
+  ethereum: "ETH",
+  bitcoin: "BTC",
+  mina: "MINA",
+  chainlink: "LINK",
+  solana: "SOL",
+  ripple: "XRP",
+  dogecoin: "DOGE",
+  polygon: "MATIC",
+  avalanche: "AVAX",
+  cardano: "ADA",
+};
+
+const CexIOSymbols = {
+  ethereum: "ETH",
+  bitcoin: "BTC",
+  mina: "MINA",
+  chainlink: "LINK",
+  solana: "SOL",
+  ripple: "XRP",
+  dogecoin: "DOGE",
+  polygon: "MATIC",
+  avalanche: "AVAX",
+  cardano: "ADA",
+};
+
+const SwapZoneSymbols = {
+  ethereum: "eth",
+  bitcoin: "btc",
+  mina: "mina",
+  chainlink: "link",
+  solana: "sol",
+  ripple: "xrp",
+  dogecoin: "doge",
+  polygon: "matic",
+  avalanche: "avax",
+  cardano: "ada",
 };
 
 module.exports = {
@@ -98,4 +218,9 @@ module.exports = {
   CoinLoreSymbols,
   CoinRankingSymbols,
   CoinCodexSymbols,
+  KuCoinSymbols,
+  HuobiSymbols,
+  ByBitSymbols,
+  CexIOSymbols,
+  SwapZoneSymbols,
 };
