@@ -72,7 +72,7 @@ const ENDPOINT_TO_DATA_PROVIDER = {
   kucoin: "KuCoin",
   huobi: "Huobi",
   bybit: "ByBit",
-  cexio: "Cex.io",
+  "cex.io": "Cex.io",
   swapzone: "Swapzone",
 };
 function DATA_PROVIDER_TO_ENDPOINT(provider, token) {
