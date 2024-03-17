@@ -318,10 +318,10 @@ async function createAssetInfoArray(token) {
   const functions = [
     getPriceBinance,
     getPriceCMC,
-    getPriceCoinAPI,
+    // getPriceCoinAPI,
     getPriceCoinCap,
     getPriceCoinGecko,
-    getPriceCoinRanking,
+    // getPriceCoinRanking,
     getPriceCoinCodex,
     getPriceCoinlore,
     getPriceCryptoCompare,
