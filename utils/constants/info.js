@@ -3,12 +3,12 @@ import {
   BinanceSymbols,
   CMCSymbols,
   CryptoCompareSymbols,
-  CoinAPISymbols,
+  // CoinAPISymbols,
   PricePaprikeSymbols,
   PriceMessariSymbols,
   CoinCapSymbols,
   CoinLoreSymbols,
-  CoinRankingSymbols,
+  // CoinRankingSymbols,
   CoinCodexSymbols,
   KuCoinSymbols,
   HuobiSymbols,
@@ -43,12 +43,12 @@ const PROVIDERS = [
   "Binance",
   "CMC",
   "Crypto Compare",
-  "Coin API",
+  // "Coin API",
   "Coin Paprika",
   "Messari",
   "Coin Cap",
   "Coin Lore",
-  "Coin Ranking",
+  // "Coin Ranking",
   "Coin Codex",
   "Coin Gecko",
   "KuCoin",
@@ -61,12 +61,12 @@ const ENDPOINT_TO_DATA_PROVIDER = {
   binance: "Binance",
   coinmarketcap: "CMC",
   cryptocompare: "Crypto Compare",
-  coinapi: "Coin API",
+  // coinapi: "Coin API",
   coinpaprika: "Coin Paprika",
   messari: "Messari",
   coincap: "Coin Cap",
   coinlore: "Coin Lore",
-  coinranking: "Coin Ranking",
+  // coinranking: "Coin Ranking",
   coincodex: "Coin Codex",
   coingecko: "Coin Gecko",
   kucoin: "KuCoin",
@@ -80,12 +80,12 @@ function DATA_PROVIDER_TO_ENDPOINT(provider, token) {
   const ciongecko_id = CoinGekoSymbols[token.toLowerCase()];
   const cmc_id = CMCSymbols[token.toLowerCase()];
   const cryptocompare_id = CryptoCompareSymbols[token.toLowerCase()];
-  const coinapi_id = CoinAPISymbols[token.toLowerCase()];
+  // const coinapi_id = CoinAPISymbols[token.toLowerCase()];
   const pricepaprika_id = PricePaprikeSymbols[token.toLowerCase()];
   const messari_id = PriceMessariSymbols[token.toLowerCase()];
   const coincap_id = CoinCapSymbols[token.toLowerCase()];
   const coinlore_id = CoinLoreSymbols[token.toLowerCase()];
-  const coinranking_id = CoinRankingSymbols[token.toLowerCase()];
+  // const coinranking_id = CoinRankingSymbols[token.toLowerCase()];
   const coincodex_id = CoinCodexSymbols[token.toLowerCase()];
   const kucoin_id = KuCoinSymbols[token.toLowerCase()];
   const huobi_id = HuobiSymbols[token.toLowerCase()];
@@ -96,12 +96,12 @@ function DATA_PROVIDER_TO_ENDPOINT(provider, token) {
     Binance: `https://api.binance.com/api/v3/ticker/price?symbol=${binance_id}USDT`,
     CMC: `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=${cmc_id}&convert=USD`,
     "Crypto Compare": `https://min-api.cryptocompare.com/data/price?fsym=${cryptocompare_id}&tsyms=USD`,
-    "Coin API": `https://rest.coinapi.io/v1/exchangerate/${coinapi_id}/USD`,
+    // "Coin API": `https://rest.coinapi.io/v1/exchangerate/${coinapi_id}/USD`,
     "Coin Paprika": `https://api.coinpaprika.com/v1/tickers/${pricepaprika_id}`,
     Messari: `https://data.messari.io/api/v1/assets/${messari_id}/metrics`,
     "Coin Cap": `https://api.coincap.io/v2/assets/${coincap_id}`,
     "Coin Lore": `https://api.coinlore.net/api/ticker/?id=${coinlore_id}`,
-    "Coin Ranking": `https://api.coinranking.com/v2/coin/${coinranking_id}/price`,
+    // "Coin Ranking": `https://api.coinranking.com/v2/coin/${coinranking_id}/price`,
     "Coin Codex": `https://coincodex.com/api/coincodex/get_coin/${coincodex_id}`,
     "Coin Gecko": `https://api.coingecko.com/api/v3/simple/price?ids=${ciongecko_id}&vs_currencies=usd`,
     KuCoin: `https://api.kucoin.com/api/v1/market/orderbook/level1?symbol=${kucoin_id}-USDT`,
