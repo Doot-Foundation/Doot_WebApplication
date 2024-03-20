@@ -33,6 +33,8 @@ const TOKEN_TO_CACHE = {
 };
 const HISTORICAL_CACHE = "historical_cid";
 const MINA_CACHE = "mina_cid";
+const HISTORICAL_SIGNED_MAX_CACHE = "historical_signed_max";
+const MINA_SIGNED_MAX_CACHE = "mina_signed_max";
 
 const ORACLE_PUBLIC_KEY =
   "B62qjm48BJuzaZmu2wA5YaZeKknkovbx9kDmu8E83jcYsg4sPgTDgPF";
