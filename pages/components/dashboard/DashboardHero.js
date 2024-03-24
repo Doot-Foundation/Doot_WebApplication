@@ -98,6 +98,9 @@ export default function DashboardHero() {
         .then((res) => {
           const data = JSON.parse(res.data);
           setUserDetails(data);
+        })
+        .catch((err) => {
+          console.log("Verification Failed.");
         });
     } else return;
   }

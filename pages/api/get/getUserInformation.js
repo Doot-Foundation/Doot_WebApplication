@@ -1,6 +1,9 @@
 // Sign a message on ui, check the sign here and if the originator is the address sent in the req.query,
 // return the api key.
-const { signatureClient } = require("../../../utils/helper/SignatureClient");
+const {
+  signatureClient,
+  mainnetSignatureClient,
+} = require("../../../utils/helper/SignatureClient");
 const KEY = process.env.NEXT_PUBLIC_API_INTERFACE_KEY;
 
 const MAIL = process.env.SUPABASE_USER;
@@ -45,8 +48,10 @@ export default async function handler(req, res) {
     };
 
     const originsVerified = signatureClient.verifyMessage(verifyBody);
+    const mainnetOriginsVerified =
+      mainnetSignatureClient.verifyMessage(verifyBody);
 
-    if (!originsVerified) {
+    if (!originsVerified && !mainnetOriginsVerified) {
       return res.status(401).json({ status: "Signature Failed." });
     }
 

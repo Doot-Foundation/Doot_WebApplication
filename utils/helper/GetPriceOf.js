@@ -357,7 +357,7 @@ async function createAssetInfoArray(token) {
     timestampArray,
     signatureArray,
     urlArray,
-    2
+    2.5
   );
   return arrays;
 }

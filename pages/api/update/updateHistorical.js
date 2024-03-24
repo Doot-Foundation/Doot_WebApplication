@@ -5,7 +5,7 @@ const {
   HISTORICAL_CACHE,
 } = require("../../../utils/constants/info");
 const { redis } = require("../../../utils/helper/InitRedis");
-``;
+
 export default async function handler(req, res) {
   const authHeader = req.headers.authorization;
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
