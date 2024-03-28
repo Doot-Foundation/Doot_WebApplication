@@ -30,6 +30,7 @@ export default async function pinHistoricalObject(previousCID, latestPrices) {
     isFirst = true;
     toUploadObject = {
       latest: {
+        //-=-=-=================================================================================
         timestamp: timestamp,
         prices: latestPrices,
       },

@@ -4,13 +4,8 @@ const { redis } = require("../../../utils/helper/InitRedis");
 const KEY = process.env.NEXT_PUBLIC_API_INTERFACE_KEY;
 
 export default async function handler(req, res) {
-  // Retrieve data from the cache
   const authHeader = req.headers.authorization;
   const { token } = req.query;
-
-  console.log(req.headers);
-  console.log(authHeader);
-  console.log(KEY, authHeader);
 
   if ("Bearer " + KEY != authHeader) {
     return res.status(401).json("Unauthorized.");

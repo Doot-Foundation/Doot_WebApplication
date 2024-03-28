@@ -380,8 +380,8 @@ async function getPriceOf(token) {
   });
 
   const meanPrice = parseFloat(sum / count);
-
   const processedPrice = processFloatString(meanPrice);
+  const aggregatedAt = Date.now();
   const signedPrice = signatureClient.signFields(
     [BigInt(processedPrice)],
     ORACLE_KEY
@@ -398,6 +398,7 @@ async function getPriceOf(token) {
     price: processedPrice,
     decimals: 10,
     signature: jsonCompatibleSignature,
+    aggregationTimestamp: aggregatedAt,
     urls: results[3],
     prices_returned: results[0],
     timestamps: results[2],
