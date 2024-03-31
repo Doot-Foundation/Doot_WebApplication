@@ -1,14 +1,12 @@
 import {
   CoinGekoSymbols,
   BinanceSymbols,
-  CMCSymbols,
+  // CMCSymbols,
   CryptoCompareSymbols,
-  // CoinAPISymbols,
   PricePaprikeSymbols,
   PriceMessariSymbols,
   CoinCapSymbols,
   CoinLoreSymbols,
-  // CoinRankingSymbols,
   CoinCodexSymbols,
   KuCoinSymbols,
   HuobiSymbols,
@@ -31,8 +29,23 @@ const TOKEN_TO_CACHE = {
   dogecoin: "doge_cache",
   polygon: "matic_cache",
 };
+const TOKEN_TO_SIGNED_SLOT = {
+  ethereum: "eth_latest_slot_cache",
+  chainlink: "link_latest_slot_cache",
+  solana: "sol_latest_slot_cache",
+  mina: "mina_latest_slot_cache",
+  bitcoin: "btc_latest_slot_cache",
+  ripple: "xrp_latest_slot_cache",
+  cardano: "ada_latest_slot_cache",
+  avalanche: "avax_latest_slot_cache",
+  dogecoin: "doge_latest_slot_cache",
+  polygon: "matic_latest_slot_cache",
+};
+
 const HISTORICAL_CACHE = "historical_cid";
 const MINA_CACHE = "mina_cid";
+const HISTORICAL_SIGNED_MAX_CACHE = "historical_signed_max";
+const MINA_SIGNED_MAX_CACHE = "mina_signed_max";
 
 const ORACLE_PUBLIC_KEY =
   "B62qjm48BJuzaZmu2wA5YaZeKknkovbx9kDmu8E83jcYsg4sPgTDgPF";
@@ -41,14 +54,12 @@ const DOOT_PUBLIC_KEY =
 
 const PROVIDERS = [
   "Binance",
-  "CMC",
+  // "CMC",
   "Crypto Compare",
-  // "Coin API",
   "Coin Paprika",
   "Messari",
   "Coin Cap",
   "Coin Lore",
-  // "Coin Ranking",
   "Coin Codex",
   "Coin Gecko",
   "KuCoin",
@@ -59,14 +70,12 @@ const PROVIDERS = [
 ];
 const ENDPOINT_TO_DATA_PROVIDER = {
   binance: "Binance",
-  coinmarketcap: "CMC",
+  // coinmarketcap: "CMC",
   cryptocompare: "Crypto Compare",
-  // coinapi: "Coin API",
   coinpaprika: "Coin Paprika",
   messari: "Messari",
   coincap: "Coin Cap",
   coinlore: "Coin Lore",
-  // coinranking: "Coin Ranking",
   coincodex: "Coin Codex",
   coingecko: "Coin Gecko",
   kucoin: "KuCoin",
@@ -78,14 +87,12 @@ const ENDPOINT_TO_DATA_PROVIDER = {
 function DATA_PROVIDER_TO_ENDPOINT(provider, token) {
   const binance_id = BinanceSymbols[token.toLowerCase()];
   const ciongecko_id = CoinGekoSymbols[token.toLowerCase()];
-  const cmc_id = CMCSymbols[token.toLowerCase()];
+  // const cmc_id = CMCSymbols[token.toLowerCase()];
   const cryptocompare_id = CryptoCompareSymbols[token.toLowerCase()];
-  // const coinapi_id = CoinAPISymbols[token.toLowerCase()];
   const pricepaprika_id = PricePaprikeSymbols[token.toLowerCase()];
   const messari_id = PriceMessariSymbols[token.toLowerCase()];
   const coincap_id = CoinCapSymbols[token.toLowerCase()];
   const coinlore_id = CoinLoreSymbols[token.toLowerCase()];
-  // const coinranking_id = CoinRankingSymbols[token.toLowerCase()];
   const coincodex_id = CoinCodexSymbols[token.toLowerCase()];
   const kucoin_id = KuCoinSymbols[token.toLowerCase()];
   const huobi_id = HuobiSymbols[token.toLowerCase()];
@@ -94,14 +101,12 @@ function DATA_PROVIDER_TO_ENDPOINT(provider, token) {
   const swapzone_id = SwapZoneSymbols[token.toLowerCase()];
   const obj = {
     Binance: `https://api.binance.com/api/v3/ticker/price?symbol=${binance_id}USDT`,
-    CMC: `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=${cmc_id}&convert=USD`,
+    // CMC: `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=${cmc_id}&convert=USD`,
     "Crypto Compare": `https://min-api.cryptocompare.com/data/price?fsym=${cryptocompare_id}&tsyms=USD`,
-    // "Coin API": `https://rest.coinapi.io/v1/exchangerate/${coinapi_id}/USD`,
     "Coin Paprika": `https://api.coinpaprika.com/v1/tickers/${pricepaprika_id}`,
     Messari: `https://data.messari.io/api/v1/assets/${messari_id}/metrics`,
     "Coin Cap": `https://api.coincap.io/v2/assets/${coincap_id}`,
     "Coin Lore": `https://api.coinlore.net/api/ticker/?id=${coinlore_id}`,
-    // "Coin Ranking": `https://api.coinranking.com/v2/coin/${coinranking_id}/price`,
     "Coin Codex": `https://coincodex.com/api/coincodex/get_coin/${coincodex_id}`,
     "Coin Gecko": `https://api.coingecko.com/api/v3/simple/price?ids=${ciongecko_id}&vs_currencies=usd`,
     KuCoin: `https://api.kucoin.com/api/v1/market/orderbook/level1?symbol=${kucoin_id}-USDT`,
@@ -154,14 +159,17 @@ const SYMBOL_TO_TOKEN = {
 module.exports = {
   DOOT_PUBLIC_KEY,
   TOKEN_TO_SYMBOL,
+  TOKEN_TO_SIGNED_SLOT,
+  HISTORICAL_CACHE,
   MINA_CACHE,
+  HISTORICAL_SIGNED_MAX_CACHE,
+  MINA_SIGNED_MAX_CACHE,
   SYMBOL_TO_TOKEN,
   MULTIPLICATION_FACTOR,
   PROVIDERS,
   TOKEN_TO_CACHE,
   SUPPORTED_TOKENS,
   ORACLE_PUBLIC_KEY,
-  HISTORICAL_CACHE,
   ENDPOINT_TO_DATA_PROVIDER,
   DATA_PROVIDER_TO_ENDPOINT,
 };

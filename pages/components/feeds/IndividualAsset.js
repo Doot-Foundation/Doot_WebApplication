@@ -64,6 +64,7 @@ export default function IndividualAsset({ token }) {
         }
       );
       setLatest(response.data.information);
+      console.log(response.data.information);
     } catch (error) {
       console.error("Error fetching price:", error);
     }
@@ -118,7 +119,7 @@ export default function IndividualAsset({ token }) {
     if (ipfsData) {
       console.log(ipfsData);
       const toPush = ipfsData.latest.prices[SYMBOL_TO_TOKEN[token]];
-      toPush.timestamp = ipfsData.latest.timestamp.toString();
+      // toPush.timestamp = ipfsData.latest.timestamp.toString();
       const latestArr = new Array();
       latestArr.push(toPush);
 
@@ -167,7 +168,7 @@ export default function IndividualAsset({ token }) {
                         Providers
                       </Text>
                       <Heading fontFamily={"Manrope Variable"} size={"lg"}>
-                        {latest.urls.length}/14
+                        {latest.urls.length}/13
                       </Heading>
                     </Flex>
                     <Spacer />
@@ -222,6 +223,21 @@ export default function IndividualAsset({ token }) {
                     </Text>
                     <Box w="100%" borderBottom={"1px dashed gray"} mt={3} />
                   </Flex>
+                  <Flex direction={"column"}>
+                    <Text fontFamily={"Montserrat Variable"} fontWeight={400}>
+                      Timestamp
+                    </Text>
+                    <Text
+                      fontFamily={"Manrope Variable"}
+                      fontWeight={800}
+                      _hover={{
+                        cursor: "pointer",
+                      }}
+                    >
+                      {latest.aggregationTimestamp}
+                    </Text>
+                    <Box w="100%" borderBottom={"1px dashed gray"} mt={3} />
+                  </Flex>
                 </Flex>
               </>
             ) : null}
@@ -272,13 +288,15 @@ export default function IndividualAsset({ token }) {
           Historical Information
         </Heading>
         <Text pb={5} mb={5} fontSize={"sm"}>
-          (The prices are considered upto the 10th decimal)
+          (The prices are precise upto the 10th decimal)
         </Text>
-        {ipfsHistorical && ipfsLatest && (
+        {ipfsHistorical && ipfsLatest ? (
           <HistoricalTable
             ipfsHistorical={ipfsHistorical}
             ipfsLatest={ipfsLatest}
           />
+        ) : (
+          <Heading fontFamily={"Montserrat Variable"}> Loading... </Heading>
         )}
       </Flex>
     </>

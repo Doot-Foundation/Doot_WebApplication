@@ -84,7 +84,7 @@ export default function HistoricalTable({ ipfsHistorical, ipfsLatest }) {
             [...ipfsLatest, ...ipfsHistorical].map((item, key) => {
               const collectivePrice = item.price;
               const collectiveSignature = item.signature.signature;
-              const collectiveTimestamp = item.timestamp;
+              const collectiveTimestamp = item.aggregationTimestamp;
 
               const urls = item.urls;
               const signatures = item.signatures;

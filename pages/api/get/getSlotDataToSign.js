@@ -1,7 +1,5 @@
-const { TOKEN_TO_CACHE } = require("../../../utils/constants/info");
-const { redis } = require("../../../utils/helper/InitRedis");
-
-const KEY = process.env.NEXT_PUBLIC_API_INTERFACE_KEY;
+import { redis } from "../../../utils/helper/InitRedis";
+import { TOKEN_TO_CACHE } from "../../../utils/constants/info";
 
 export default async function handler(req, res) {
   const authHeader = req.headers.authorization;

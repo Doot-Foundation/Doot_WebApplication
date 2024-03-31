@@ -47,6 +47,21 @@ export default function HomeHeader() {
               _hover={{ color: "#94ffe5", cursor: "pointer" }}
             >
               <Link
+                href="/slots"
+                _hover={{
+                  textDecoration: "none",
+                }}
+              >
+                Slots
+              </Link>
+              <CgArrowTopRight />
+            </Flex>
+            <Flex
+              direction={"row"}
+              gap={1}
+              _hover={{ color: "#94ffe5", cursor: "pointer" }}
+            >
+              <Link
                 href="/verify"
                 _hover={{
                   textDecoration: "none",

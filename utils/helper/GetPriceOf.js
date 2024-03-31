@@ -9,7 +9,7 @@ const { signatureClient } = require("./SignatureClient");
 import {
   CoinGekoSymbols,
   BinanceSymbols,
-  CMCSymbols,
+  // CMCSymbols,
   CryptoCompareSymbols,
   CoinAPISymbols,
   PricePaprikeSymbols,
@@ -317,7 +317,7 @@ async function removeOutliers(array, timestamps, signatures, urls, threshold) {
 async function createAssetInfoArray(token) {
   const functions = [
     getPriceBinance,
-    getPriceCMC,
+    // getPriceCMC,
     // getPriceCoinAPI,
     getPriceCoinCap,
     getPriceCoinGecko,
@@ -357,7 +357,7 @@ async function createAssetInfoArray(token) {
     timestampArray,
     signatureArray,
     urlArray,
-    2
+    2.5
   );
   return arrays;
 }
@@ -380,8 +380,8 @@ async function getPriceOf(token) {
   });
 
   const meanPrice = parseFloat(sum / count);
-
   const processedPrice = processFloatString(meanPrice);
+  const aggregatedAt = Date.now();
   const signedPrice = signatureClient.signFields(
     [BigInt(processedPrice)],
     ORACLE_KEY
@@ -398,6 +398,7 @@ async function getPriceOf(token) {
     price: processedPrice,
     decimals: 10,
     signature: jsonCompatibleSignature,
+    aggregationTimestamp: aggregatedAt,
     urls: results[3],
     prices_returned: results[0],
     timestamps: results[2],

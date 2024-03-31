@@ -1,8 +1,8 @@
 import { redis } from "../../../utils/helper/InitRedis";
 import {
-  HISTORICAL_CACHE,
-  TOKEN_TO_CACHE,
-  MINA_CACHE,
+  HISTORICAL_SIGNED_MAX_CACHE,
+  MINA_SIGNED_MAX_CACHE,
+  TOKEN_TO_SIGNED_SLOT,
 } from "../../../utils/constants/info";
 
 export default async function handler(req, res) {
@@ -13,13 +13,15 @@ export default async function handler(req, res) {
     return;
   }
 
-  await redis.set(MINA_CACHE, "NULL");
-  await redis.set(HISTORICAL_CACHE, "NULL");
-
-  const keys = Object.keys(TOKEN_TO_CACHE);
+  const keys = Object.keys(TOKEN_TO_SIGNED_SLOT);
+  const signedCacheInit = {};
   for (const item of keys) {
-    await redis.set(TOKEN_TO_CACHE[item], "NULL");
+    await redis.set(TOKEN_TO_SIGNED_SLOT[item], "NULL");
+    signedCacheInit[item] = { community: {} };
   }
 
-  res.status(200).json("Cleared Cache!");
+  await redis.set(HISTORICAL_SIGNED_MAX_CACHE, signedCacheInit);
+  await redis.set(MINA_SIGNED_MAX_CACHE, signedCacheInit);
+
+  res.status(200).json("Init Cache!");
 }

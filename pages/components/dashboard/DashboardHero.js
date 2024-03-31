@@ -79,7 +79,6 @@ export default function DashboardHero() {
       const signedObj = await window.mina.signMessage({
         message: toVerifyMessage,
       });
-
       signedObj.timestamp = timestamp;
       const finalObj = JSON.stringify(signedObj);
 
@@ -98,6 +97,9 @@ export default function DashboardHero() {
         .then((res) => {
           const data = JSON.parse(res.data);
           setUserDetails(data);
+        })
+        .catch((err) => {
+          console.log("Verification Failed.");
         });
     } else return;
   }
