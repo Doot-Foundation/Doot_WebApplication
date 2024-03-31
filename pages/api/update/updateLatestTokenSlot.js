@@ -15,8 +15,6 @@ export default async function handler(req, res) {
 
   const compatibleSignatureObject = JSON.parse(signature);
 
-  console.log(toCheck);
-
   var toVerify = {
     data: toCheck.data.toString(),
     publicKey: toCheck.publicKey.toString(),
@@ -30,10 +28,8 @@ export default async function handler(req, res) {
     publicKey: compatibleSignatureObject.publicKey,
   };
 
-  console.log(verifyBody);
   originsVerified = signatureClient.verifyMessage(verifyBody);
 
-  console.log(originsVerified);
   if (!originsVerified) res.status(201).json({ status: 0 });
 
   await appendSignatureToSlot(
