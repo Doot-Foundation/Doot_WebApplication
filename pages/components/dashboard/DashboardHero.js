@@ -79,7 +79,6 @@ export default function DashboardHero() {
       const signedObj = await window.mina.signMessage({
         message: toVerifyMessage,
       });
-
       signedObj.timestamp = timestamp;
       const finalObj = JSON.stringify(signedObj);
 

@@ -4,9 +4,9 @@ import ConnectButton from "../common/ConnectButton";
 export default function SlotsHeader() {
   return (
     <>
-      <Flex>
-        <Link href="/" mt={10}>
-          <Image src="/static/images/Doot.png" boxSize={24} />
+      <Flex p={"2% 8% 5% 8%"} align={"center"}>
+        <Link href="/">
+          <Image src="/static/images/Doot.png" boxSize={20} />
         </Link>
         <Spacer />
         <ConnectButton />

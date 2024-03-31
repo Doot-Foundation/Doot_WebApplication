@@ -7,7 +7,7 @@ export default function SlotsHero() {
 
   return (
     <>
-      <Flex flexWrap={"wrap"}>
+      <Flex flexWrap={"wrap"} m={"auto"} align={"center"} justify={"center"}>
         {tokens.map((token, index) => {
           return <IndividualSlot key={index} token={token} />;
         })}
