@@ -1,7 +1,7 @@
 import {
   CoinGekoSymbols,
   BinanceSymbols,
-  CMCSymbols,
+  // CMCSymbols,
   CryptoCompareSymbols,
   PricePaprikeSymbols,
   PriceMessariSymbols,
@@ -54,7 +54,7 @@ const DOOT_PUBLIC_KEY =
 
 const PROVIDERS = [
   "Binance",
-  "CMC",
+  // "CMC",
   "Crypto Compare",
   "Coin Paprika",
   "Messari",
@@ -70,7 +70,7 @@ const PROVIDERS = [
 ];
 const ENDPOINT_TO_DATA_PROVIDER = {
   binance: "Binance",
-  coinmarketcap: "CMC",
+  // coinmarketcap: "CMC",
   cryptocompare: "Crypto Compare",
   coinpaprika: "Coin Paprika",
   messari: "Messari",
@@ -87,7 +87,7 @@ const ENDPOINT_TO_DATA_PROVIDER = {
 function DATA_PROVIDER_TO_ENDPOINT(provider, token) {
   const binance_id = BinanceSymbols[token.toLowerCase()];
   const ciongecko_id = CoinGekoSymbols[token.toLowerCase()];
-  const cmc_id = CMCSymbols[token.toLowerCase()];
+  // const cmc_id = CMCSymbols[token.toLowerCase()];
   const cryptocompare_id = CryptoCompareSymbols[token.toLowerCase()];
   const pricepaprika_id = PricePaprikeSymbols[token.toLowerCase()];
   const messari_id = PriceMessariSymbols[token.toLowerCase()];
@@ -101,7 +101,7 @@ function DATA_PROVIDER_TO_ENDPOINT(provider, token) {
   const swapzone_id = SwapZoneSymbols[token.toLowerCase()];
   const obj = {
     Binance: `https://api.binance.com/api/v3/ticker/price?symbol=${binance_id}USDT`,
-    CMC: `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=${cmc_id}&convert=USD`,
+    // CMC: `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=${cmc_id}&convert=USD`,
     "Crypto Compare": `https://min-api.cryptocompare.com/data/price?fsym=${cryptocompare_id}&tsyms=USD`,
     "Coin Paprika": `https://api.coinpaprika.com/v1/tickers/${pricepaprika_id}`,
     Messari: `https://data.messari.io/api/v1/assets/${messari_id}/metrics`,

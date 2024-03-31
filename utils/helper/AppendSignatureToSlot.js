@@ -5,21 +5,50 @@ const {
 } = require("../constants/info");
 const { redis } = require("./InitRedis");
 
-export default async function appendSignatureToSlot(
+async function appendSignatureToSlot(
   token,
+  tokenDetails,
   signature,
   publicKey
 ) {
-  const lastUpdatedSlotInfo = redis.get(TOKEN_TO_SIGNED_SLOT[token]);
-  const finalState = lastUpdatedSlotInfo;
+  const lastUpdatedSlotInfo = await redis.get(TOKEN_TO_SIGNED_SLOT[token]);
+  var finalState = lastUpdatedSlotInfo;
 
-  if (lastUpdatedSlotInfo.communitySignatures) {
-    finalState.communitySignatures.push(signature);
-    finalState.communityPublicKeys.push(publicKey);
+  if (finalState == "NULL") {
+    finalState = tokenDetails;
+    finalState["community"] = {
+      [publicKey]: signature,
+    };
+    // finalState["communityPublicKeys"] = [publicKey];
   } else {
-    finalState["communitySignatures"] = [signature];
-    finalState["communityPublicKeys"] = [publicKey];
+    const updatedState = finalState.community;
+    updatedState[publicKey] = signature;
+    finalState.community = updatedState;
+  }
+
+  const currentMaxHistoricalCache = await redis.get(
+    HISTORICAL_SIGNED_MAX_CACHE
+  );
+  if (
+    Object.keys(finalState.community).length >
+    Object.keys(currentMaxHistoricalCache[token].community).length
+  ) {
+    currentMaxHistoricalCache[token] = finalState;
+    await redis.set(HISTORICAL_SIGNED_MAX_CACHE, currentMaxHistoricalCache);
+  }
+
+  const currentMaxMinaCache = await redis.get(MINA_SIGNED_MAX_CACHE);
+  if (
+    Object.keys(finalState.community).length >
+    Object.keys(currentMaxMinaCache[token].community).length
+  ) {
+    currentMaxMinaCache[token] = finalState;
+    await redis.set(MINA_SIGNED_MAX_CACHE, currentMaxMinaCache);
   }
 
   await redis.set(TOKEN_TO_SIGNED_SLOT[token], finalState);
+
+  return;
 }
+
+module.exports = appendSignatureToSlot;

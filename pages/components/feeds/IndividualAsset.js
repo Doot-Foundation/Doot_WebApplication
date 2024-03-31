@@ -168,7 +168,7 @@ export default function IndividualAsset({ token }) {
                         Providers
                       </Text>
                       <Heading fontFamily={"Manrope Variable"} size={"lg"}>
-                        {latest.urls.length}/14
+                        {latest.urls.length}/13
                       </Heading>
                     </Flex>
                     <Spacer />

@@ -9,7 +9,7 @@ const { signatureClient } = require("./SignatureClient");
 import {
   CoinGekoSymbols,
   BinanceSymbols,
-  CMCSymbols,
+  // CMCSymbols,
   CryptoCompareSymbols,
   CoinAPISymbols,
   PricePaprikeSymbols,
@@ -317,7 +317,7 @@ async function removeOutliers(array, timestamps, signatures, urls, threshold) {
 async function createAssetInfoArray(token) {
   const functions = [
     getPriceBinance,
-    getPriceCMC,
+    // getPriceCMC,
     // getPriceCoinAPI,
     getPriceCoinCap,
     getPriceCoinGecko,

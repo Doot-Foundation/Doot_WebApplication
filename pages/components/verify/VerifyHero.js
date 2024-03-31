@@ -167,7 +167,12 @@ export default function VerifyHero() {
                     disabled={isSubmittingF1}
                     onChange={(e) => setAggPrice(e.target.value)}
                   />
-                  <Button type="submit" w={"30%"} colorScheme="green">
+                  <Button
+                    type="submit"
+                    w={"30%"}
+                    colorScheme="green"
+                    disabled={isSubmittingF1}
+                  >
                     Submit
                   </Button>
                 </HStack>
@@ -195,6 +200,7 @@ export default function VerifyHero() {
                     placeholder="Select a provider"
                     value={selectedProvider}
                     onChange={(e) => setSelectedProvider(e.target.value)}
+                    disabled={isSubmittingF2}
                   >
                     {PROVIDERS.map((provider, index) => (
                       <option key={index} value={provider}>
@@ -206,6 +212,7 @@ export default function VerifyHero() {
                     placeholder="Select the asset"
                     value={selectedToken}
                     onChange={(e) => setSelectedToken(e.target.value)}
+                    disabled={isSubmittingF2}
                   >
                     {SUPPORTED_TOKENS.map((token, index) => (
                       <option
@@ -230,12 +237,14 @@ export default function VerifyHero() {
                     placeholder="Timestamp"
                     w={"90%"}
                     onChange={(e) => setTimestamp(e.target.value)}
+                    disabled={isSubmittingF2}
                   />
                   <Input
                     name="signature"
                     placeholder="Signature"
                     w={"90%"}
                     onChange={(e) => setSignature(e.target.value)}
+                    disabled={isSubmittingF2}
                   />
                   <HStack w={"90%"}>
                     <Input
@@ -243,6 +252,7 @@ export default function VerifyHero() {
                       placeholder="Price"
                       w={"60%"}
                       onChange={(e) => setPrice(e.target.value)}
+                      disabled={isSubmittingF2}
                     />
                     <Input
                       name="decimals"
@@ -251,7 +261,12 @@ export default function VerifyHero() {
                       disabled={true}
                       w={"10%"}
                     />
-                    <Button type="submit" w={"30%"} colorScheme="green">
+                    <Button
+                      type="submit"
+                      w={"30%"}
+                      colorScheme="green"
+                      disabled={isSubmittingF2}
+                    >
                       Submit
                     </Button>
                   </HStack>

@@ -1,5 +1,6 @@
 import { redis } from "../../../utils/helper/InitRedis";
-import { TOKEN_TO_CACHE } from "../../../utils/constants/info";
+import { HISTORICAL_SIGNED_MAX_CACHE } from "../../../utils/constants/info";
+const KEY = process.env.NEXT_PUBLIC_API_INTERFACE_KEY;
 
 export default async function handler(req, res) {
   const authHeader = req.headers.authorization;
@@ -9,7 +10,7 @@ export default async function handler(req, res) {
     return res.status(401).json("Unauthorized.");
   }
 
-  const cachedData = await redis.get(TOKEN_TO_CACHE[token.toLowerCase()]);
+  const cachedData = await redis.get(HISTORICAL_SIGNED_MAX_CACHE);
 
   if (cachedData) {
     return res
