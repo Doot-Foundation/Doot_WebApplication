@@ -114,7 +114,7 @@ export default function IndividualSlot({ token }) {
 
       await axios
         .post(
-          `/api/update/updateLatestTokenSlot?signature=${signedObj}&publicKey=${signer}&token=${token}`
+          `/api/update/updateLatestTokenSlot?signature=${signedObj}&publicKey=${signer.toString()}&token=${token}`
         )
         .then((res) => {
           if (res.data.status == 1) {
