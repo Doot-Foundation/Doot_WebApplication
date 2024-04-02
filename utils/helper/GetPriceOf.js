@@ -9,7 +9,7 @@ const { signatureClient } = require("./SignatureClient");
 import {
   CoinGekoSymbols,
   BinanceSymbols,
-  // CMCSymbols,
+  CMCSymbols,
   CryptoCompareSymbols,
   CoinAPISymbols,
   PricePaprikeSymbols,

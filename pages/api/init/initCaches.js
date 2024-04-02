@@ -1,9 +1,5 @@
 import { redis } from "../../../utils/helper/InitRedis";
-import {
-  HISTORICAL_SIGNED_MAX_CACHE,
-  MINA_SIGNED_MAX_CACHE,
-  TOKEN_TO_SIGNED_SLOT,
-} from "../../../utils/constants/info";
+import { SLOT_STATUS_CACHE } from "../../../utils/constants/info";
 
 export default async function handler(req, res) {
   const authHeader = req.headers.authorization;
@@ -13,15 +9,7 @@ export default async function handler(req, res) {
     return;
   }
 
-  const keys = Object.keys(TOKEN_TO_SIGNED_SLOT);
-  const signedCacheInit = {};
-  for (const item of keys) {
-    await redis.set(TOKEN_TO_SIGNED_SLOT[item], "NULL");
-    signedCacheInit[item] = { community: {} };
-  }
-
-  await redis.set(HISTORICAL_SIGNED_MAX_CACHE, signedCacheInit);
-  await redis.set(MINA_SIGNED_MAX_CACHE, signedCacheInit);
+  await redis.set(SLOT_STATUS_CACHE, false);
 
   res.status(200).json("Init Cache!");
 }
