@@ -41,7 +41,18 @@ export default function HomeHero() {
     opacity: 0;
   }
   `;
-  const assets = ["Mina", "Ethereum", "Bitcoin  ", "Chainlink", "Solana"];
+  const assets = [
+    "Mina",
+    "Ethereum",
+    "Bitcoin  ",
+    "Chainlink",
+    "Solana",
+    "Ripple",
+    "Cardano",
+    "Avalanche",
+    "Polygon",
+    "Dogecoin",
+  ];
 
   const handleSubmit = async () => {
     try {
