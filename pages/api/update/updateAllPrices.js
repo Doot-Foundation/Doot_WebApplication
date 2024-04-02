@@ -1,6 +1,7 @@
 const {
   TOKEN_TO_CACHE,
   TOKEN_TO_SIGNED_SLOT,
+  SLOT_STATUS_CACHE,
 } = require("../../../utils/constants/info.js");
 const { redis } = require("../../../utils/helper/InitRedis.js");
 const getPriceOf = require("../../../utils/helper/GetPriceOf.js");
@@ -12,6 +13,18 @@ async function PriceOf(token) {
   });
 }
 
+async function startFetchAndUpdates(tokens) {
+  for (const token of tokens) {
+    try {
+      const results = await PriceOf(token);
+      await redis.set(TOKEN_TO_CACHE[token.toLowerCase()], results[1]);
+      await redis.set(TOKEN_TO_SIGNED_SLOT[token.toLowerCase()], "NULL");
+    } catch (err) {
+      console.log("Failed For", token);
+    }
+  }
+}
+
 export default async function handler(req, res) {
   const authHeader = req.headers.authorization;
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
@@ -19,14 +32,13 @@ export default async function handler(req, res) {
     return;
   }
 
-  const { token } = req.query;
-  const results = await PriceOf(token.toLowerCase());
+  const keys = Object.keys(TOKEN_TO_CACHE);
+  await startFetchAndUpdates(keys);
 
-  await redis.set(TOKEN_TO_CACHE[token.toLowerCase()], results[1]);
-  await redis.set(TOKEN_TO_SIGNED_SLOT[token.toLowerCase()], "NULL");
+  await redis.set(SLOT_STATUS_CACHE, true);
 
   res.status(200).json({
-    status: `Updated ${token} Successfully!`,
+    status: `Updated Prices Successfully!`,
     price: results[0],
     timestamp: Date.now(),
   });

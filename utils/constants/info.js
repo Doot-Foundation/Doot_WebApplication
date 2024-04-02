@@ -1,7 +1,6 @@
 import {
   CoinGekoSymbols,
   BinanceSymbols,
-  // CMCSymbols,
   CryptoCompareSymbols,
   PricePaprikeSymbols,
   PriceMessariSymbols,
@@ -47,6 +46,8 @@ const MINA_CACHE = "mina_cid";
 const HISTORICAL_SIGNED_MAX_CACHE = "historical_signed_max";
 const MINA_SIGNED_MAX_CACHE = "mina_signed_max";
 
+const SLOT_STATUS_CACHE = "slot_logic_allowed";
+
 const ORACLE_PUBLIC_KEY =
   "B62qjm48BJuzaZmu2wA5YaZeKknkovbx9kDmu8E83jcYsg4sPgTDgPF";
 const DOOT_PUBLIC_KEY =
@@ -54,7 +55,6 @@ const DOOT_PUBLIC_KEY =
 
 const PROVIDERS = [
   "Binance",
-  // "CMC",
   "Crypto Compare",
   "Coin Paprika",
   "Messari",
@@ -70,7 +70,6 @@ const PROVIDERS = [
 ];
 const ENDPOINT_TO_DATA_PROVIDER = {
   binance: "Binance",
-  // coinmarketcap: "CMC",
   cryptocompare: "Crypto Compare",
   coinpaprika: "Coin Paprika",
   messari: "Messari",
@@ -87,7 +86,6 @@ const ENDPOINT_TO_DATA_PROVIDER = {
 function DATA_PROVIDER_TO_ENDPOINT(provider, token) {
   const binance_id = BinanceSymbols[token.toLowerCase()];
   const ciongecko_id = CoinGekoSymbols[token.toLowerCase()];
-  // const cmc_id = CMCSymbols[token.toLowerCase()];
   const cryptocompare_id = CryptoCompareSymbols[token.toLowerCase()];
   const pricepaprika_id = PricePaprikeSymbols[token.toLowerCase()];
   const messari_id = PriceMessariSymbols[token.toLowerCase()];
@@ -101,7 +99,6 @@ function DATA_PROVIDER_TO_ENDPOINT(provider, token) {
   const swapzone_id = SwapZoneSymbols[token.toLowerCase()];
   const obj = {
     Binance: `https://api.binance.com/api/v3/ticker/price?symbol=${binance_id}USDT`,
-    // CMC: `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=${cmc_id}&convert=USD`,
     "Crypto Compare": `https://min-api.cryptocompare.com/data/price?fsym=${cryptocompare_id}&tsyms=USD`,
     "Coin Paprika": `https://api.coinpaprika.com/v1/tickers/${pricepaprika_id}`,
     Messari: `https://data.messari.io/api/v1/assets/${messari_id}/metrics`,
@@ -168,6 +165,7 @@ module.exports = {
   MULTIPLICATION_FACTOR,
   PROVIDERS,
   TOKEN_TO_CACHE,
+  SLOT_STATUS_CACHE,
   SUPPORTED_TOKENS,
   ORACLE_PUBLIC_KEY,
   ENDPOINT_TO_DATA_PROVIDER,
