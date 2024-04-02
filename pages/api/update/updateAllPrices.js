@@ -16,16 +16,10 @@ async function PriceOf(token) {
 async function startFetchAndUpdates(tokens) {
   for (const token of tokens) {
     try {
-      console.log("For", token);
-      console.log("REACHED 1");
+      console.log(token);
       const results = await PriceOf(token);
-      console.log("REACHED 2");
-      if (results) {
-        await redis.set(TOKEN_TO_CACHE[token], results[1]);
-        console.log("REACHED 3");
-        await redis.set(TOKEN_TO_SIGNED_SLOT[token], "NULL");
-        console.log("REACHED 4");
-      }
+      await redis.set(TOKEN_TO_CACHE[token], results[1]);
+      await redis.set(TOKEN_TO_SIGNED_SLOT[token], "NULL");
     } catch (err) {
       console.log("Failed For", token);
     }
