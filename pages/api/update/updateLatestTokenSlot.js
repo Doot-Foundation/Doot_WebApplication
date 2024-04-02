@@ -9,6 +9,8 @@ const appendSignatureToSlot = require("../../../utils/helper/AppendSignatureToSl
 export default async function handler(req, res) {
   const { signature, publicKey, token } = req.query;
 
+  console.log(signature, publicKey, token);
+
   const cachedData = await redis.get(TOKEN_TO_CACHE[token.toLowerCase()]);
   const toCheck = cachedData.signature;
   var originsVerified = false;

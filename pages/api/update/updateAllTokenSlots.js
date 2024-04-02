@@ -15,15 +15,19 @@ export default async function handler(req, res) {
   }
 
   const runLogic = await redis.get(SLOT_STATUS_CACHE);
+  console.log(runLogic);
   if (!runLogic) {
     console.log("In Locked State. Can't run.");
-    res.status(200);
+    res.status(200).json({ status: "failed." });
     return;
   }
+
   await redis.set(SLOT_STATUS_CACHE, false);
 
   const keys = Object.keys(TOKEN_TO_CACHE);
   for (const token of keys) {
+    console.log(token, "update, ");
+
     const cachedData = await redis.get(TOKEN_TO_CACHE[token]);
 
     await appendSignatureToSlot(
@@ -32,9 +36,8 @@ export default async function handler(req, res) {
       cachedData.signature,
       ORACLE_PUBLIC_KEY
     );
-
-    console.log(token, "slot updated\n");
   }
 
   res.status(201).json({ status: "Updated All Slots Successfully." });
+  return;
 }

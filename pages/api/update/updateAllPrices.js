@@ -16,9 +16,16 @@ async function PriceOf(token) {
 async function startFetchAndUpdates(tokens) {
   for (const token of tokens) {
     try {
+      console.log("For", token);
+      console.log("REACHED 1");
       const results = await PriceOf(token);
-      await redis.set(TOKEN_TO_CACHE[token.toLowerCase()], results[1]);
-      await redis.set(TOKEN_TO_SIGNED_SLOT[token.toLowerCase()], "NULL");
+      console.log("REACHED 2");
+      if (results) {
+        await redis.set(TOKEN_TO_CACHE[token], results[1]);
+        console.log("REACHED 3");
+        await redis.set(TOKEN_TO_SIGNED_SLOT[token], "NULL");
+        console.log("REACHED 4");
+      }
     } catch (err) {
       console.log("Failed For", token);
     }
@@ -39,7 +46,6 @@ export default async function handler(req, res) {
 
   res.status(200).json({
     status: `Updated Prices Successfully!`,
-    price: results[0],
     timestamp: Date.now(),
   });
 }

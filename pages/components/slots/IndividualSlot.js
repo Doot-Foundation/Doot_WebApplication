@@ -112,9 +112,10 @@ export default function IndividualSlot({ token }) {
       });
       signedObj = JSON.stringify(signedObj);
 
+      console.log(signer.toString());
       await axios
         .post(
-          `/api/update/updateLatestTokenSlot?signature=${signedObj}&publicKey=${signer}&token=${token}`
+          `/api/update/updateLatestTokenSlot?signature=${signedObj}&publicKey=${signer.toString()}&token=${token}`
         )
         .then((res) => {
           if (res.data.status == 1) {

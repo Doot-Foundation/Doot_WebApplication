@@ -363,8 +363,6 @@ async function createAssetInfoArray(token) {
 }
 
 async function getPriceOf(token) {
-  console.log("\n");
-  console.log(token);
   const results = await createAssetInfoArray(token);
 
   const prices = results[0];
