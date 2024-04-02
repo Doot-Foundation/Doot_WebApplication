@@ -1,9 +1,9 @@
-const {
-  TOKEN_TO_CACHE,
-  ORACLE_PUBLIC_KEY,
-} = require("../../../utils/constants/info");
+const { TOKEN_TO_CACHE } = require("../../../utils/constants/info");
 const { redis } = require("../../../utils/helper/InitRedis");
-const { signatureClient } = require("../../../utils/helper/SignatureClient");
+const {
+  signatureClient,
+  mainnetSignatureClient,
+} = require("../../../utils/helper/SignatureClient");
 const appendSignatureToSlot = require("../../../utils/helper/AppendSignatureToSlot");
 
 export default async function handler(req, res) {
@@ -29,8 +29,14 @@ export default async function handler(req, res) {
   };
 
   originsVerified = signatureClient.verifyMessage(verifyBody);
-
-  if (!originsVerified) res.status(201).json({ status: 0 });
+  if (!originsVerified) {
+    const mainnetOriginsVerified =
+      mainnetSignatureClient.verifyMessage(verifyBody);
+    if (!mainnetOriginsVerified) {
+      res.status(201).json({ status: 0 });
+      return;
+    }
+  }
 
   await appendSignatureToSlot(
     token.toLowerCase(),
@@ -38,5 +44,7 @@ export default async function handler(req, res) {
     compatibleSignatureObject,
     publicKey
   );
+  console.log(publicKey, "joined", token, "consensus.");
+
   res.status(201).json({ status: 1 });
 }

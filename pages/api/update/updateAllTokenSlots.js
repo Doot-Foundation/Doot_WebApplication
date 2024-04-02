@@ -14,11 +14,9 @@ export default async function handler(req, res) {
   }
 
   const keys = Object.keys(TOKEN_TO_CACHE);
-  console.log(keys);
 
   for (const token of keys) {
     const cachedData = await redis.get(TOKEN_TO_CACHE[token]);
-    console.log(cachedData);
 
     await appendSignatureToSlot(
       token,
@@ -26,6 +24,8 @@ export default async function handler(req, res) {
       cachedData.signature,
       ORACLE_PUBLIC_KEY
     );
+
+    console.log(token, "slot updated\n");
   }
   res.status(201).json({ status: 1 });
 }

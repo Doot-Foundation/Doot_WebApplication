@@ -9,11 +9,13 @@ import {
 import { useEffect, useState, useContext } from "react";
 import { TOKEN_TO_SYMBOL } from "../../../utils/constants/info";
 
-import { SignerContext } from "../../../lib/context/contexts";
+import { SignerContext, ChainContext } from "../../../lib/context/contexts";
 
 export default function IndividualSlot({ token }) {
   const key = process.env.NEXT_PUBLIC_API_INTERFACE_KEY;
-  const { signer } = useContext(SignerContext);
+  const { signer, setSigner } = useContext(SignerContext);
+  const { chain, setChain } = useContext(ChainContext);
+
   const toast = useToast();
 
   const axios = require("axios");
@@ -52,7 +54,9 @@ export default function IndividualSlot({ token }) {
     setTimeLeft(Date.now() - result.aggregationTimestamp);
   }
 
-  if (timeLeft !== null) startTimer(timeLeft);
+  useEffect(() => {
+    if (timeLeft) startTimer(timeLeft);
+  }, [timeLeft]);
 
   // Function to start the timer
   function startTimer(startingTime) {
@@ -60,11 +64,10 @@ export default function IndividualSlot({ token }) {
 
     const intervalId = setInterval(() => {
       timer--;
-      console.log(token, timer);
 
       if (timer === 0) {
         clearInterval(intervalId);
-        location.reload();
+        window.location.reload();
       }
     }, 1000);
   }
@@ -77,7 +80,25 @@ export default function IndividualSlot({ token }) {
   }
 
   async function handleSign() {
-    if (typeof window !== "undefined" && window.mina) {
+    if (
+      typeof window !== "undefined" &&
+      window.mina &&
+      result &&
+      result.signature
+    ) {
+      const account = await window.mina.requestAccounts();
+      const network = await window.mina.requestNetwork();
+      setSigner(account[0]);
+      setChain({ chainId: network.chainId, chainName: network.name });
+
+      if (!account[0] || !network.chainId) {
+        toast({
+          title: "Wallet Not Connected!",
+          status: "info",
+        });
+        return;
+      }
+
       var toSignObject = {
         data: result.signature.data.toString(),
         publicKey: result.signature.publicKey.toString(),
@@ -96,10 +117,9 @@ export default function IndividualSlot({ token }) {
           `/api/update/updateLatestTokenSlot?signature=${signedObj}&publicKey=${signer}&token=${token}`
         )
         .then((res) => {
-          console.log(res.data.status);
           if (res.data.status == 1) {
             toast({
-              title: "Signed and Confirmed Successfully!!!",
+              title: "Signed and Confirmed Successfully!",
               duration: "7000",
               status: "success",
               position: "top",
@@ -108,7 +128,7 @@ export default function IndividualSlot({ token }) {
         })
         .catch((err) => {
           toast({
-            title: "Failed !!!",
+            title: "Failed. Please try again!",
             status: "error",
             position: "top",
           });
@@ -136,7 +156,7 @@ export default function IndividualSlot({ token }) {
         >
           {TOKEN_TO_SYMBOL[token]}
         </Heading>
-        {result ? (
+        {result && result.signature && !timeLagError && timeLeft != 0 ? (
           <>
             <Flex gap={1}>
               <Text w={"30%"}>Price</Text>
@@ -162,16 +182,16 @@ export default function IndividualSlot({ token }) {
               <Text w={"30%"}>Data </Text>
               <Text w={"70%"}>{result.signature.data}</Text>
             </Flex>
-            {signer ? (
-              <>
-                <Progress max={600000} value={timeLeft}></Progress>
-                <Button colorScheme="green" onClick={handleSign}>
-                  Join Consensus
-                </Button>
-              </>
-            ) : null}
+            <Progress max={600000} value={timeLeft}></Progress>
+            <Button colorScheme="green" onClick={handleSign}>
+              Join Consensus
+            </Button>
           </>
-        ) : null}
+        ) : (
+          <Text>
+            Loading Latest Slot, Please check back in a couple of minutes...
+          </Text>
+        )}
       </Flex>
     </>
   );
