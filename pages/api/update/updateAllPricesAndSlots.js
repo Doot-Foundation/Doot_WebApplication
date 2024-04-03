@@ -1,10 +1,12 @@
 const {
   TOKEN_TO_CACHE,
   TOKEN_TO_SIGNED_SLOT,
+  ORACLE_PUBLIC_KEY,
   SLOT_STATUS_CACHE,
 } = require("../../../utils/constants/info.js");
 const { redis } = require("../../../utils/helper/InitRedis.js");
 const getPriceOf = require("../../../utils/helper/GetPriceOf.js");
+const appendSignatureToSlot = require("../../../utils/helper/AppendSignatureToSlot");
 
 async function PriceOf(token) {
   return new Promise((resolve) => {
@@ -16,10 +18,17 @@ async function PriceOf(token) {
 async function startFetchAndUpdates(tokens) {
   for (const token of tokens) {
     try {
-      console.log(token);
+      console.log("=======================\n", token);
       const results = await PriceOf(token);
       await redis.set(TOKEN_TO_CACHE[token], results[1]);
       await redis.set(TOKEN_TO_SIGNED_SLOT[token], "NULL");
+
+      await appendSignatureToSlot(
+        token,
+        results[1],
+        results[1].signature,
+        ORACLE_PUBLIC_KEY
+      );
     } catch (err) {
       console.log("Failed For", token);
     }
