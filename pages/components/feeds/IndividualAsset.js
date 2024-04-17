@@ -64,7 +64,6 @@ export default function IndividualAsset({ token }) {
         }
       );
       setLatest(response.data.information);
-      console.log(response.data.information);
     } catch (error) {
       console.error("Error fetching price:", error);
     }
@@ -117,7 +116,6 @@ export default function IndividualAsset({ token }) {
 
   useEffect(() => {
     if (ipfsData) {
-      console.log(ipfsData);
       const toPush = ipfsData.latest.prices[SYMBOL_TO_TOKEN[token]];
       // toPush.timestamp = ipfsData.latest.timestamp.toString();
       const latestArr = new Array();
@@ -292,8 +290,8 @@ export default function IndividualAsset({ token }) {
         </Text>
         {ipfsHistorical && ipfsLatest ? (
           <HistoricalTable
-            ipfsHistorical={ipfsHistorical}
             ipfsLatest={ipfsLatest}
+            ipfsHistorical={ipfsHistorical}
           />
         ) : (
           <Heading fontFamily={"Montserrat Variable"}> Loading... </Heading>

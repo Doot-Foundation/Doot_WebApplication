@@ -15,6 +15,7 @@ async function appendSignatureToSlot(
   var finalState = lastUpdatedSlotInfo;
 
   if (finalState == "NULL") {
+    console.log("Running fresh slot.");
     finalState = tokenDetails;
     finalState["community"] = {
       [publicKey]: signature,
@@ -35,6 +36,7 @@ async function appendSignatureToSlot(
   ) {
     currentMaxHistoricalCache[token] = finalState;
     await redis.set(HISTORICAL_SIGNED_MAX_CACHE, currentMaxHistoricalCache);
+    console.log("UPATED HISTORICAL SIGNED SLOT INFO.");
   }
 
   const currentMaxMinaCache = await redis.get(MINA_SIGNED_MAX_CACHE);
@@ -44,6 +46,7 @@ async function appendSignatureToSlot(
   ) {
     currentMaxMinaCache[token] = finalState;
     await redis.set(MINA_SIGNED_MAX_CACHE, currentMaxMinaCache);
+    console.log("UPATED MINA SIGNED SLOT INFO.");
   }
 
   await redis.set(TOKEN_TO_SIGNED_SLOT[token], finalState);

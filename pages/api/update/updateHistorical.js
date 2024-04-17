@@ -20,8 +20,14 @@ export default async function handler(req, res) {
 
   for (const item of keys) {
     const data = CACHED_DATA[item];
+    if (Object.keys(data).length === 1) continue;
     obj[item] = data;
     finalSlotState[item] = { community: {} };
+  }
+
+  if (Object.keys(obj).length === 0) {
+    res.status(200).json({ latest: "Not updated." });
+    return;
   }
 
   const cid = await redis.get(HISTORICAL_CACHE);

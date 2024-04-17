@@ -19,8 +19,6 @@ function removeOldTimestamps(obj) {
 }
 
 export default async function pinHistoricalObject(previousCID, latestPrices) {
-  // const previousCID = await getHistoricalCache();
-
   let isFirst;
   let toUploadObject;
 
@@ -37,7 +35,6 @@ export default async function pinHistoricalObject(previousCID, latestPrices) {
     };
   } else {
     isFirst = false;
-    // console.log("endpoint :", `https://${GATEWAY}/ipfs/${previousCID}`);
 
     const res = await axios.get(`https://${GATEWAY}/ipfs/${previousCID}`);
     const previousObject = res.data;
