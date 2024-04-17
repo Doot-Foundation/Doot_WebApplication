@@ -1,5 +1,5 @@
 import { redis } from "../../../utils/helper/InitRedis";
-import { SLOT_STATUS_CACHE } from "../../../utils/constants/info";
+import { HISTORICAL_CACHE } from "../../../utils/constants/info";
 
 export default async function handler(req, res) {
   const authHeader = req.headers.authorization;
@@ -8,8 +8,6 @@ export default async function handler(req, res) {
     res.status(401).json("Unauthorized");
     return;
   }
-
-  await redis.set(SLOT_STATUS_CACHE, false);
 
   res.status(200).json("Init Cache!");
 }
