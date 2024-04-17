@@ -82,47 +82,51 @@ export default function HistoricalTable({ ipfsHistorical, ipfsLatest }) {
           {Array.isArray(ipfsHistorical) &&
             Array.isArray(ipfsLatest) &&
             [...ipfsLatest, ...ipfsHistorical].map((item, key) => {
-              const collectivePrice = item.price;
-              const collectiveSignature = item.signature.signature;
-              const collectiveTimestamp = item.aggregationTimestamp;
+              try {
+                const collectivePrice = item.price;
+                const collectiveSignature = item.signature.signature;
+                const collectiveTimestamp = item.aggregationTimestamp;
 
-              const urls = item.urls;
-              const signatures = item.signatures;
-              const prices_returned = item.prices_returned;
-              const timestamps = item.timestamps;
+                const urls = item.urls;
+                const signatures = item.signatures;
+                const prices_returned = item.prices_returned;
+                const timestamps = item.timestamps;
 
-              const limit = timestamps.length;
+                const limit = timestamps.length;
 
-              return Array.from({ length: limit }).map((_, x) => (
-                <Tr key={`${key}-${x}`} fontFamily={"Manrope Variable"} p={2}>
-                  <Td>{key + 1}</Td>
-                  <Td
-                    _hover={{ cursor: "pointer" }}
-                    onClick={() => handleCopy(collectiveSignature)}
-                  >
-                    {collectiveSignature
-                      ? collectiveSignature.slice(0, 4) +
-                        "..." +
-                        collectiveSignature.slice(-4)
-                      : null}
-                  </Td>
-                  <Td>{collectivePrice}</Td>
-                  <Td>{collectiveTimestamp}</Td>
-                  <Td>{urlToProvider(urls[x])}</Td>
-                  <Td>{processFloatString(prices_returned[x])}</Td>
-                  <Td
-                    _hover={{ cursor: "pointer" }}
-                    onClick={() => handleCopy(signatures[x].signature)}
-                  >
-                    {signatures[x] && signatures[x].signature
-                      ? signatures[x].signature.slice(0, 4) +
-                        "..." +
-                        signatures[x].signature.slice(-4)
-                      : null}
-                  </Td>
-                  <Td>{timestamps[x]}</Td>
-                </Tr>
-              ));
+                return Array.from({ length: limit }).map((_, x) => (
+                  <Tr key={`${key}-${x}`} fontFamily={"Manrope Variable"} p={2}>
+                    <Td>{key + 1}</Td>
+                    <Td
+                      _hover={{ cursor: "pointer" }}
+                      onClick={() => handleCopy(collectiveSignature)}
+                    >
+                      {collectiveSignature
+                        ? collectiveSignature.slice(0, 4) +
+                          "..." +
+                          collectiveSignature.slice(-4)
+                        : null}
+                    </Td>
+                    <Td>{collectivePrice}</Td>
+                    <Td>{collectiveTimestamp}</Td>
+                    <Td>{urlToProvider(urls[x])}</Td>
+                    <Td>{processFloatString(prices_returned[x])}</Td>
+                    <Td
+                      _hover={{ cursor: "pointer" }}
+                      onClick={() => handleCopy(signatures[x].signature)}
+                    >
+                      {signatures[x] && signatures[x].signature
+                        ? signatures[x].signature.slice(0, 4) +
+                          "..." +
+                          signatures[x].signature.slice(-4)
+                        : null}
+                    </Td>
+                    <Td>{timestamps[x]}</Td>
+                  </Tr>
+                ));
+              } catch (err) {
+                console.log();
+              }
             })}
         </Tbody>
       </Table>

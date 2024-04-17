@@ -20,7 +20,7 @@
     },
     {
       "path": "/api/update/updateHistorical",
-      "schedule": "*/30 * * * *"
+      "schedule": "*/33 * * * *"
     }
   ]
 }
