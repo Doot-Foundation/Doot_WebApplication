@@ -7,6 +7,7 @@ import {
   Button,
   FormControl,
   Link,
+  Image,
 } from "@chakra-ui/react";
 
 import { keyframes } from "@emotion/react";
@@ -22,6 +23,7 @@ import { FaArrowRightLong } from "react-icons/fa6";
 import { GoVerified } from "react-icons/go";
 import { LuPartyPopper } from "react-icons/lu";
 
+import HeroAnimatedText from "./HeroAnimatedText";
 import InformationCard from "./InformationCard";
 
 import {
@@ -109,31 +111,29 @@ export default function HomeHero() {
           p={10}
           align={"center"}
         >
-          <Heading
-            fontFamily={"Montserrat Variable"}
-            size={"4xl"}
-            textAlign={"center"}
-            w={"80%"}
+          <Flex
+            position="relative"
+            direction="column"
+            align="center"
+            justify="center"
+            fontSize="70px"
+            fontFamily={"Poppins"}
           >
-            Supercharged Oracle For The Mina Protocol
-          </Heading>
-          <Text
-            fontFamily={"Source Code Pro Variable"}
-            fontSize={"2xl"}
-            width={"100%"}
-            textAlign={"center"}
-          >
-            <Box
-              as={"span"}
-              color={"#8c54ff"}
-              fontSize={"3xl"}
-              fontWeight={800}
-            >
-              Verifiable, Transparent.
+            <Image
+              height="auto"
+              m="auto"
+              src={"/static/animation/dots.gif"}
+              zIndex={"-1"}
+              position={"absolute"}
+              maxW="180%"
+              filter="brightness(50%)"
+            />
+            <Box h={120}>
+              <HeroAnimatedText />
             </Box>
-            <br />
-            That's how we like our asset feeds for the Mina Protocol.
-          </Text>
+            <Box fontWeight={900}>Oracle</Box>
+            <Box>For Mina Protocol</Box>
+          </Flex>
           <Flex gap={5}>
             <Link href="https://docs.doot.foundation/" target="_blank">
               <Button
