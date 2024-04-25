@@ -103,6 +103,15 @@ export default function HomeHero() {
     return formattedString;
   }
 
+  const scrollToElement = (elementId) => {
+    const element = document.getElementById(elementId);
+    element?.scrollIntoView({
+      behavior: "smooth",
+      block: "end",
+      inline: "nearest",
+    });
+  };
+
   return (
     <>
       <Flex direction={"column"} gap={120} mb={150}>
@@ -138,39 +147,38 @@ export default function HomeHero() {
             <Box>For Mina Protocol</Box>
           </Flex>
           <Flex gap={28} mt={2}>
-            <Link href="#" target="_blank">
-              <Button
-                position={"relative"}
-                alignItems={"center"}
-                justifyItems={"center"}
-                p={"33px 54px"}
-                gap={2}
-                transition={"0.2s"}
-                _active={{}}
-                _hover={{}}
-                background=" #6B1BFF"
-                boxShadow=" 0px 0px 200px #6B1BFF, inset 0px -3px 0px rgba(0, 0, 0, 0.2), inset 0px 1px 0px rgba(255, 255, 255, 0.4)"
-                borderRadius="100px"
-                fontFamily={"Manrope Variable"}
-                fontSize={"20px"}
-                overflow="hidden"
-              >
-                <Box
-                  position="absolute"
-                  width="134px"
-                  height="40px"
-                  left="calc(50% - 134px/2)"
-                  top="calc(50% - 40px/2 + 39.95px)"
-                  background="#9470DD"
-                  filter="blur(13px)"
-                />
+            <Button
+              position={"relative"}
+              alignItems={"center"}
+              justifyItems={"center"}
+              p={"33px 54px"}
+              gap={2}
+              transition={"0.2s"}
+              _active={{}}
+              _hover={{}}
+              background=" #6B1BFF"
+              boxShadow=" 0px 0px 200px #6B1BFF, inset 0px -3px 0px rgba(0, 0, 0, 0.2), inset 0px 1px 0px rgba(255, 255, 255, 0.4)"
+              borderRadius="100px"
+              fontFamily={"Manrope Variable"}
+              fontSize={"20px"}
+              overflow="hidden"
+              onClick={() => scrollToElement("targetSection")}
+            >
+              <Box
+                position="absolute"
+                width="134px"
+                height="40px"
+                left="calc(50% - 134px/2)"
+                top="calc(50% - 40px/2 + 39.95px)"
+                background="#9470DD"
+                filter="blur(13px)"
+              />
 
-                <Image src="/static/images/stars.png" alt="Stars" />
-                <Text color="white" fontWeight={"900"}>
-                  Try Doot
-                </Text>
-              </Button>
-            </Link>
+              <Image src="/static/images/stars.png" alt="Stars" />
+              <Text color="white" fontWeight={"900"}>
+                Try Doot
+              </Text>
+            </Button>
 
             <Link
               href="https://docs.doot.foundation/"
@@ -337,201 +345,203 @@ export default function HomeHero() {
           </Flex>
         </Flex>
         {/* Testing  */}
-        <Flex direction={"column"}>
-          <Flex direction={"column"} alignItems={"left"}>
-            <Flex ml={200} direction={"row"} align={"center"} gap={10}>
-              <Box
-                background={
-                  "linear-gradient(90deg, #6c35de 0%,rgba(23,0,44,1) 100%)"
-                }
-                w={200}
-                h={5}
-              ></Box>
+        <section id="targetSection">
+          <Flex direction={"column"}>
+            <Flex direction={"column"} alignItems={"left"}>
+              <Flex ml={200} direction={"row"} align={"center"} gap={10}>
+                <Box
+                  background={
+                    "linear-gradient(90deg, #6c35de 0%,rgba(23,0,44,1) 100%)"
+                  }
+                  w={200}
+                  h={5}
+                ></Box>
+                <Heading
+                  letterSpacing={3}
+                  size={"3xl"}
+                  fontFamily={"Montserrat Variable"}
+                >
+                  TEST DOOT
+                </Heading>
+              </Flex>{" "}
               <Heading
                 letterSpacing={3}
                 size={"3xl"}
                 fontFamily={"Montserrat Variable"}
+                ml={200}
               >
-                TEST DOOT
+                ASSET FEEDS
               </Heading>
-            </Flex>{" "}
-            <Heading
-              letterSpacing={3}
-              size={"3xl"}
-              fontFamily={"Montserrat Variable"}
-              ml={200}
-            >
-              ASSET FEEDS
-            </Heading>
-          </Flex>
-
-          <Flex
-            direction={"row"}
-            align={"center"}
-            justify={"center"}
-            mt={50}
-            gap={5}
-          >
-            <Flex
-              background={"linear-gradient(120deg,#2c0055 0%, #5126a9 100%)"}
-              direction={"column"}
-              borderRadius={10}
-              p={5}
-              minH={400}
-              w={"22%"}
-              pos={"relative"}
-            >
-              <Text fontSize={25}>
-                Choose the asset and run the asset feed.
-              </Text>
-
-              <FormControl
-                fontFamily={"Source Code Pro Variable"}
-                mt={5}
-                position={"relative"}
-              >
-                <AutoComplete
-                  openOnFocus
-                  value={asset}
-                  onChange={(e) => setAsset(e)}
-                >
-                  <Box
-                    position={"absolute"}
-                    top={0}
-                    left={0}
-                    borderRadius={10}
-                    backgroundColor={"white"}
-                    h={10}
-                    w={"100%"}
-                  ></Box>
-                  <AutoCompleteInput
-                    id={1}
-                    w={"100%"}
-                    variant="filled"
-                    placeholder="Select Asset"
-                    color={"black"}
-                  />
-                  <AutoCompleteList>
-                    {assets.map((asset, cid) => (
-                      <AutoCompleteItem
-                        key={`option-${cid}`}
-                        value={asset}
-                        color={"black"}
-                        textTransform="capitalize"
-                      >
-                        {asset}
-                      </AutoCompleteItem>
-                    ))}
-                  </AutoCompleteList>
-                </AutoComplete>
-              </FormControl>
-
-              <Button
-                backgroundColor={"#00eab1"}
-                position="absolute"
-                bottom={5}
-                onClick={handleSubmit}
-                fontFamily={"Source Code Pro Variable"}
-                _hover={{
-                  backgroundColor: "#00bc8f",
-                }}
-              >
-                RUN REQUEST
-              </Button>
             </Flex>
-            {/* Result Window */}
+
             <Flex
-              direction={"column"}
-              h={400}
-              w={"50%"}
-              fontFamily={"Source Code Pro Variable"}
+              direction={"row"}
+              align={"center"}
+              justify={"center"}
+              mt={50}
+              gap={5}
             >
               <Flex
-                gap={2}
-                background={
-                  "linear-gradient(190deg, rgba(23,0,44,1) 0%, #5126a9 100%)"
-                }
-                p={3}
-                borderTopRadius={10}
+                background={"linear-gradient(120deg,#2c0055 0%, #5126a9 100%)"}
+                direction={"column"}
+                borderRadius={10}
+                p={5}
+                minH={400}
+                w={"22%"}
+                pos={"relative"}
               >
-                <Box
-                  borderRadius={"50%"}
-                  boxSize={3}
-                  backgroundColor={"green.300"}
-                ></Box>
-                <Box
-                  borderRadius={"50%"}
-                  boxSize={3}
-                  backgroundColor={"orange"}
-                ></Box>
-                <Box
-                  borderRadius={"50%"}
-                  boxSize={3}
-                  backgroundColor={"red"}
-                ></Box>
-              </Flex>
+                <Text fontSize={25}>
+                  Choose the asset and run the asset feed.
+                </Text>
 
-              <Flex
-                backgroundColor="#2c0055"
-                borderBottomRadius={10}
-                p="0 20px 20px 20px"
-                h={"100%"}
-              >
-                <Flex
-                  maxW={"100%"}
-                  borderRadius={10}
-                  backgroundColor={"#3f007a"}
-                  direction={"column"}
-                  w={"100%"}
+                <FormControl
+                  fontFamily={"Source Code Pro Variable"}
+                  mt={5}
+                  position={"relative"}
                 >
-                  <Flex
-                    direction={"row"}
-                    borderBottom={"2px solid white"}
-                    p={5}
-                    pt={7}
-                    pl={5}
-                    gap={20}
-                    ml={10}
-                    mr={10}
+                  <AutoComplete
+                    openOnFocus
+                    value={asset}
+                    onChange={(e) => setAsset(e)}
                   >
                     <Box
-                      cursor={"pointer"}
-                      onClick={() => {
-                        setMode("res");
-                      }}
-                      fontWeight={mode == "res" ? 900 : 500}
-                      color={"#0ce1ae"}
+                      position={"absolute"}
+                      top={0}
+                      left={0}
+                      borderRadius={10}
+                      backgroundColor={"white"}
+                      h={10}
+                      w={"100%"}
+                    ></Box>
+                    <AutoCompleteInput
+                      id={1}
+                      w={"100%"}
+                      variant="filled"
+                      placeholder="Select Asset"
+                      color={"black"}
+                    />
+                    <AutoCompleteList>
+                      {assets.map((asset, cid) => (
+                        <AutoCompleteItem
+                          key={`option-${cid}`}
+                          value={asset}
+                          color={"black"}
+                          textTransform="capitalize"
+                        >
+                          {asset}
+                        </AutoCompleteItem>
+                      ))}
+                    </AutoCompleteList>
+                  </AutoComplete>
+                </FormControl>
+
+                <Button
+                  backgroundColor={"#00eab1"}
+                  position="absolute"
+                  bottom={5}
+                  onClick={handleSubmit}
+                  fontFamily={"Source Code Pro Variable"}
+                  _hover={{
+                    backgroundColor: "#00bc8f",
+                  }}
+                >
+                  RUN REQUEST
+                </Button>
+              </Flex>
+              {/* Result Window */}
+              <Flex
+                direction={"column"}
+                h={400}
+                w={"50%"}
+                fontFamily={"Source Code Pro Variable"}
+              >
+                <Flex
+                  gap={2}
+                  background={
+                    "linear-gradient(190deg, rgba(23,0,44,1) 0%, #5126a9 100%)"
+                  }
+                  p={3}
+                  borderTopRadius={10}
+                >
+                  <Box
+                    borderRadius={"50%"}
+                    boxSize={3}
+                    backgroundColor={"green.300"}
+                  ></Box>
+                  <Box
+                    borderRadius={"50%"}
+                    boxSize={3}
+                    backgroundColor={"orange"}
+                  ></Box>
+                  <Box
+                    borderRadius={"50%"}
+                    boxSize={3}
+                    backgroundColor={"red"}
+                  ></Box>
+                </Flex>
+
+                <Flex
+                  backgroundColor="#2c0055"
+                  borderBottomRadius={10}
+                  p="0 20px 20px 20px"
+                  h={"100%"}
+                >
+                  <Flex
+                    maxW={"100%"}
+                    borderRadius={10}
+                    backgroundColor={"#3f007a"}
+                    direction={"column"}
+                    w={"100%"}
+                  >
+                    <Flex
+                      direction={"row"}
+                      borderBottom={"2px solid white"}
+                      p={5}
+                      pt={7}
+                      pl={5}
+                      gap={20}
+                      ml={10}
+                      mr={10}
                     >
-                      Response
-                    </Box>
-                    <Box
-                      cursor={"pointer"}
-                      onClick={() => {
-                        setMode("req");
-                      }}
-                      fontWeight={mode == "req" ? 900 : 500}
-                      color={"#0ce1ae"}
-                    >
-                      API Endpoint
-                    </Box>
-                  </Flex>
-                  <Flex p={10} fontWeight={800}>
-                    <Text
-                      maxW={"100%"}
-                      hidden={mode == "req"}
-                      dangerouslySetInnerHTML={{
-                        __html: result,
-                      }}
-                    ></Text>
-                    <Text maxW={"100%"} hidden={mode == "res"}>
-                      {`https://doot.foundation/api/get/getPrice?token=${asset}`}
-                    </Text>
+                      <Box
+                        cursor={"pointer"}
+                        onClick={() => {
+                          setMode("res");
+                        }}
+                        fontWeight={mode == "res" ? 900 : 500}
+                        color={"#0ce1ae"}
+                      >
+                        Response
+                      </Box>
+                      <Box
+                        cursor={"pointer"}
+                        onClick={() => {
+                          setMode("req");
+                        }}
+                        fontWeight={mode == "req" ? 900 : 500}
+                        color={"#0ce1ae"}
+                      >
+                        API Endpoint
+                      </Box>
+                    </Flex>
+                    <Flex p={10} fontWeight={800}>
+                      <Text
+                        maxW={"100%"}
+                        hidden={mode == "req"}
+                        dangerouslySetInnerHTML={{
+                          __html: result,
+                        }}
+                      ></Text>
+                      <Text maxW={"100%"} hidden={mode == "res"}>
+                        {`https://doot.foundation/api/get/getPrice?token=${asset}`}
+                      </Text>
+                    </Flex>
                   </Flex>
                 </Flex>
               </Flex>
             </Flex>
           </Flex>
-        </Flex>
+        </section>
       </Flex>
     </>
   );
