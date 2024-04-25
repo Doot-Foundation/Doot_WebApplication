@@ -1,5 +1,5 @@
-import { Button, Flex, Image } from "@chakra-ui/react";
-import { RiArrowDownSLine } from "react-icons/ri";
+import { Button, Flex, Image, Box, PseudoBox } from "@chakra-ui/react";
+import { SlArrowDown } from "react-icons/sl";
 
 import WalletError from "./WalletError";
 
@@ -38,34 +38,65 @@ export default function ConnectButton() {
 
   return (
     <>
-      <Flex direction={"row"} gap={2}>
+      <Flex direction="row" position="relative">
         {signer != null ? (
-          <Button fontWeight={300}>
-            <Flex direction={"row"} justify={"center"} align={"center"} gap={2}>
-              <Image src="/static/images/mina.png" boxSize={4} />
-              {chain.chainName}
+          <>
+            <Button
+              width="130px"
+              height="48px"
+              position="absolute"
+              left="-140px"
+              cursor="default"
+            >
+              <Flex
+                direction={"row"}
+                justify={"center"}
+                align={"center"}
+                gap={2}
+                fontWeight="300"
+              >
+                <Image src="/static/images/mina.png" h="16px" />
+                {chain.chainName}
+              </Flex>
+            </Button>
+            <Button
+              width="130px"
+              height="48px"
+              background="linear-gradient(93.59deg, #00EAB1 -14.32%, rgba(23, 190, 194, 0.91) 12.24%, rgba(39, 158, 206, 0.65) 35.82%, rgba(61, 116, 221, 0.61) 58.92%, rgba(81, 77, 236, 0.43) 83.94%, #6B1BFF 107.82%)"
+              _active={{}}
+              _hover={{}}
+              color="white"
+              cursor="default"
+            >
+              {signer.slice(0, 4) + "..." + signer.slice(-4)}
+            </Button>
+          </>
+        ) : (
+          <>
+            <Flex
+              width="130px"
+              height="48px"
+              p={0}
+              justify="center"
+              align="center"
+              borderRadius="8px"
+              background="linear-gradient(93.59deg, #00EAB1 -14.32%, rgba(23, 190, 194, 0.91) 12.24%, rgba(39, 158, 206, 0.65) 35.82%, rgba(61, 116, 221, 0.61) 58.92%, rgba(81, 77, 236, 0.43) 83.94%, #6B1BFF 107.82%)"
+            >
+              <Button
+                w="98%"
+                h="95%"
+                bg="#171717" // Ensure the button's background is transparent
+                color="white"
+                _hover={{}}
+                _active={{}}
+                onClick={handleConnection}
+              >
+                Connect
+              </Button>
             </Flex>
-            <RiArrowDownSLine />
-          </Button>
-        ) : null}
-        <Button
-          colorScheme={!signer ? "purple" : null}
-          bgColor={signer ? "#00eab1" : null}
-          onClick={handleConnection}
-          _hover={
-            signer
-              ? {
-                  backgroundColor: "#00bc8f",
-                }
-              : null
-          }
-        >
-          {signer == null ? (
-            <>Connect</>
-          ) : (
-            signer.slice(0, 4) + "..." + signer.slice(-4)
-          )}
-        </Button>
+          </>
+        )}
+
         {showWalletPopup && (
           <WalletError
             isOpen={showWalletPopup}

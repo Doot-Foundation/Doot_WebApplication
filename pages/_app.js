@@ -3,7 +3,6 @@ import Head from "next/head";
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import "@fontsource-variable/source-code-pro";
 import "@fontsource-variable/montserrat";
-import "@fontsource/poppins/600.css";
 import "@fontsource-variable/manrope";
 
 import { useState } from "react";
@@ -19,7 +18,7 @@ export default function App({ Component, pageProps }) {
         body: {
           bg: "#171717",
           color: "white",
-          fontFamily: "'Poppins', sans-serif",
+          fontFamily: "'Manrope Variable', sans-serif",
         },
       },
     },

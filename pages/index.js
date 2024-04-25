@@ -3,8 +3,6 @@ import HomeHeader from "./components/home/HomeHeader";
 import HomeHero from "./components/home/HomeHero";
 import HomeFooter from "./components/home/HomeFooter";
 
-import BackgroundImageComponent from "./components/common/BackgroundImageComponent";
-
 export default function Home() {
   return (
     <>

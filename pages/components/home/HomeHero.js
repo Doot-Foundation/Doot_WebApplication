@@ -19,7 +19,6 @@ import { useState } from "react";
 import { GiAllSeeingEye } from "react-icons/gi";
 import { MdOutlineJoinInner } from "react-icons/md";
 import { MdOutlineCleaningServices } from "react-icons/md";
-import { FaArrowRightLong } from "react-icons/fa6";
 import { GoVerified } from "react-icons/go";
 import { LuPartyPopper } from "react-icons/lu";
 
@@ -37,6 +36,10 @@ export default function HomeHero() {
   const [asset, setAsset] = useState("Select asset");
   const [result, setResult] = useState(null);
   const [mode, setMode] = useState("res");
+
+  const spin = keyframes`
+  to { transform: rotate(360deg); }
+ `;
 
   const blinking = keyframes`
   50% {
@@ -117,7 +120,7 @@ export default function HomeHero() {
             align="center"
             justify="center"
             fontSize="70px"
-            fontFamily={"Poppins"}
+            fontWeight="600"
           >
             <Image
               height="auto"
@@ -131,44 +134,85 @@ export default function HomeHero() {
             <Box h={120}>
               <HeroAnimatedText />
             </Box>
-            <Box fontWeight={900}>Oracle</Box>
+            <Box>Oracle</Box>
             <Box>For Mina Protocol</Box>
           </Flex>
-          <Flex gap={5}>
-            <Link href="https://docs.doot.foundation/" target="_blank">
+          <Flex gap={28} mt={2}>
+            <Link href="#" target="_blank">
               <Button
+                position={"relative"}
                 alignItems={"center"}
                 justifyItems={"center"}
-                p={"5px 30px"}
-                borderRadius={20}
+                p={"33px 54px"}
                 gap={2}
                 transition={"0.2s"}
-                _hover={{ gap: "5" }}
                 _active={{}}
-                background={
-                  " linear-gradient(75deg, rgba(88,255,216,1) 16%, rgba(170,81,255,1) 100%);"
-                }
-                fontFamily={"Montserrat Variable"}
+                _hover={{}}
+                background=" #6B1BFF"
+                boxShadow=" 0px 0px 200px #6B1BFF, inset 0px -3px 0px rgba(0, 0, 0, 0.2), inset 0px 1px 0px rgba(255, 255, 255, 0.4)"
+                borderRadius="100px"
+                fontFamily={"Manrope Variable"}
+                fontSize={"20px"}
+                overflow="hidden"
               >
-                <Text fontWeight={"bold"}>TRY DOOT</Text>
-                <FaArrowRightLong />
+                <Box
+                  position="absolute"
+                  width="134px"
+                  height="40px"
+                  left="calc(50% - 134px/2)"
+                  top="calc(50% - 40px/2 + 39.95px)"
+                  background="#9470DD"
+                  filter="blur(13px)"
+                />
+
+                <Image src="/static/images/stars.png" alt="Stars" />
+                <Text color="white" fontWeight={"900"}>
+                  Try Doot
+                </Text>
               </Button>
             </Link>
-            <Link href="https://docs.doot.foundation/" target="_blank">
-              <Button
-                alignItems={"center"}
-                justifyItems={"center"}
-                p={"5px 30px"}
-                borderRadius={20}
-                gap={2}
-                transition={"0.2s"}
-                _hover={{ gap: "5" }}
-                _active={{}}
-                fontFamily={"Montserrat Variable"}
+
+            <Link
+              href="https://docs.doot.foundation/"
+              target="_blank"
+              _hover={{}}
+            >
+              <Flex
+                position="relative"
+                justify="center"
+                align="center"
+                borderRadius="100px"
+                p="4px 4px"
+                overflow="hidden"
               >
-                <Text fontWeight={"bold"}>Learn More</Text>
-                <FaArrowRightLong />
-              </Button>
+                <Box
+                  position="absolute"
+                  top={0}
+                  h={"100%"}
+                  w={"100%"}
+                  background="linear-gradient(90deg, #5E5EE5 -9.95%, rgba(129, 129, 222, 0.8) 12.47%, rgba(94, 94, 229, 0.62) 30.87%, rgba(28, 25, 26, 0.89) 53.87%, rgba(68, 220, 183, 0.65) 70.34%, #00EAB1 100.44%)"
+                  animation={`${spin} 5s infinite ease`}
+                />
+                <Button
+                  p={"29px 54px"}
+                  alignItems={"center"}
+                  justifyItems={"center"}
+                  gap={2}
+                  transition={"0.2s"}
+                  _active={{}}
+                  _hover={{}}
+                  background="#202020"
+                  borderRadius="100px"
+                  fontFamily={"Manrope Variable"}
+                  fontSize={"20px"}
+                  overflow="hidden"
+                >
+                  <Image src="/static/images/stars.png" alt="Stars" />
+                  <Text color="white" fontWeight={"900"}>
+                    Learn More
+                  </Text>
+                </Button>
+              </Flex>
             </Link>
           </Flex>
         </Flex>
@@ -292,7 +336,6 @@ export default function HomeHero() {
             </InformationCard>
           </Flex>
         </Flex>
-
         {/* Testing  */}
         <Flex direction={"column"}>
           <Flex direction={"column"} alignItems={"left"}>
