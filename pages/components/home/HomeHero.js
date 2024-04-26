@@ -8,20 +8,20 @@ import {
   FormControl,
   Link,
   Image,
+  useToast,
 } from "@chakra-ui/react";
-
-import { keyframes } from "@emotion/react";
-
-import axios from "axios";
 
 import { useState } from "react";
 
-import { GiAllSeeingEye } from "react-icons/gi";
-import { MdOutlineJoinInner } from "react-icons/md";
-import { MdOutlineCleaningServices } from "react-icons/md";
-import { GoVerified } from "react-icons/go";
-import { LuPartyPopper } from "react-icons/lu";
+import { keyframes } from "@emotion/react";
 
+import { GiAllSeeingEye } from "react-icons/gi";
+import {
+  MdOutlineCleaningServices,
+  MdOutlineContentCopy,
+  MdOutlineJoinInner,
+} from "react-icons/md";
+import { GoVerified } from "react-icons/go";
 import HeroAnimatedText from "./HeroAnimatedText";
 import InformationCard from "./InformationCard";
 
@@ -32,10 +32,14 @@ import {
   AutoCompleteList,
 } from "@choc-ui/chakra-autocomplete";
 
+import axios from "axios";
+
 export default function HomeHero() {
   const [asset, setAsset] = useState("Select asset");
   const [result, setResult] = useState(null);
   const [mode, setMode] = useState("res");
+
+  const toast = useToast();
 
   const spin = keyframes`
   to { transform: rotate(360deg); }
@@ -46,6 +50,7 @@ export default function HomeHero() {
     opacity: 0;
   }
   `;
+
   const assets = [
     "Mina",
     "Ethereum",
@@ -112,24 +117,32 @@ export default function HomeHero() {
     });
   };
 
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText("npm install @doot-oracles/client");
+      toast({
+        title: "Copied Successfully",
+        duration: "2000",
+        status: "success",
+        position: "top",
+      });
+    } catch (err) {
+      console.error("Failed to copy text: ", err);
+    }
+  };
+
   return (
     <>
       <Flex direction={"column"} gap={120} mb={150}>
         {/* Opening */}
-        <Flex
-          direction={"column"}
-          maxW={"100%"}
-          gap={10}
-          p={10}
-          align={"center"}
-        >
+        <Flex direction={"column"} maxW={"100%"} gap={7} align={"center"}>
           <Flex
             position="relative"
             direction="column"
             align="center"
             justify="center"
             fontSize="70px"
-            fontWeight="600"
+            fontWeight={600}
           >
             <Image
               height="auto"
@@ -146,7 +159,7 @@ export default function HomeHero() {
             <Box>Oracle</Box>
             <Box>For Mina Protocol</Box>
           </Flex>
-          <Flex gap={28} mt={2}>
+          <Flex gap={28}>
             <Button
               position={"relative"}
               alignItems={"center"}
@@ -156,8 +169,8 @@ export default function HomeHero() {
               transition={"0.2s"}
               _active={{}}
               _hover={{}}
-              background=" #6B1BFF"
-              boxShadow=" 0px 0px 200px #6B1BFF, inset 0px -3px 0px rgba(0, 0, 0, 0.2), inset 0px 1px 0px rgba(255, 255, 255, 0.4)"
+              background="#6B1BFF"
+              boxShadow="0px 0px 200px #6B1BFF, inset 0px -3px 0px rgba(0, 0, 0, 0.2), inset 0px 1px 0px rgba(255, 255, 255, 0.4)"
               borderRadius="100px"
               fontFamily={"Manrope Variable"}
               fontSize={"20px"}
@@ -190,7 +203,7 @@ export default function HomeHero() {
                 justify="center"
                 align="center"
                 borderRadius="100px"
-                p="4px 4px"
+                p="4px"
                 overflow="hidden"
               >
                 <Box
@@ -198,11 +211,11 @@ export default function HomeHero() {
                   top={0}
                   h={"100%"}
                   w={"100%"}
-                  background="linear-gradient(90deg, #5E5EE5 -9.95%, rgba(129, 129, 222, 0.8) 12.47%, rgba(94, 94, 229, 0.62) 30.87%, rgba(28, 25, 26, 0.89) 53.87%, rgba(68, 220, 183, 0.65) 70.34%, #00EAB1 100.44%)"
-                  animation={`${spin} 5s infinite ease`}
+                  background="linear-gradient(90deg, rgba(107,27,255,1) 0%, rgba(73,68,180,0) 35%, rgba(5,130,85,0) 50%, rgba(2,210,114,0) 65%, rgba(12,225,174,1) 100%)"
+                  animation={`${spin} 3s infinite ease-out`}
                 />
                 <Button
-                  p={"29px 54px"}
+                  p={"30px 53px"}
                   alignItems={"center"}
                   justifyItems={"center"}
                   gap={2}
@@ -213,7 +226,6 @@ export default function HomeHero() {
                   borderRadius="100px"
                   fontFamily={"Manrope Variable"}
                   fontSize={"20px"}
-                  overflow="hidden"
                 >
                   <Image src="/static/images/stars.png" alt="Stars" />
                   <Text color="white" fontWeight={"900"}>
@@ -223,109 +235,144 @@ export default function HomeHero() {
               </Flex>
             </Link>
           </Flex>
+          <Flex
+            fontFamily="Source Code Pro Variable"
+            borderRadius={100}
+            backgroundColor="#202020"
+            fontSize="18px"
+            p="20px 50px"
+            w="fit-content"
+            gap={6}
+          >
+            <Flex align="center" gap={5}>
+              <MdOutlineContentCopy
+                color={"gray"}
+                size={22}
+                onClick={copyToClipboard}
+                cursor={"pointer"}
+              />
+              <Box border="1px solid gray" h="100%"></Box>
+              <Flex gap={2}>
+                <Flex>
+                  <Box fontFamily={"Source Code Pro Variable"}>
+                    revolutionary@zkapp
+                  </Box>
+                  <Text>:~$</Text>
+                </Flex>
+                <Text
+                  color="white"
+                  onClick={copyToClipboard}
+                  cursor={"pointer"}
+                >
+                  npm install @doot-oracles/client
+                </Text>
+                <Box
+                  fontWeight={900}
+                  animation={`${blinking} 1.2s step-start infinite`}
+                  display={"inline"}
+                  color={"#0ce1ae"}
+                >
+                  _
+                </Box>
+              </Flex>
+            </Flex>
+          </Flex>
         </Flex>
 
         {/* Features */}
         <Flex direction={"column"} align={"center"}>
-          <Heading size={"lg"} fontFamily={"Source Code Pro Variable"}>
-            for@developers:~${" "}
+          <Flex direction="column" gap={10} align="center">
             <Box
-              animation={`${blinking} 1.2s step-start infinite`}
-              display={"inline "}
-              color={"#0ce1ae"}
+              border="1.5px solid cyan"
+              borderRadius="16px"
+              p="20px 28px"
+              fontWeight={700}
+              style={{
+                backgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+              fontFamily={"Source Code Pro Variable"}
+              background="linear-gradient(92.63deg, #F3F3F3 -14.41%, #15B7B3 97.58%, #14B8B3 97.59%)"
             >
-              _
+              FOR THE COMMUNITY, BY THE COMMUNITY.
             </Box>
-          </Heading>
-          <Text fontSize={"xl"}>
-            Who prioritize transparency, accuracy and verifiability.
-          </Text>
-
-          <Flex
-            direction={"row"}
-            padding={"0px 140px"}
-            gap={5}
-            mt={10}
-            // on
-            // animation={`${slideIn} 1s ease-in-out forwards`}
-          >
-            <InformationCard>
-              <GiAllSeeingEye size={100} />
-              <Heading
-                textAlign={"center"}
-                fontFamily={"Manrope Variable"}
-                fontWeight={900}
-              >
-                Asset Prices
-              </Heading>
-              <Text fontSize={20} textAlign={"center"}>
-                Mina-compatible asset feeds readily available for developers,
-                tracking several prominent assets. The accuracy of our final
-                results extends up to ten decimal places, providing developers
-                with highly precise data.
-              </Text>
-            </InformationCard>
-            <Spacer />
-            <InformationCard>
-              <MdOutlineJoinInner size={100} />
-              <Heading
-                textAlign={"center"}
-                fontFamily={"Manrope Variable"}
-                fontWeight={900}
-              >
-                Aggregated
-              </Heading>
-              <Text fontSize={20} textAlign={"center"}>
-                Pooling insights from diverse sources, our curated aggregation
-                method ensures an unadulterated stream of information. This
-                allows us to leave no room for manipulation or failure.
-              </Text>
-            </InformationCard>
-            <Spacer />
-            <InformationCard>
-              <MdOutlineCleaningServices size={100} />
-              <Heading
-                textAlign={"center"}
-                fontFamily={"Manrope Variable"}
-                fontWeight={900}
-              >
-                Filtered
-              </Heading>
-              <Text fontSize={20} textAlign={"center"}>
-                We meticulously eliminate outliers to extract the authentic
-                value, ensuring a signal devoid of disruptive noise that might
-                otherwise yield inaccurate outcomes.
-              </Text>
-            </InformationCard>
+            <Heading
+              fontFamily={"Poppins"}
+              fontWeight={"500"}
+              fontSize={"56px"}
+              maxW="70%"
+              align="center"
+            >
+              Unleash your project's potential
+              <br /> with a focus on transparency, accuracy and verifiablity.
+            </Heading>
           </Flex>
-          <Flex
-            direction={"row"}
-            mt={10}
-            mb={10}
-            p={"0px 100px"}
-            justify={"center"}
-            gap={10}
-          >
-            <InformationCard>
-              <GoVerified size={100} strokeWidth={1} />
-              <Heading
-                textAlign={"center"}
-                fontFamily={"Manrope Variable"}
-                fontWeight={900}
-              >
-                Verify
-              </Heading>
-              <Text textAlign={"center"}>
-                Every phase of our process is publically accessible, providing
-                transparency and enabling independent verification.
-                <br />
-                Individuals interested in validating the computed can use our
-                intuitive user interface. Additionally, they can also leverage
-                the smart contracts deployed on the Mina's Berkeley Testnet for
-                further verification.
-              </Text>
-            </InformationCard>
-            <InformationCard>
+          <Flex direction="column" mt={20}>
+            <Flex direction={"row"} justify={"center"} gap={20}>
+              <InformationCard>
+                <GiAllSeeingEye size={100} />
+                <Heading
+                  fontSize={"38px"}
+                  textAlign={"center"}
+                  fontFamily={"Poppins"}
+                  fontWeight={700}
+                >
+                  Data Feeds
+                </Heading>
+                <Text fontSize={"26px"} textAlign={"center"}>
+                  Access o1js compatible data feeds with ease directly in your
+                  project. With the trust of 10+ data providers and 10+
+                  prominent assets.
+                </Text>
+              </InformationCard>
+              <InformationCard>
+                <MdOutlineJoinInner size={100} />
+                <Heading
+                  textAlign={"center"}
+                  fontFamily={"Manrope Variable"}
+                  fontWeight={900}
+                >
+                  Reliable Aggregation
+                </Heading>
+                <Text fontSize={20} textAlign={"center"}>
+                  Our curated aggregation method ensures an unadulterated stream
+                  of information, leaving no room for manipulation or failure by
+                  pooling insights from multiple sources.
+                </Text>
+              </InformationCard>
+            </Flex>
+            <Flex direction={"row"} justify={"center"} mt={20} gap={20}>
+              <InformationCard>
+                <MdOutlineCleaningServices size={100} />
+                <Heading
+                  textAlign={"center"}
+                  fontFamily={"Manrope Variable"}
+                  fontWeight={900}
+                >
+                  Filtered
+                </Heading>
+                <Text fontSize={20} textAlign={"center"}>
+                  We meticulously eliminate outliers to extract the authentic
+                  value, ensuring a signal devoid of disruptive noise that might
+                  otherwise yield inaccurate outcomes.
+                </Text>
+              </InformationCard>
+              <InformationCard>
+                <GoVerified size={100} strokeWidth={1} />
+                <Heading
+                  textAlign={"center"}
+                  fontFamily={"Manrope Variable"}
+                  fontWeight={900}
+                >
+                  Verify
+                </Heading>
+                <Text textAlign={"center"}>
+                  Our process is transparent and publicly accessible, enabling
+                  independent verification. Utilize our intuitive User Interface
+                  and Smart Contracts for validation
+                </Text>
+              </InformationCard>
+              {/* <InformationCard>
               <LuPartyPopper size={100} />
               <Heading
                 textAlign={"center"}
@@ -341,7 +388,8 @@ export default function HomeHero() {
                 we anticipate unveiling numerous exciting features and
                 improvements that will enhance the overall developer experience.
               </Text>
-            </InformationCard>
+            </InformationCard> */}
+            </Flex>
           </Flex>
         </Flex>
         {/* Testing  */}
