@@ -15,15 +15,8 @@ import { useState } from "react";
 
 import { keyframes } from "@emotion/react";
 
-import { GiAllSeeingEye } from "react-icons/gi";
-import {
-  MdOutlineCleaningServices,
-  MdOutlineContentCopy,
-  MdOutlineJoinInner,
-} from "react-icons/md";
-import { GoVerified } from "react-icons/go";
+import { MdOutlineContentCopy } from "react-icons/md";
 import HeroAnimatedText from "./HeroAnimatedText";
-import InformationCard from "./InformationCard";
 
 import {
   AutoComplete,
@@ -33,6 +26,8 @@ import {
 } from "@choc-ui/chakra-autocomplete";
 
 import axios from "axios";
+
+import Features from "./Features";
 
 export default function HomeHero() {
   const [asset, setAsset] = useState("Select asset");
@@ -280,118 +275,7 @@ export default function HomeHero() {
         </Flex>
 
         {/* Features */}
-        <Flex direction={"column"} align={"center"}>
-          <Flex direction="column" gap={10} align="center">
-            <Box
-              border="1.5px solid cyan"
-              borderRadius="16px"
-              p="20px 28px"
-              fontWeight={700}
-              style={{
-                backgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}
-              fontFamily={"Source Code Pro Variable"}
-              background="linear-gradient(92.63deg, #F3F3F3 -14.41%, #15B7B3 97.58%, #14B8B3 97.59%)"
-            >
-              FOR THE COMMUNITY, BY THE COMMUNITY.
-            </Box>
-            <Heading
-              fontFamily={"Poppins"}
-              fontWeight={"500"}
-              fontSize={"56px"}
-              maxW="70%"
-              align="center"
-            >
-              Unleash your project's potential
-              <br /> with a focus on transparency, accuracy and verifiablity.
-            </Heading>
-          </Flex>
-          <Flex direction="column" mt={20}>
-            <Flex direction={"row"} justify={"center"} gap={20}>
-              <InformationCard>
-                <GiAllSeeingEye size={100} />
-                <Heading
-                  fontSize={"38px"}
-                  textAlign={"center"}
-                  fontFamily={"Poppins"}
-                  fontWeight={700}
-                >
-                  Data Feeds
-                </Heading>
-                <Text fontSize={"26px"} textAlign={"center"}>
-                  Access o1js compatible data feeds with ease directly in your
-                  project. With the trust of 10+ data providers and 10+
-                  prominent assets.
-                </Text>
-              </InformationCard>
-              <InformationCard>
-                <MdOutlineJoinInner size={100} />
-                <Heading
-                  textAlign={"center"}
-                  fontFamily={"Manrope Variable"}
-                  fontWeight={900}
-                >
-                  Reliable Aggregation
-                </Heading>
-                <Text fontSize={20} textAlign={"center"}>
-                  Our curated aggregation method ensures an unadulterated stream
-                  of information, leaving no room for manipulation or failure by
-                  pooling insights from multiple sources.
-                </Text>
-              </InformationCard>
-            </Flex>
-            <Flex direction={"row"} justify={"center"} mt={20} gap={20}>
-              <InformationCard>
-                <MdOutlineCleaningServices size={100} />
-                <Heading
-                  textAlign={"center"}
-                  fontFamily={"Manrope Variable"}
-                  fontWeight={900}
-                >
-                  Filtered
-                </Heading>
-                <Text fontSize={20} textAlign={"center"}>
-                  We meticulously eliminate outliers to extract the authentic
-                  value, ensuring a signal devoid of disruptive noise that might
-                  otherwise yield inaccurate outcomes.
-                </Text>
-              </InformationCard>
-              <InformationCard>
-                <GoVerified size={100} strokeWidth={1} />
-                <Heading
-                  textAlign={"center"}
-                  fontFamily={"Manrope Variable"}
-                  fontWeight={900}
-                >
-                  Verify
-                </Heading>
-                <Text textAlign={"center"}>
-                  Our process is transparent and publicly accessible, enabling
-                  independent verification. Utilize our intuitive User Interface
-                  and Smart Contracts for validation
-                </Text>
-              </InformationCard>
-              {/* <InformationCard>
-              <LuPartyPopper size={100} />
-              <Heading
-                textAlign={"center"}
-                fontFamily={"Manrope Variable"}
-                fontWeight={900}
-              >
-                Much More!
-              </Heading>
-              <Text textAlign={"center"}>
-                We are commited to help streamline the developer experience for
-                Oracles on the Mina Protocol and let them focus on what matters
-                the most. In line with this objective, over the coming months,
-                we anticipate unveiling numerous exciting features and
-                improvements that will enhance the overall developer experience.
-              </Text>
-            </InformationCard> */}
-            </Flex>
-          </Flex>
-        </Flex>
+        <Features />
         {/* Testing  */}
         <section id="targetSection">
           <Flex direction={"column"}>
@@ -409,7 +293,7 @@ export default function HomeHero() {
                   size={"3xl"}
                   fontFamily={"Montserrat Variable"}
                 >
-                  TEST DOOT
+                  TRY DOOT
                 </Heading>
               </Flex>{" "}
               <Heading
