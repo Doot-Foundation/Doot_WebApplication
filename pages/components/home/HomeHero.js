@@ -1,5 +1,4 @@
 import {
-  Spacer,
   Flex,
   Box,
   Heading,
@@ -167,7 +166,6 @@ export default function HomeHero() {
               background="#6B1BFF"
               boxShadow="0px 0px 200px #6B1BFF, inset 0px -3px 0px rgba(0, 0, 0, 0.2), inset 0px 1px 0px rgba(255, 255, 255, 0.4)"
               borderRadius="100px"
-              fontFamily={"Manrope Variable"}
               fontSize={"20px"}
               overflow="hidden"
               onClick={() => scrollToElement("targetSection")}
@@ -183,7 +181,7 @@ export default function HomeHero() {
               />
 
               <Image src="/static/images/stars.png" alt="Stars" />
-              <Text color="white" fontWeight={"900"}>
+              <Text color="white" fontWeight={"700"}>
                 Try Doot
               </Text>
             </Button>
@@ -219,11 +217,10 @@ export default function HomeHero() {
                   _hover={{}}
                   background="#202020"
                   borderRadius="100px"
-                  fontFamily={"Manrope Variable"}
                   fontSize={"20px"}
                 >
                   <Image src="/static/images/stars.png" alt="Stars" />
-                  <Text color="white" fontWeight={"900"}>
+                  <Text color="white" fontWeight={"700"}>
                     Learn More
                   </Text>
                 </Button>

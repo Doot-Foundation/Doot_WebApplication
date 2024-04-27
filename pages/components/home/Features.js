@@ -1,9 +1,9 @@
 import { GiAllSeeingEye } from "react-icons/gi";
-import { MdOutlineCleaningServices, MdOutlineJoinInner } from "react-icons/md";
-import { GoVerified } from "react-icons/go";
+import { CiBadgeDollar } from "react-icons/ci";
 
 import { Flex, Box, Heading, Text, Image } from "@chakra-ui/react";
 import InformationCard from "./InformationCard";
+import ScaleFadeBox from "../common/ScaleFadeBox";
 
 export default function Features() {
   return (
@@ -14,7 +14,7 @@ export default function Features() {
             border="1.5px solid cyan"
             borderRadius="16px"
             p="20px 28px"
-            fontWeight={700}
+            fontWeight={600}
             style={{
               backgroundClip: "text",
               WebkitTextFillColor: "transparent",
@@ -40,7 +40,7 @@ export default function Features() {
           <Flex align="center" w="100%" justify="center">
             <Box mr={-370} mt={-450}>
               <InformationCard>
-                <MdOutlineJoinInner size={100} />
+                <Image src="/static/images/data_feeds.png" />
                 <Heading
                   textAlign={"center"}
                   fontFamily={"Montserrat Variable"}
@@ -59,11 +59,11 @@ export default function Features() {
             <Flex direction="column" align="center">
               <Box>
                 <InformationCard>
-                  <MdOutlineCleaningServices size={100} />
+                  <CiBadgeDollar size={120} color="#E8E8E8" />
                   <Heading
                     textAlign={"center"}
                     fontFamily={"Montserrat Variable"}
-                    fontWeight={700}
+                    fontWeight={600}
                     fontSize={"38px"}
                   >
                     Data Feeds
@@ -75,36 +75,39 @@ export default function Features() {
                   </Text>
                 </InformationCard>
               </Box>
-              <Box
-                borderRadius="20%"
-                w="fit-content"
-                overflow="hidden"
-                border={"5px solid white"}
-                mt={-5}
-                zIndex={10}
-              >
-                <GiAllSeeingEye size={250} />
+              <Box zIndex={10}>
+                <Box
+                  borderRadius="20%"
+                  w="fit-content"
+                  overflow="hidden"
+                  border={"5px solid white"}
+                >
+                  <GiAllSeeingEye size={250} />
+                </Box>
+                <Box
+                  h={350}
+                  mt={-1}
+                  w={"10px"}
+                  background="linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.5) 100%)"
+                ></Box>
+                <Box
+                  w={1200}
+                  h={"10px"}
+                  borderRadius={"50%"}
+                  background="linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0) 100%)"
+                ></Box>
               </Box>
-              <Box
-                h={350}
-                mt={-1}
-                w={"10px"}
-                background="linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.5) 100%)"
-              ></Box>
-              <Box
-                w={1200}
-                h={"10px"}
-                borderRadius={"50%"}
-                background="linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0) 100%)"
-              ></Box>
             </Flex>
             <Box ml={-370} mt={-450}>
               <InformationCard>
-                <MdOutlineCleaningServices size={100} />
+                <Image
+                  src="
+                /static/images/filtered.png"
+                />
                 <Heading
                   textAlign={"center"}
                   fontFamily={"Montserrat Variable"}
-                  fontWeight={700}
+                  fontWeight={600}
                   fontSize={"38px"}
                 >
                   Filtered
@@ -119,12 +122,12 @@ export default function Features() {
           </Flex>
           <Flex justify="center" align="center" gap={350} mt={-500}>
             <Box>
-              <InformationCard flip={true}>
-                <GoVerified size={100} strokeWidth={1} />
+              <InformationCard>
+                <Image src="/static/images/verification.png" size={100} />
                 <Heading
                   textAlign={"center"}
                   fontFamily={"Montserrat Variable"}
-                  fontWeight={700}
+                  fontWeight={600}
                   fontSize={"38px"}
                 >
                   Verify
@@ -137,12 +140,16 @@ export default function Features() {
               </InformationCard>
             </Box>
             <Box>
-              <InformationCard flip={true}>
-                <GoVerified size={100} strokeWidth={1} />
+              <InformationCard>
+                <Image
+                  src={"/static/images/trustless.png"}
+                  size={100}
+                  strokeWidth={1}
+                />
                 <Heading
                   textAlign={"center"}
                   fontFamily={"Montserrat Variable"}
-                  fontWeight={700}
+                  fontWeight={600}
                   fontSize={"38px"}
                 >
                   Trustless
@@ -161,38 +168,52 @@ export default function Features() {
           direction="column"
           align="center"
           justify="center"
-          mt={40}
-          mb={40}
-          w={"80%"}
+          mt={20}
+          mb={20}
+          w={1200}
+          position="relative"
           gap={"40px"}
         >
-          <Flex gap={2} fontSize={"56px"} align="center" justify="center">
-            <Heading
-              fontSize="56px"
-              fontWeight={700}
-              textAlign="center"
-              fontFamily="'Montserrat Variable'"
+          <Image
+            position="absolute"
+            src="/static/images/Background_Lines.svg"
+            minW="100vw"
+          />
+          <ScaleFadeBox>
+            <Flex
+              gap={2}
+              fontSize={"56px"}
+              align="center"
+              justify="center"
+              mb={5}
             >
-              <Box
-                style={{
-                  background:
-                    "linear-gradient(92.58deg, #6B1BFF 3.61%, #D2B9FF 58.75%)",
-                  backgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                }}
-                display="inline-block"
+              <Heading
+                fontSize="56px"
+                fontWeight={700}
+                textAlign="center"
+                fontFamily="'Montserrat Variable'"
               >
-                Stay tuned
-              </Box>{" "}
-              for exciting features and <br /> improvements!
-            </Heading>
-          </Flex>
+                <Box
+                  style={{
+                    background:
+                      "linear-gradient(92.58deg, #6B1BFF 3.61%, #D2B9FF 58.75%)",
+                    backgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                  }}
+                  display="inline-block"
+                >
+                  Stay tuned
+                </Box>{" "}
+                for much more exciting features and improvements!
+              </Heading>
+            </Flex>
+          </ScaleFadeBox>
           <Text fontWeight={"400"} fontSize="34px" align="center">
-            We’re dedicated to streamlining the developer experience for Oracles
-            on the Mina Protocol, allowing them{" "}
+            We’re dedicated to streamlining the developer experience for
+            integrating Oracles on the Mina Protocol, allowing them{" "}
             <b>focus on what matters the most</b>. Look forward to exciting
-            enhancements and features coming soon to{" "}
-            <b>enhance your overall experience</b>.
+            enhancements and features coming soon to
+            <b> enhance your overall experience</b>.
           </Text>
         </Flex>
       </Flex>
