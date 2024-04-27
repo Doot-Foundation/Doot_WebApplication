@@ -299,7 +299,7 @@ export default function HomeHero() {
                 fontFamily={"Montserrat Variable"}
                 ml={200}
               >
-                ASSET FEEDS
+                DATA FEEDS
               </Heading>
             </Flex>
 

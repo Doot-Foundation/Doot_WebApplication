@@ -3,7 +3,6 @@ import { CiBadgeDollar } from "react-icons/ci";
 
 import { Flex, Box, Heading, Text, Image } from "@chakra-ui/react";
 import InformationCard from "./InformationCard";
-import ScaleFadeBox from "../common/ScaleFadeBox";
 
 export default function Features() {
   return (
@@ -27,18 +26,19 @@ export default function Features() {
           <Heading
             fontFamily={"Poppins"}
             fontWeight={"500"}
-            fontSize={"56px"}
-            maxW="70%"
+            fontSize={"50px"}
+            maxW="80%"
             align="center"
           >
-            Unleash your project's potential
-            <br /> with a focus on transparency, accuracy and verifiablity.
+            Fulfill your zkApp's data feed requirement with a focus on
+            transparency, accuracy, precision and provable nature right out of
+            the box.
           </Heading>
         </Flex>
         {/* ============= */}
         <Box align="center" p={20} w="100%">
           <Flex align="center" w="100%" justify="center">
-            <Box mr={-370} mt={-450}>
+            <Box mr={-370} mt={-410}>
               <InformationCard>
                 <Image src="/static/images/data_feeds.png" />
                 <Heading
@@ -50,9 +50,9 @@ export default function Features() {
                   Aggregated
                 </Heading>
                 <Text fontSize={20} textAlign={"center"}>
-                  Our curated aggregation method ensures an unadulterated stream
-                  of information, leaving no room for manipulation or failure by
-                  pooling insights from multiple sources.
+                  Our price calculation mechanism ensures unwavering data
+                  integrity by sourcing prices from over 13 data providers,
+                  filtering them, and finally aggregating the results.
                 </Text>
               </InformationCard>
             </Box>
@@ -69,9 +69,9 @@ export default function Features() {
                     Data Feeds
                   </Heading>
                   <Text fontSize={20} textAlign={"center"}>
-                    Access o1js compatible data feeds with ease directly in your
-                    project. With the trust of 10+ data providers and 10+
-                    prominent assets.
+                    Easily access data feeds compatible with Mina Protocol
+                    directly within your zkApp, supporting over 10 popular
+                    assets today.
                   </Text>
                 </InformationCard>
               </Box>
@@ -85,7 +85,7 @@ export default function Features() {
                   <GiAllSeeingEye size={250} />
                 </Box>
                 <Box
-                  h={350}
+                  h={380}
                   mt={-1}
                   w={"10px"}
                   background="linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.5) 100%)"
@@ -98,7 +98,7 @@ export default function Features() {
                 ></Box>
               </Box>
             </Flex>
-            <Box ml={-370} mt={-450}>
+            <Box ml={-370} mt={-410}>
               <InformationCard>
                 <Image
                   src="
@@ -113,32 +113,14 @@ export default function Features() {
                   Filtered
                 </Heading>
                 <Text fontSize={20} textAlign={"center"}>
-                  We meticulously eliminate outliers to extract the authentic
-                  value, ensuring a signal devoid of disruptive noise that might
-                  otherwise yield inaccurate outcomes.
+                  We systematically eliminate outliers from the dataset using
+                  the MAD Score, ensuring the aggregated value is devoid of
+                  disruptive noise, thereby preventing inaccurate results.
                 </Text>
               </InformationCard>
             </Box>
           </Flex>
-          <Flex justify="center" align="center" gap={350} mt={-500}>
-            <Box>
-              <InformationCard>
-                <Image src="/static/images/verification.png" size={100} />
-                <Heading
-                  textAlign={"center"}
-                  fontFamily={"Montserrat Variable"}
-                  fontWeight={600}
-                  fontSize={"38px"}
-                >
-                  Verify
-                </Heading>
-                <Text fontSize={20} textAlign={"center"}>
-                  Our process is transparent and publicly accessible, enabling
-                  independent verification. Utilize our intuitive User Interface
-                  and Smart Contracts for validation
-                </Text>
-              </InformationCard>
-            </Box>
+          <Flex justify="center" align="center" gap={320} mt={-530}>
             <Box>
               <InformationCard>
                 <Image
@@ -155,9 +137,28 @@ export default function Features() {
                   Trustless
                 </Heading>
                 <Text textAlign={"center"} fontSize={20}>
-                  With the help of Async Circuit made available by Mina
-                  Protocol, we can prove the interactions with data providers
-                  hence there is no need to trust us.
+                  Leveraging Mina Protocol's ZkProgram, we can prove the
+                  interactions with data providers, thereby eliminating the need
+                  for trust. Everything is hence provable by nature on Doot.
+                </Text>
+              </InformationCard>
+            </Box>
+            <Box>
+              <InformationCard>
+                <Image src="/static/images/verification.png" size={100} />
+                <Heading
+                  textAlign={"center"}
+                  fontFamily={"Montserrat Variable"}
+                  fontWeight={600}
+                  fontSize={"38px"}
+                >
+                  Verify
+                </Heading>
+                <Text fontSize={20} textAlign={"center"}>
+                  Every step of our process is transparent and publicly
+                  accessible, facilitating independent verification. Our User
+                  Interface and Smart Contracts are two of the ways for
+                  verification.
                 </Text>
               </InformationCard>
             </Box>
@@ -179,41 +180,39 @@ export default function Features() {
             src="/static/images/Background_Lines.svg"
             minW="100vw"
           />
-          <ScaleFadeBox>
-            <Flex
-              gap={2}
-              fontSize={"56px"}
-              align="center"
-              justify="center"
-              mb={5}
+          <Flex
+            gap={2}
+            fontSize={"56px"}
+            align="center"
+            justify="center"
+            mb={5}
+          >
+            <Heading
+              fontSize="56px"
+              fontWeight={700}
+              textAlign="center"
+              fontFamily="'Montserrat Variable'"
             >
-              <Heading
-                fontSize="56px"
-                fontWeight={700}
-                textAlign="center"
-                fontFamily="'Montserrat Variable'"
+              <Box
+                style={{
+                  background:
+                    "linear-gradient(92.58deg, #6B1BFF 3.61%, #D2B9FF 58.75%)",
+                  backgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                }}
+                display="inline-block"
               >
-                <Box
-                  style={{
-                    background:
-                      "linear-gradient(92.58deg, #6B1BFF 3.61%, #D2B9FF 58.75%)",
-                    backgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                  }}
-                  display="inline-block"
-                >
-                  Stay tuned
-                </Box>{" "}
-                for much more exciting features and improvements!
-              </Heading>
-            </Flex>
-          </ScaleFadeBox>
+                Stay tuned
+              </Box>{" "}
+              for much more exciting features and improvements!
+            </Heading>
+          </Flex>
           <Text fontWeight={"400"} fontSize="34px" align="center">
             We’re dedicated to streamlining the developer experience for
-            integrating Oracles on the Mina Protocol, allowing them{" "}
-            <b>focus on what matters the most</b>. Look forward to exciting
-            enhancements and features coming soon to
-            <b> enhance your overall experience</b>.
+            integrating Oracles on the Mina Protocol, allowing them to focus on
+            their zkApps and let us take care of their data feed needs. Look
+            forward to much exciting enhancements and features coming soon to
+            the protocol.
           </Text>
         </Flex>
       </Flex>

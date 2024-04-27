@@ -34,7 +34,7 @@ export default function InformationCard({ children }) {
         <Flex
           ref={ref}
           w="386px"
-          h="450px"
+          h="480px"
           position="relative"
           justify="center"
           align="center"

@@ -11,7 +11,7 @@ export default function HeroAnimatedText() {
           1200,
           "Trustless",
           1200,
-          "Verifiable",
+          "Provable",
           1200,
         ]}
         wrapper="span"
