@@ -169,8 +169,6 @@ export default function Features() {
           direction="column"
           align="center"
           justify="center"
-          mt={20}
-          mb={20}
           w={1200}
           position="relative"
           gap={"40px"}
@@ -179,13 +177,16 @@ export default function Features() {
             position="absolute"
             src="/static/images/Background_Lines.svg"
             minW="100vw"
+            zIndex={-10}
           />
           <Flex
-            gap={2}
+            gap={10}
+            mt={20}
+            mb={16}
+            direction="column"
             fontSize={"56px"}
             align="center"
             justify="center"
-            mb={5}
           >
             <Heading
               fontSize="56px"
@@ -201,19 +202,20 @@ export default function Features() {
                   WebkitTextFillColor: "transparent",
                 }}
                 display="inline-block"
+                mr={4}
               >
                 Stay tuned
-              </Box>{" "}
+              </Box>
               for much more exciting features and improvements!
             </Heading>
+            <Text fontWeight={"400"} fontSize="34px" align="center">
+              We’re dedicated to streamlining the developer experience for
+              integrating Oracles on the Mina Protocol, allowing them to focus
+              on their zkApps and let us take care of their data feed needs.
+              Look forward to much exciting enhancements and features coming
+              soon to the protocol.
+            </Text>
           </Flex>
-          <Text fontWeight={"400"} fontSize="34px" align="center">
-            We’re dedicated to streamlining the developer experience for
-            integrating Oracles on the Mina Protocol, allowing them to focus on
-            their zkApps and let us take care of their data feed needs. Look
-            forward to much exciting enhancements and features coming soon to
-            the protocol.
-          </Text>
         </Flex>
       </Flex>
     </>

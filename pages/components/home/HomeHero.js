@@ -8,6 +8,7 @@ import {
   Link,
   Image,
   useToast,
+  Fade,
 } from "@chakra-ui/react";
 
 import { useState } from "react";
@@ -58,6 +59,10 @@ export default function HomeHero() {
     "Dogecoin",
   ];
 
+  function formatSign(sign) {
+    return sign.slice(0, 10) + "......." + sign.slice(-10);
+  }
+
   const handleSubmit = async () => {
     try {
       const key = process.env.NEXT_PUBLIC_API_INTERFACE_KEY;
@@ -70,11 +75,13 @@ export default function HomeHero() {
           headers: headers,
         }
       );
+      console.log(response.data);
       const finalObj = {
         asset: response.data.asset,
         price: response.data.information.price,
         decimals: 10,
-        timestamp: response.data.timestamp,
+        timestamp: response.data.information.aggregationTimestamp,
+        signature: formatSign(response.data.information.signature.signature),
       };
 
       const finalString = await formatString(finalObj);
@@ -275,16 +282,16 @@ export default function HomeHero() {
         <Features />
         {/* Testing  */}
         <section id="targetSection">
-          <Flex direction={"column"}>
+          <Flex direction={"column"} maxW="1200" margin="0 auto">
             <Flex direction={"column"} alignItems={"left"}>
-              <Flex ml={200} direction={"row"} align={"center"} gap={10}>
+              <Flex direction={"row"} align={"center"} gap={10}>
                 <Box
                   background={
                     "linear-gradient(90deg, #6c35de 0%,rgba(23,0,44,1) 100%)"
                   }
                   w={200}
                   h={5}
-                ></Box>
+                />
                 <Heading
                   letterSpacing={3}
                   size={"3xl"}
@@ -297,31 +304,22 @@ export default function HomeHero() {
                 letterSpacing={3}
                 size={"3xl"}
                 fontFamily={"Montserrat Variable"}
-                ml={200}
               >
                 DATA FEEDS
               </Heading>
             </Flex>
 
-            <Flex
-              direction={"row"}
-              align={"center"}
-              justify={"center"}
-              mt={50}
-              gap={5}
-            >
+            <Flex direction={"row"} align={"center"} mt={50} gap={5}>
               <Flex
                 background={"linear-gradient(120deg,#2c0055 0%, #5126a9 100%)"}
                 direction={"column"}
                 borderRadius={10}
                 p={5}
-                minH={400}
-                w={"22%"}
+                minH={450}
+                w={"30%"}
                 pos={"relative"}
               >
-                <Text fontSize={25}>
-                  Choose the asset and run the asset feed.
-                </Text>
+                <Text fontSize={25}>Choose the asset and run.</Text>
 
                 <FormControl
                   fontFamily={"Source Code Pro Variable"}
@@ -378,20 +376,8 @@ export default function HomeHero() {
                 </Button>
               </Flex>
               {/* Result Window */}
-              <Flex
-                direction={"column"}
-                h={400}
-                w={"50%"}
-                fontFamily={"Source Code Pro Variable"}
-              >
-                <Flex
-                  gap={2}
-                  background={
-                    "linear-gradient(190deg, rgba(23,0,44,1) 0%, #5126a9 100%)"
-                  }
-                  p={3}
-                  borderTopRadius={10}
-                >
+              <Flex direction={"column"} h={450} w={"70%"}>
+                <Flex gap={2} background="#5126a9" p={3} borderTopRadius={10}>
                   <Box
                     borderRadius={"50%"}
                     boxSize={3}
@@ -431,39 +417,55 @@ export default function HomeHero() {
                       gap={20}
                       ml={10}
                       mr={10}
+                      color={"#0ce1ae"}
                     >
                       <Box
+                        w={"20%"}
                         cursor={"pointer"}
                         onClick={() => {
                           setMode("res");
                         }}
-                        fontWeight={mode == "res" ? 900 : 500}
-                        color={"#0ce1ae"}
+                        transition="0.2s"
+                        fontWeight={mode == "res" ? 700 : 500}
                       >
-                        Response
+                        RESPONSE
                       </Box>
                       <Box
                         cursor={"pointer"}
                         onClick={() => {
                           setMode("req");
                         }}
-                        fontWeight={mode == "req" ? 900 : 500}
-                        color={"#0ce1ae"}
+                        transition="0.2s"
+                        fontWeight={mode == "req" ? 700 : 500}
                       >
-                        API Endpoint
+                        API ENDPOINT
                       </Box>
                     </Flex>
-                    <Flex p={10} fontWeight={800}>
-                      <Text
-                        maxW={"100%"}
-                        hidden={mode == "req"}
-                        dangerouslySetInnerHTML={{
-                          __html: result,
-                        }}
-                      ></Text>
-                      <Text maxW={"100%"} hidden={mode == "res"}>
-                        {`https://doot.foundation/api/get/getPrice?token=${asset}`}
-                      </Text>
+                    <Flex
+                      p={10}
+                      position="relative"
+                      fontSize={"20px"}
+                      fontFamily="Montserrat Variable"
+                      fontWeight="500"
+                      letterSpacing="1px"
+                    >
+                      <Box position="absolute">
+                        <Fade in={mode == "res"}>
+                          <Text
+                            maxW={"100%"}
+                            dangerouslySetInnerHTML={{
+                              __html: result,
+                            }}
+                          ></Text>
+                        </Fade>
+                      </Box>
+                      <Box position="absolute">
+                        <Fade in={mode == "req"}>
+                          <Text maxW={"100%"}>
+                            {`https://doot.foundation/api/get/getPrice?token=${asset}`}
+                          </Text>
+                        </Fade>
+                      </Box>
                     </Flex>
                   </Flex>
                 </Flex>

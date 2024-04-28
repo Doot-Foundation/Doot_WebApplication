@@ -9,10 +9,13 @@ export default function HomeHeader() {
         height="52px"
         ml="calc(50% - 1120px/2)"
         mt="76px"
+        mb="76px"
         align="center"
         justify="center"
       >
-        <Image src="/static/images/DootDot.png" />
+        <Link href="/">
+          <Image src="/static/images/DootDot.png" />
+        </Link>
         <Spacer />
         <Flex
           direction="row"

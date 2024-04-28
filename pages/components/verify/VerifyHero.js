@@ -8,6 +8,7 @@ import {
   VStack,
   HStack,
   Select,
+  Spacer,
   Heading,
   Text,
   useToast,
@@ -23,6 +24,7 @@ export default function VerifyHero() {
     PROVIDERS,
   } = require("../../../utils/constants/info");
   const toast = useToast();
+  const [mode, setMode] = useState("agg");
 
   //FORM 1
   const [aggPrice, setAggPrice] = useState("");
@@ -121,161 +123,238 @@ export default function VerifyHero() {
 
   return (
     <>
-      <Flex ml={20} mb={10} direction={"column"}>
-        <Heading fontFamily={"Montserrat Variable"} fontSize={"6xl"}>
-          Verify Yourself
-        </Heading>
-        <Text>
-          You can use these forms to verify if certain information was indeed
-          signed by the Oracle Keys...
-        </Text>
-      </Flex>
-      <Flex
-        direction={"column"}
-        pl={100}
-        pr={100}
-        gap={40}
-        mb={100}
-        align={"center"}
-      >
-        <Box w={"50%"}>
-          <FormLabel fontFamily={"Source Code Pro Variable"} fontSize={"2xl"}>
-            Aggregated Price Verification
-          </FormLabel>
-          <form id="form1" onSubmit={handleFormOne}>
-            <FormControl
-              bgColor={"white"}
-              color={"black"}
-              p={5}
-              pt={20}
-              pb={20}
-              borderRadius={10}
-            >
-              <VStack spacing={4} justify={"center"}>
-                <Input
-                  name="signature"
-                  placeholder="Signature"
-                  w={"80%"}
-                  disabled={isSubmittingF1}
-                  onChange={(e) => setAggSignature(e.target.value)}
-                />
-                <HStack w={"80%"}>
-                  <Input
-                    name="price"
-                    placeholder="Price"
-                    w={"70%"}
-                    disabled={isSubmittingF1}
-                    onChange={(e) => setAggPrice(e.target.value)}
-                  />
-                  <Button
-                    type="submit"
-                    w={"30%"}
-                    colorScheme="green"
-                    disabled={isSubmittingF1}
-                  >
-                    Submit
-                  </Button>
-                </HStack>
-              </VStack>
-            </FormControl>
-          </form>
-        </Box>
-
-        <Box w={"80%"}>
-          <FormLabel fontFamily={"Source Code Pro Variable"} fontSize={"2xl"}>
-            Individual Request Verification
-          </FormLabel>
-          <form id="form2" onSubmit={handleFormTwo}>
-            <FormControl
-              bgColor={"white"}
-              color={"black"}
-              p={5}
-              pt={10}
-              pb={10}
-              borderRadius={10}
-            >
-              <VStack w={"100%"}>
-                <HStack mb={2} w={"90%"}>
-                  <Select
-                    placeholder="Select a provider"
-                    value={selectedProvider}
-                    onChange={(e) => setSelectedProvider(e.target.value)}
-                    disabled={isSubmittingF2}
-                  >
-                    {PROVIDERS.map((provider, index) => (
-                      <option key={index} value={provider}>
-                        {provider}
-                      </option>
-                    ))}
-                  </Select>
-                  <Select
-                    placeholder="Select the asset"
-                    value={selectedToken}
-                    onChange={(e) => setSelectedToken(e.target.value)}
-                    disabled={isSubmittingF2}
-                  >
-                    {SUPPORTED_TOKENS.map((token, index) => (
-                      <option
-                        key={index}
-                        value={SYMBOL_TO_TOKEN[token].toUpperCase()}
-                      >
-                        {SYMBOL_TO_TOKEN[token].toUpperCase()}
-                      </option>
-                    ))}
-                  </Select>
-                </HStack>
-                <VStack spacing={4} w={"100%"}>
-                  <Input
-                    name="url"
-                    value={url}
-                    placeholder="https://google.com/api/getTokenValue"
-                    disabled={true}
-                    w={"90%"}
-                  />
-                  <Input
-                    name="timestamp"
-                    placeholder="Timestamp"
-                    w={"90%"}
-                    onChange={(e) => setTimestamp(e.target.value)}
-                    disabled={isSubmittingF2}
-                  />
+      <Flex direction="column" maxW="1120" margin="0 auto" gap={20}>
+        <Flex direction={"column"} gap="43px">
+          <Heading fontFamily={"Montserrat Variable"} fontWeight={600}>
+            Oracle Signature Verification
+          </Heading>
+          <Text fontSize="24px">
+            Securely verify the origins of the information you've provided. By
+            using these forms, we can confirm whether the data you've submitted
+            has been signed with our private keys, ensuring its integrity and
+            authenticity.
+          </Text>
+        </Flex>
+        <Flex direction={"column"} gap={40} align={"center"}>
+          {/* <Box w={"50%"}>
+            <FormLabel fontFamily={"Source Code Pro Variable"} fontSize={"2xl"}>
+              Aggregated Price Verification
+            </FormLabel>
+            <form id="form1" onSubmit={handleFormOne}>
+              <FormControl
+                bgColor={"white"}
+                color={"black"}
+                p={5}
+                pt={20}
+                pb={20}
+                borderRadius={10}
+              >
+                <VStack spacing={4} justify={"center"}>
                   <Input
                     name="signature"
                     placeholder="Signature"
-                    w={"90%"}
-                    onChange={(e) => setSignature(e.target.value)}
-                    disabled={isSubmittingF2}
+                    w={"80%"}
+                    disabled={isSubmittingF1}
+                    onChange={(e) => setAggSignature(e.target.value)}
                   />
-                  <HStack w={"90%"}>
+                  <HStack w={"80%"}>
                     <Input
                       name="price"
                       placeholder="Price"
-                      w={"60%"}
-                      onChange={(e) => setPrice(e.target.value)}
-                      disabled={isSubmittingF2}
-                    />
-                    <Input
-                      name="decimals"
-                      placeholder="Decimals"
-                      value={10}
-                      disabled={true}
-                      w={"10%"}
+                      w={"70%"}
+                      disabled={isSubmittingF1}
+                      onChange={(e) => setAggPrice(e.target.value)}
                     />
                     <Button
                       type="submit"
                       w={"30%"}
                       colorScheme="green"
-                      disabled={isSubmittingF2}
+                      disabled={isSubmittingF1}
                     >
                       Submit
                     </Button>
                   </HStack>
                 </VStack>
-              </VStack>
-            </FormControl>
-          </form>
-        </Box>
+              </FormControl>
+            </form>
+          </Box> */}
+
+          {/* <Box w={"80%"}>
+            <FormLabel fontFamily={"Source Code Pro Variable"} fontSize={"2xl"}>
+              Individual Request Verification
+            </FormLabel>
+            <form id="form2" onSubmit={handleFormTwo}>
+              <FormControl
+                bgColor={"white"}
+                color={"black"}
+                p={5}
+                pt={10}
+                pb={10}
+                borderRadius={10}
+              >
+                <VStack w={"100%"}>
+                  <HStack mb={2} w={"90%"}>
+                    <Select
+                      placeholder="Select a provider"
+                      value={selectedProvider}
+                      onChange={(e) => setSelectedProvider(e.target.value)}
+                      disabled={isSubmittingF2}
+                    >
+                      {PROVIDERS.map((provider, index) => (
+                        <option key={index} value={provider}>
+                          {provider}
+                        </option>
+                      ))}
+                    </Select>
+                    <Select
+                      placeholder="Select the asset"
+                      value={selectedToken}
+                      onChange={(e) => setSelectedToken(e.target.value)}
+                      disabled={isSubmittingF2}
+                    >
+                      {SUPPORTED_TOKENS.map((token, index) => (
+                        <option
+                          key={index}
+                          value={SYMBOL_TO_TOKEN[token].toUpperCase()}
+                        >
+                          {SYMBOL_TO_TOKEN[token].toUpperCase()}
+                        </option>
+                      ))}
+                    </Select>
+                  </HStack>
+                  <VStack spacing={4} w={"100%"}>
+                    <Input
+                      name="url"
+                      value={url}
+                      placeholder="https://google.com/api/getTokenValue"
+                      disabled={true}
+                      w={"90%"}
+                    />
+                    <Input
+                      name="timestamp"
+                      placeholder="Timestamp"
+                      w={"90%"}
+                      onChange={(e) => setTimestamp(e.target.value)}
+                      disabled={isSubmittingF2}
+                    />
+                    <Input
+                      name="signature"
+                      placeholder="Signature"
+                      w={"90%"}
+                      onChange={(e) => setSignature(e.target.value)}
+                      disabled={isSubmittingF2}
+                    />
+                    <HStack w={"90%"}>
+                      <Input
+                        name="price"
+                        placeholder="Price"
+                        w={"60%"}
+                        onChange={(e) => setPrice(e.target.value)}
+                        disabled={isSubmittingF2}
+                      />
+                      <Input
+                        name="decimals"
+                        placeholder="Decimals"
+                        value={10}
+                        disabled={true}
+                        w={"10%"}
+                      />
+                      <Button
+                        type="submit"
+                        w={"30%"}
+                        colorScheme="green"
+                        disabled={isSubmittingF2}
+                      >
+                        Submit
+                      </Button>
+                    </HStack>
+                  </VStack>
+                </VStack>
+              </FormControl>
+            </form>
+          </Box> */}
+          <Flex margin="0 auto" gap={10}>
+            <Flex
+              transition="0.5s"
+              justify="center"
+              align="center"
+              background={
+                mode == "agg"
+                  ? "radial-gradient(208.44% 148.88% at 50% -5%, rgba(151, 94, 255, 0.5) 0%, rgba(0, 0, 0, 0) 35.83%, rgba(245, 245, 245, 0.05) 100%)"
+                  : null
+              }
+              color={mode == "agg" ? "#975EFF" : "#BFBFBF"}
+              border={mode == "agg" ? "1px solid #975EFF" : "1px solid gray"}
+              borderRight={mode == "agg" ? "10px solid #975EFF" : null}
+              fontWeight={700}
+              borderRadius="13px 0px 0px 4px;"
+              width="356px"
+              height="71px"
+              onClick={() => setMode("agg")}
+            >
+              Aggregated Price Verification
+            </Flex>
+            <Flex
+              transition="0.5s"
+              justify="center"
+              align="center"
+              background={
+                mode == "ind"
+                  ? "radial-gradient(208.44% 148.88% at 50% -5%, rgba(151, 94, 255, 0.5) 0%, rgba(0, 0, 0, 0) 35.83%, rgba(245, 245, 245, 0.05) 100%)"
+                  : null
+              }
+              color={mode == "ind" ? "#975EFF" : "#BFBFBF"}
+              border={mode == "ind" ? "1px solid #975EFF" : "1px solid gray"}
+              borderLeft={mode == "ind" ? "10px solid #975EFF" : null}
+              borderRadius="0px 13px 4px 0px;"
+              fontWeight={700}
+              width="356px"
+              height="71px"
+              onClick={() => setMode("ind")}
+            >
+              Individual Request Verification
+            </Flex>
+          </Flex>
+        </Flex>
       </Flex>
     </>
   );
 }
+
+// /* Inside auto layout */
+// flex: none;
+// order: 0;
+// flex-grow: 0;
+
+// /* div.inner-tab */
+
+// box-sizing: border-box;
+
+// position: absolute;
+// height: 71px;
+// left: 0px;
+// right: 0px;
+// top: 0px;
+
+// border-right: 10px solid #975EFF;
+
+// /* Individual Request Verification */
+
+// position: absolute;
+// width: 301px;
+// height: 27px;
+// left: calc(50% - 301px/2 + 0.5px);
+// top: calc(50% - 27px/2);
+
+// font-family: 'Poppins';
+// font-style: normal;
+// font-weight: 700;
+// font-size: 18px;
+// line-height: 27px;
+// /* identical to box height, or 150% */
+// display: flex;
+// align-items: center;
+// text-align: center;
+// letter-spacing: 0.5px;
+
+// color: #975EFF;
