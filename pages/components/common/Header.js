@@ -1,7 +1,7 @@
 import { Link, Flex, Image, Spacer } from "@chakra-ui/react";
-import ConnectButton from "../common/ConnectButton";
+import ConnectButton from "./ConnectButton";
 
-export default function HomeHeader() {
+export default function Header() {
   return (
     <>
       <Flex

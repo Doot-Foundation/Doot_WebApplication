@@ -27,7 +27,7 @@ export default function Features() {
             fontFamily={"Poppins"}
             fontWeight={"500"}
             fontSize={"50px"}
-            maxW="80%"
+            maxW="1200"
             align="center"
           >
             Fulfill your zkApp's data feed requirement with a focus on
@@ -181,8 +181,8 @@ export default function Features() {
           />
           <Flex
             gap={10}
-            mt={20}
-            mb={16}
+            mt={32}
+            mb={20}
             direction="column"
             fontSize={"56px"}
             align="center"

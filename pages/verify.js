@@ -1,14 +1,15 @@
 import VerifyLayout from "./components/verify/VerifyLayout";
-// import VerifyHeader from "./components/verify/VerifyHeader";
-import HomeHeader from "./components/home/HomeHeader";
+import Header from "./components/common/Header";
 import VerifyHero from "./components/verify/VerifyHero";
+import Footer from "./components/common/Footer";
 
 export default function Verify() {
   return (
     <>
       <VerifyLayout>
-        <HomeHeader />
+        <Header />
         <VerifyHero />
+        <Footer />
       </VerifyLayout>
     </>
   );

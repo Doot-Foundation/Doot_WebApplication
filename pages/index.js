@@ -1,15 +1,15 @@
 import HomeLayout from "./components/home/HomeLayout";
-import HomeHeader from "./components/home/HomeHeader";
+import Header from "./components/common/Header";
 import HomeHero from "./components/home/HomeHero";
-import HomeFooter from "./components/home/HomeFooter";
+import Footer from "./components/common/Footer";
 
 export default function Home() {
   return (
     <>
       <HomeLayout>
-        <HomeHeader />
+        <Header />
         <HomeHero />
-        <HomeFooter />
+        <Footer />
       </HomeLayout>
     </>
   );

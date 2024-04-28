@@ -29,7 +29,7 @@ export default function VerifyHero() {
   //FORM 1
   const [aggPrice, setAggPrice] = useState("");
   const [aggSignature, setAggSignature] = useState("");
-  const [isSubmittingF1, setIsSubmittingF1] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   //FORM 2
   const [selectedProvider, setSelectedProvider] = useState("");
@@ -44,6 +44,8 @@ export default function VerifyHero() {
     if (selectedProvider && selectedToken)
       setURL(DATA_PROVIDER_TO_ENDPOINT(selectedProvider, selectedToken));
   }, [selectedProvider, selectedToken]);
+
+  const handleFormSubmission = async () => {};
 
   const handleFormOne = async (event) => {
     event.preventDefault();
@@ -123,7 +125,7 @@ export default function VerifyHero() {
 
   return (
     <>
-      <Flex direction="column" maxW="1120" margin="0 auto" gap={20}>
+      <Flex direction="column" maxW="1120" margin="0 auto" gap={28} mb={200}>
         <Flex direction={"column"} gap="43px">
           <Heading fontFamily={"Montserrat Variable"} fontWeight={600}>
             Oracle Signature Verification
@@ -135,7 +137,7 @@ export default function VerifyHero() {
             authenticity.
           </Text>
         </Flex>
-        <Flex direction={"column"} gap={40} align={"center"}>
+        <Flex direction={"column"} gap={10} align={"center"}>
           {/* <Box w={"50%"}>
             <FormLabel fontFamily={"Source Code Pro Variable"} fontSize={"2xl"}>
               Aggregated Price Verification
@@ -179,100 +181,6 @@ export default function VerifyHero() {
             </form>
           </Box> */}
 
-          {/* <Box w={"80%"}>
-            <FormLabel fontFamily={"Source Code Pro Variable"} fontSize={"2xl"}>
-              Individual Request Verification
-            </FormLabel>
-            <form id="form2" onSubmit={handleFormTwo}>
-              <FormControl
-                bgColor={"white"}
-                color={"black"}
-                p={5}
-                pt={10}
-                pb={10}
-                borderRadius={10}
-              >
-                <VStack w={"100%"}>
-                  <HStack mb={2} w={"90%"}>
-                    <Select
-                      placeholder="Select a provider"
-                      value={selectedProvider}
-                      onChange={(e) => setSelectedProvider(e.target.value)}
-                      disabled={isSubmittingF2}
-                    >
-                      {PROVIDERS.map((provider, index) => (
-                        <option key={index} value={provider}>
-                          {provider}
-                        </option>
-                      ))}
-                    </Select>
-                    <Select
-                      placeholder="Select the asset"
-                      value={selectedToken}
-                      onChange={(e) => setSelectedToken(e.target.value)}
-                      disabled={isSubmittingF2}
-                    >
-                      {SUPPORTED_TOKENS.map((token, index) => (
-                        <option
-                          key={index}
-                          value={SYMBOL_TO_TOKEN[token].toUpperCase()}
-                        >
-                          {SYMBOL_TO_TOKEN[token].toUpperCase()}
-                        </option>
-                      ))}
-                    </Select>
-                  </HStack>
-                  <VStack spacing={4} w={"100%"}>
-                    <Input
-                      name="url"
-                      value={url}
-                      placeholder="https://google.com/api/getTokenValue"
-                      disabled={true}
-                      w={"90%"}
-                    />
-                    <Input
-                      name="timestamp"
-                      placeholder="Timestamp"
-                      w={"90%"}
-                      onChange={(e) => setTimestamp(e.target.value)}
-                      disabled={isSubmittingF2}
-                    />
-                    <Input
-                      name="signature"
-                      placeholder="Signature"
-                      w={"90%"}
-                      onChange={(e) => setSignature(e.target.value)}
-                      disabled={isSubmittingF2}
-                    />
-                    <HStack w={"90%"}>
-                      <Input
-                        name="price"
-                        placeholder="Price"
-                        w={"60%"}
-                        onChange={(e) => setPrice(e.target.value)}
-                        disabled={isSubmittingF2}
-                      />
-                      <Input
-                        name="decimals"
-                        placeholder="Decimals"
-                        value={10}
-                        disabled={true}
-                        w={"10%"}
-                      />
-                      <Button
-                        type="submit"
-                        w={"30%"}
-                        colorScheme="green"
-                        disabled={isSubmittingF2}
-                      >
-                        Submit
-                      </Button>
-                    </HStack>
-                  </VStack>
-                </VStack>
-              </FormControl>
-            </form>
-          </Box> */}
           <Flex margin="0 auto" gap={10}>
             <Flex
               transition="0.5s"
@@ -315,6 +223,95 @@ export default function VerifyHero() {
               Individual Request Verification
             </Flex>
           </Flex>
+          <form id="form" onSubmit={handleFormSubmission}>
+            <FormControl
+              bgColor={"white"}
+              color={"black"}
+              p={5}
+              pt={10}
+              pb={10}
+              borderRadius={10}
+            >
+              <VStack w={"100%"}>
+                <HStack mb={2} w={"90%"}>
+                  <Select
+                    placeholder="Select a provider"
+                    value={selectedProvider}
+                    onChange={(e) => setSelectedProvider(e.target.value)}
+                    disabled={isSubmittingF2}
+                  >
+                    {PROVIDERS.map((provider, index) => (
+                      <option key={index} value={provider}>
+                        {provider}
+                      </option>
+                    ))}
+                  </Select>
+                  <Select
+                    placeholder="Select the asset"
+                    value={selectedToken}
+                    onChange={(e) => setSelectedToken(e.target.value)}
+                    disabled={isSubmittingF2}
+                  >
+                    {SUPPORTED_TOKENS.map((token, index) => (
+                      <option
+                        key={index}
+                        value={SYMBOL_TO_TOKEN[token].toUpperCase()}
+                      >
+                        {SYMBOL_TO_TOKEN[token].toUpperCase()}
+                      </option>
+                    ))}
+                  </Select>
+                </HStack>
+                <VStack spacing={4} w={"100%"}>
+                  <Input
+                    name="url"
+                    value={url}
+                    placeholder="https://google.com/api/getTokenValue"
+                    disabled={true}
+                    w={"90%"}
+                  />
+                  <Input
+                    name="timestamp"
+                    placeholder="Timestamp"
+                    w={"90%"}
+                    onChange={(e) => setTimestamp(e.target.value)}
+                    disabled={isSubmittingF2}
+                  />
+                  <Input
+                    name="signature"
+                    placeholder="Signature"
+                    w={"90%"}
+                    onChange={(e) => setSignature(e.target.value)}
+                    disabled={isSubmittingF2}
+                  />
+                  <HStack w={"90%"}>
+                    <Input
+                      name="price"
+                      placeholder="Price"
+                      w={"60%"}
+                      onChange={(e) => setPrice(e.target.value)}
+                      disabled={isSubmittingF2}
+                    />
+                    <Input
+                      name="decimals"
+                      placeholder="Decimals"
+                      value={10}
+                      disabled={true}
+                      w={"10%"}
+                    />
+                    <Button
+                      type="submit"
+                      w={"30%"}
+                      colorScheme="green"
+                      disabled={isSubmittingF2}
+                    >
+                      Submit
+                    </Button>
+                  </HStack>
+                </VStack>
+              </VStack>
+            </FormControl>
+          </form>
         </Flex>
       </Flex>
     </>
