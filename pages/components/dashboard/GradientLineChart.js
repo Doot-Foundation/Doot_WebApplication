@@ -3,7 +3,6 @@ import { ComposedChart, Line, Area, XAxis, YAxis, Tooltip } from "recharts";
 export default function GradientLineChart({ calls }) {
   function transformJsonToArray(json) {
     const currentMonth = new Date().getMonth();
-
     const months = [
       "JAN",
       "FEB",
@@ -27,42 +26,43 @@ export default function GradientLineChart({ calls }) {
         result.push({ month, count: json[month] });
       }
     }
-
     return result;
   }
 
   // const data = transformJsonToArray(calls);
 
-  const dummyCalls = {
-    JAN: 432,
-    FEB: 967,
-    MAR: 225,
-    APR: 751,
-    MAY: 834,
-    JUN: 445,
-    JUL: 220,
-    AUG: 177,
-    SEP: 934,
-    OCT: 662,
-    NOV: 491,
-    DEC: 301,
-  };
-  const data = transformJsonToArray(dummyCalls);
+  // const dummyCalls = {
+  //   JAN: 432,
+  //   FEB: 967,
+  //   MAR: 225,
+  //   APR: 751,
+  //   MAY: 834,
+  //   JUN: 445,
+  //   JUL: 220,
+  //   AUG: 177,
+  //   SEP: 934,
+  //   OCT: 662,
+  //   NOV: 491,
+  //   DEC: 301,
+  // };
 
-  const dummyData = [
-    { month: "Jan", count: 542 },
-    { month: "Feb", count: 312 },
-    { month: "Mar", count: 112 },
-    { month: "Apr", count: 112 },
-    { month: "May", count: 756 },
-    { month: "June", count: 563 },
-    { month: "July", count: 658 },
-    { month: "Aug", count: 657 },
-    { month: "Sept", count: 112 },
-    { month: "Oct", count: 852 },
-    { month: "Nov", count: 563 },
-    { month: "Dec", count: 651 },
-  ];
+  const data = transformJsonToArray(calls);
+
+  // const dummyData = [
+  //   { month: "Jan", count: 542 },
+  //   { month: "Feb", count: 312 },
+  //   { month: "Mar", count: 112 },
+  //   { month: "Apr", count: 112 },
+  //   { month: "May", count: 756 },
+  //   { month: "June", count: 563 },
+  //   { month: "July", count: 658 },
+  //   { month: "Aug", count: 657 },
+  //   { month: "Sept", count: 112 },
+  //   { month: "Oct", count: 852 },
+  //   { month: "Nov", count: 563 },
+  //   { month: "Dec", count: 651 },
+  // ];
+  console.log(calls);
 
   return (
     <>
@@ -76,16 +76,16 @@ export default function GradientLineChart({ calls }) {
         <Tooltip />
         <XAxis
           dataKey="month"
-          axisLine={false}
           tick={{ fontWeight: "500" }}
+          axisLine={false}
           tickLine={false}
         />
         <YAxis
+          tickFormatter={(value) => (value === 0 ? "" : value)}
           dataKey="count"
           tick={{ fontWeight: "500" }}
           tickLine={false}
           axisLine={false}
-          tickFormatter={(value) => (value === 0 ? "" : value)}
         />
         <Area
           type="monotone"
