@@ -1,11 +1,22 @@
-import { Flex, Heading, Text, Box, Spacer, useToast } from "@chakra-ui/react";
-import { PiUserRectangle } from "react-icons/pi";
+import {
+  Flex,
+  Heading,
+  Text,
+  Box,
+  Spacer,
+  useToast,
+  Button,
+} from "@chakra-ui/react";
+import { CiUser } from "react-icons/ci";
+import { TfiKey, TfiUser } from "react-icons/tfi";
+import GradientLineChart from "./GradientLineChart";
 
 export default function Profile({ info }) {
   const publicKey = info ? info.address : null;
   const timestamp = info ? info.created_at : null;
   const api = info ? info.generated_key : null;
   const plan = info ? info.plan : null;
+  const calls = info ? JSON.parse(info.calls) : null;
 
   const toast = useToast();
 
@@ -33,126 +44,77 @@ export default function Profile({ info }) {
     }
   };
 
+  const currentMonth = new Date().getMonth();
+  const currentYear = new Date().getFullYear();
+
   return (
     <>
-      <Flex direction={"column"} p={20} pt={14} textAlign={"left"} gap={20}>
-        <Flex direction={"column"}>
-          <Heading fontFamily={"Montserrat Variable"}>Dashboard</Heading>
-          <Text fontFamily={"Manrope Variable"} fontWeight={400}>
-            Easily view important details about your account...
-          </Text>
+      <Flex
+        direction={"column"}
+        p={20}
+        pt={11}
+        textAlign={"left"}
+        gap={10}
+        w={1300}
+        m={"0 auto"}
+      >
+        <Heading fontFamily={"Montserrat Variable"}>
+          Account Information
+        </Heading>
+        <Flex
+          backgroundColor="white"
+          p={20}
+          pt={16}
+          pl={16}
+          borderRadius="14px"
+          align="left"
+          direction="column"
+          gap={16}
+        >
+          <Flex color="black" direction="column" gap={3}>
+            <Heading fontFamily="Poppins" fontSize="26px" fontWeight="600">
+              API Usage Volume
+            </Heading>
+            <Text fontFamily="Montserrat Variable">
+              ( {1 + " / " + currentYear} - {currentMonth + " / " + currentYear}{" "}
+              )
+            </Text>
+          </Flex>
+          <GradientLineChart calls={calls} />
         </Flex>
-        <Flex direction={"column"} gap={5}>
-          <Flex
-            direction={"row"}
-            gap={3}
-            align={"center"}
-            w={"fit-content"}
-            p={3}
-            bgColor={"white"}
-            borderRadius={10}
-            fontWeight={800}
-          >
-            <PiUserRectangle color="#6c35de" size={30} />
-            <Text color={"black"}>{publicKey}</Text>
+        <Flex
+          gap={5}
+          backgroundColor="white"
+          p={20}
+          pt={16}
+          pb={16}
+          borderRadius={14}
+          color="black"
+          direction="column"
+        >
+          <Heading fontSize={26} mb={5} fontFamily="Montserrat Variable">
+            Keys
+          </Heading>
+          <Flex align="center" justify="left">
+            <TfiUser size={25} />
+            <Text ml={"10px"}>Public Key</Text>
+            <Text ml={"103px"}>{publicKey}</Text>
           </Flex>
-          <Flex gap={5}>
-            <Flex
-              h={"fit-content"}
-              direction={"column"}
-              p={3}
-              pl={5}
-              pr={5}
-              borderRadius={10}
-              align={"center"}
-              bgColor={"white"}
-              color={"black"}
-              justify={"center"}
-              gap={2}
-            >
-              <Text
-                borderBottom={"1px solid black"}
-                fontWeight={700}
-                w={"100%"}
-                textAlign={"center"}
-              >
-                Created On
-              </Text>
-              <Text>{formatDate(timestamp)}</Text>
-            </Flex>
-            <Flex
-              h={"fit-content"}
-              direction={"column"}
-              p={3}
-              pl={5}
-              pr={5}
-              borderRadius={10}
-              align={"center"}
-              bgColor={"white"}
-              color={"black"}
-              justify={"center"}
-              gap={2}
-            >
-              <Text
-                borderBottom={"1px solid black"}
-                fontWeight={700}
-                w={"100%"}
-                textAlign={"center"}
-              >
-                Plan
-              </Text>
-              <Text>{plan == "10" ? "Premium" : "Free"}</Text>
-            </Flex>
-          </Flex>
-          <Flex mt={5} maxW={"fit-content"} minW={"70%"} direction={"column"}>
-            <Flex
-              p={2}
-              bgColor={"#6c35de"}
-              w={"100%"}
-              gap={1}
-              textAlign={"left"}
-              align={"center"}
-              borderTopRadius={20}
-            >
-              <Flex gap={2} ml={2}>
-                <Box
-                  borderRadius={"50%"}
-                  boxSize={3}
-                  backgroundColor={"green.300"}
-                ></Box>
-                <Box
-                  borderRadius={"50%"}
-                  boxSize={3}
-                  backgroundColor={"orange"}
-                ></Box>
-                <Box
-                  borderRadius={"50%"}
-                  boxSize={3}
-                  backgroundColor={"red"}
-                ></Box>
-              </Flex>
-              <Spacer />
-              <Text fontFamily={"Source Code Pro Variable"} mr={2}>
-                api_key.html
-              </Text>
-            </Flex>
-            <Flex
-              p={10}
-              h={"40%"}
-              bgColor={"white"}
-              borderBottomRadius={20}
-              align={"center"}
-              justify={"center"}
-              color={"black"}
-            >
-              <Text
-                fontWeight={600}
-                onClick={handleCopy}
-                _hover={{ cursor: "pointer" }}
-              >
-                {api}
-              </Text>
-            </Flex>
+          <Flex align="center" justify="center">
+            <TfiKey size={26} />
+            <Text ml={2} mr={5} fontWeight="700">
+              API Key
+            </Text>
+            <Spacer />
+            <Text onClick={handleCopy} cursor="pointer">
+              {api.slice(0, 5) + "......" + api.slice(-5)}
+            </Text>
+            <Spacer />
+            <Text>{formatDate(timestamp)}</Text>
+            <Spacer />
+            <Text>Active</Text>
+            <Spacer />
+            <Button>Regenrate</Button>
           </Flex>
         </Flex>
       </Flex>

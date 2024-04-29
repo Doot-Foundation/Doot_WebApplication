@@ -1,5 +1,7 @@
 import DashboardHero from "./components/dashboard/DashboardHero";
 import DashboardLayout from "./components/dashboard/DashboardLayout";
+import Header from "./components/common/Header";
+import Footer from "./components/common/Footer";
 
 import { SignerContext, ChainContext } from "../lib/context/contexts";
 import { useEffect, useContext } from "react";
@@ -24,7 +26,9 @@ export default function Dashboard() {
   return (
     <>
       <DashboardLayout>
+        <Header />
         <DashboardHero />
+        <Footer />
       </DashboardLayout>
     </>
   );

@@ -17,7 +17,6 @@
     "@fontsource-variable/montserrat": "^5.0.16",
     "@fontsource-variable/source-code-pro": "^5.0.16",
     "@fontsource/poppins": "^5.0.14",
-    "@nivo/line": "^0.85.1",
     "@supabase/supabase-js": "^2.39.0",
     "@upstash/redis": "^1.28.1",
     "api": "^6.1.1",
@@ -36,6 +35,7 @@
     "react-icons": "^4.12.0",
     "react-intersection-observer": "^9.8.2",
     "react-type-animation": "^3.2.0",
+    "recharts": "^2.12.6",
     "uuid": "^9.0.1"
   },
   "devDependencies": {

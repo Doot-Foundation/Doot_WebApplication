@@ -1,7 +1,5 @@
 import {
   Flex,
-  Link,
-  Spacer,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -11,8 +9,6 @@ import {
   Box,
   Button,
   useDisclosure,
-  Image,
-  background,
 } from "@chakra-ui/react";
 
 import { useEffect, useState, useContext } from "react";
@@ -21,11 +17,7 @@ import { SignerContext } from "../../../lib/context/contexts";
 
 import axios from "axios";
 
-import MenuItem from "./MenuItem";
 import Profile from "./Profile";
-
-import { HiHome } from "react-icons/hi2";
-import ConnectButton from "../common/ConnectButton";
 
 export default function DashboardHero() {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -176,35 +168,8 @@ export default function DashboardHero() {
           </ModalFooter>
         </ModalContent>
       </Modal>
-      <Flex h={"100vh"}>
-        <Flex
-          direction={"column"}
-          h={"100%"}
-          w={"20%"}
-          bgColor={"#3f007a"}
-          align={"center"}
-          gap={100}
-          p={10}
-        >
-          <Link href="/" mt={10}>
-            <Image src="/static/images/Doot.png" boxSize={24} />
-          </Link>
-          <Flex>
-            <MenuItem>
-              <HiHome size={20} />
-              Dashboard
-            </MenuItem>
-          </Flex>
-        </Flex>
-
-        <Flex direction={"column"} bgColor={"#2c0055"} w={"80%"}>
-          <Flex p={5}>
-            <Flex />
-            <Spacer />
-            <ConnectButton />
-          </Flex>
-          {userDetails && <Profile info={userDetails} />}
-        </Flex>
+      <Flex mb={100} minH={600}>
+        {userDetails && <Profile info={userDetails} />}
       </Flex>
     </>
   );

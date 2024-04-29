@@ -20,11 +20,14 @@ export default function WalletError({ isOpen, onClose }) {
       <Modal isOpen={isOpen} onClose={onClose} isCentered size={"xl"}>
         <ModalOverlay bg="rgba(0, 0, 0, 0.9)" />
         <ModalContent
+          p={4}
           color={"white"}
           bg="linear-gradient(180deg, rgba(42,0,82,1) 0%, rgba(71,30,127,1) 50%, rgba(83,0,188,1) 100%)"
         >
-          <ModalHeader fontSize={80}>Oops!</ModalHeader>
-          <ModalBody p={4}>
+          <ModalHeader fontSize={80} fontFamily="Montserrat Variable">
+            Oops!
+          </ModalHeader>
+          <ModalBody>
             <Text>It Looks Like You Don't Have Auro Wallet :(</Text>
             <br />
             <Text>
