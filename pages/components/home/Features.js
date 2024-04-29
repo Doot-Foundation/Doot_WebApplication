@@ -102,7 +102,7 @@ export default function Features() {
               <InformationCard>
                 <Image
                   src="
-                /static/images/filtered.png"
+                /static/images/magnifying.png"
                 />
                 <Heading
                   textAlign={"center"}

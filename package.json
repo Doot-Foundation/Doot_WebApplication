@@ -17,6 +17,7 @@
     "@fontsource-variable/montserrat": "^5.0.16",
     "@fontsource-variable/source-code-pro": "^5.0.16",
     "@fontsource/poppins": "^5.0.14",
+    "@nivo/line": "^0.85.1",
     "@supabase/supabase-js": "^2.39.0",
     "@upstash/redis": "^1.28.1",
     "api": "^6.1.1",
