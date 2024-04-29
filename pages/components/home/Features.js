@@ -26,13 +26,13 @@ export default function Features() {
           <Heading
             fontFamily={"Poppins"}
             fontWeight={"500"}
-            fontSize={"50px"}
+            fontSize={"45px"}
             maxW="1200"
             align="center"
           >
-            Fulfill your zkApp's data feed requirement with a focus on
-            transparency, accuracy, precision and provable nature right out of
-            the box.
+            Fulfill your zkApp's data feed requirements with a focus on
+            transparent, accurate, precise and provable nature right out of the
+            box.
           </Heading>
         </Flex>
         {/* ============= */}
