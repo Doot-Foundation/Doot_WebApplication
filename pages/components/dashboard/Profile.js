@@ -12,16 +12,18 @@ import GradientLineChart from "./GradientLineChart";
 import { SignerContext } from "../../../lib/context/contexts";
 import { useState, useContext } from "react";
 
-export default function Profile({ info }) {
-  const publicKey = info ? info.address : null;
-  const timestamp = info ? info.created_at : null;
-  const plan = info ? info.plan : null;
-  const calls = info ? JSON.parse(info.calls) : null;
+export default function Profile({ info = {} }) {
+  const publicKey = info ? (info.address ? info.address : null) : null;
+  const timestamp = info ? (info.created_at ? info.created_at : null) : null;
+  const calls =
+    info.calls && typeof info.calls === "string"
+      ? JSON.parse(info.calls)
+      : null;
 
+  const { signer } = useContext(SignerContext);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [api, setAPI] = useState(info ? info.generated_key : null);
   const toast = useToast();
-  const { signer } = useContext(SignerContext);
   const axios = require("axios");
 
   function formatDate(timestamp) {
@@ -143,7 +145,7 @@ export default function Profile({ info }) {
             </Text>
             <Spacer />
             <Text onClick={handleCopy} cursor="pointer">
-              {api.slice(0, 5) + "......" + api.slice(-5)}
+              {api ? api.slice(0, 5) + "......" + api.slice(-5) : null}
             </Text>
             <Spacer />
             <Text>{formatDate(timestamp)}</Text>

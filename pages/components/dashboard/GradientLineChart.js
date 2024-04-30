@@ -1,31 +1,34 @@
 import { ComposedChart, Area, XAxis, YAxis, Tooltip } from "recharts";
 
-export default function GradientLineChart({ calls }) {
+export default function GradientLineChart({ calls = {} }) {
   function transformJsonToArray(json) {
-    const currentMonth = new Date().getMonth();
-    const months = [
-      "JAN",
-      "FEB",
-      "MAR",
-      "APR",
-      "MAY",
-      "JUN",
-      "JUL",
-      "AUG",
-      "SEP",
-      "OCT",
-      "NOV",
-      "DEC",
-    ];
-    let result = [];
+    if (json) {
+      const currentMonth = new Date().getMonth();
+      const months = [
+        "JAN",
+        "FEB",
+        "MAR",
+        "APR",
+        "MAY",
+        "JUN",
+        "JUL",
+        "AUG",
+        "SEP",
+        "OCT",
+        "NOV",
+        "DEC",
+      ];
+      let result = [];
 
-    for (let i = 0; i <= currentMonth; i++) {
-      const month = months[i];
-      if (json[month]) {
-        result.push({ month, count: json[month] });
+      for (let i = 0; i <= currentMonth; i++) {
+        const month = months[i];
+        if (json[month]) {
+          result.push({ month, count: json[month] });
+        }
       }
+      return result;
     }
-    return result;
+    return [];
   }
 
   const data = transformJsonToArray(calls);

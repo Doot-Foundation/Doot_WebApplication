@@ -23,6 +23,10 @@ import PositiveMiniChart from "./PositiveMiniChart";
 import NegativeMiniChart from "./NegativeMiniChart";
 
 export default function IndividualAsset({ token }) {
+  if (!token) {
+    return <div>Loading...</div>; // Or any loading indicator
+  }
+
   const axios = require("axios");
   const GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
 
@@ -56,7 +60,8 @@ export default function IndividualAsset({ token }) {
     setIPFSHistorical(tokenHistoricalArray);
   }
   function capitalizeFirstLetter(word) {
-    return word.charAt(0).toUpperCase() + word.slice(1);
+    if (word) return word.charAt(0).toUpperCase() + word.slice(1);
+    else return "";
   }
   function normalizePrice(str) {
     let num = parseInt(str);

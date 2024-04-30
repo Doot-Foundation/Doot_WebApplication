@@ -1,7 +1,8 @@
 import Marquee from "react-fast-marquee";
 import { Image, Text, Flex } from "@chakra-ui/react";
 
-export default function MarqueeDataProviders({ providers }) {
+export default function MarqueeDataProviders({ providers = [] }) {
+  // Provide a default value for providers
   function capitalizeFirstLetter(word) {
     return word.charAt(0).toUpperCase() + word.slice(1);
   }

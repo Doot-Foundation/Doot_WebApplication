@@ -133,7 +133,8 @@ export default function IndividualSlot({ token }) {
   }
 
   function capitalizeFirstLetter(word) {
-    return word.charAt(0).toUpperCase() + word.slice(1);
+    if (word) return word.charAt(0).toUpperCase() + word.slice(1);
+    else return "";
   }
 
   return (
