@@ -9,6 +9,7 @@ import TokenNotSupported from "../components/feeds/TokenNotSupported";
 
 import { SUPPORTED_TOKENS } from "../../utils/constants/info";
 import Header from "../components/common/Header";
+import Footer from "../components/common/Footer";
 
 export default function TokenPage() {
   const router = useRouter();
@@ -27,6 +28,7 @@ export default function TokenPage() {
           <FeedsHero />
         </>
       )}
+      <Footer />
     </FeedsLayout>
   );
 }
