@@ -10,11 +10,12 @@ import { useEffect, useState, useContext } from "react";
 import { TOKEN_TO_SYMBOL } from "../../../utils/constants/info";
 
 import { SignerContext, ChainContext } from "../../../lib/context/contexts";
+import TimeLeft from "./TimeLeft";
 
 export default function IndividualSlot({ token }) {
   const key = process.env.NEXT_PUBLIC_API_INTERFACE_KEY;
   const { signer, setSigner } = useContext(SignerContext);
-  const { chain, setChain } = useContext(ChainContext);
+  const { setChain } = useContext(ChainContext);
 
   const toast = useToast();
 
@@ -23,54 +24,47 @@ export default function IndividualSlot({ token }) {
   const [timeLeft, setTimeLeft] = useState(null);
 
   const [timeLagError, setTimeLagError] = useState(false);
+  const src = `/static/slot_token/${token}.png`;
+
+  async function fetchInitDetails() {
+    try {
+      const headers = {
+        Authorization: "Bearer " + key,
+      };
+      const response = await axios.get(
+        `/api/get/getLatestTokenSlot?token=${token}`,
+        {
+          headers: headers,
+        }
+      );
+      setResult(response.data.information);
+      if (Date.now() - response.data.information.aggregationTimestamp > 600000)
+        setTimeLagError(true);
+      else {
+        setTimeLeft(
+          Math.floor(
+            (Date.now() - response.data.information.aggregationTimestamp) / 1000
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Error fetching price:", error);
+    }
+  }
 
   useEffect(() => {
-    async function execute() {
-      try {
-        const headers = {
-          Authorization: "Bearer " + key,
-        };
-        const response = await axios.get(
-          `/api/get/getLatestTokenSlot?token=${token}`,
-          {
-            headers: headers,
-          }
-        );
-        setResult(response.data.information);
-        if (
-          Date.now() - response.data.information.aggregationTimestamp >
-          600000
-        )
-          setTimeLagError(true);
-      } catch (error) {
-        console.error("Error fetching price:", error);
-      }
-    }
-
-    execute();
+    fetchInitDetails();
   }, []);
 
-  if (result && timeLeft == null && !timeLagError) {
-    setTimeLeft(Date.now() - result.aggregationTimestamp);
-  }
-
   useEffect(() => {
-    if (timeLeft) startTimer(timeLeft);
+    if (timeLeft != 0) {
+      let interval = null;
+      interval = setInterval(() => {
+        setTimeLeft((timeLeft) => timeLeft - 1);
+      }, 1000);
+      return () => clearInterval(interval);
+    } else fetchInitDetails();
   }, [timeLeft]);
-
-  // Function to start the timer
-  function startTimer(startingTime) {
-    let timer = startingTime;
-
-    const intervalId = setInterval(() => {
-      timer--;
-
-      if (timer === 0) {
-        clearInterval(intervalId);
-        window.location.reload();
-      }
-    }, 1000);
-  }
 
   function normalizePrice(str) {
     let num = parseInt(str);
@@ -139,8 +133,6 @@ export default function IndividualSlot({ token }) {
   function capitalizeFirstLetter(word) {
     return word.charAt(0).toUpperCase() + word.slice(1);
   }
-
-  const src = `/static/slot_token/${token}.png`;
 
   return (
     <>
@@ -225,7 +217,7 @@ export default function IndividualSlot({ token }) {
                 <Button
                   w="98%"
                   h="95%"
-                  borderRadius="12px"
+                  borderRadius="11px"
                   background="#202020"
                   color="white"
                   fontWeight={400}
@@ -245,13 +237,12 @@ export default function IndividualSlot({ token }) {
               </Flex>
             </Flex>
             <Flex direction="column" gap={2}>
-              <Text fontSize="14px">
-                <i>Time left:</i>
-              </Text>
+              <TimeLeft timestamp={timeLeft} />
               <Progress
                 hasStripe
                 isAnimated
-                max={600000}
+                max={600}
+                min={0}
                 value={timeLeft}
                 colorScheme="purple"
                 borderRadius="20px"
@@ -259,9 +250,19 @@ export default function IndividualSlot({ token }) {
             </Flex>
           </>
         ) : (
-          <Text>
-            Loading Latest Slot, Please check back in a couple of minutes...
-          </Text>
+          <Flex
+            direction="column"
+            h="100%"
+            w="100%"
+            align="center"
+            justify="center"
+            gap={5}
+          >
+            <Image src="/static/animation/loading.gif" />
+            <Text fointSize="16px" w="fit-content">
+              Fetching slot details...
+            </Text>
+          </Flex>
         )}
       </Flex>
     </>
