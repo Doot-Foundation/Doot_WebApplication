@@ -217,8 +217,8 @@ export default function IndividualSlot({ token }) {
                 background="linear-gradient(93.59deg, #00EAB1 -14.32%, rgba(23, 190, 194, 0.91) 12.24%, rgba(39, 158, 206, 0.65) 35.82%, rgba(61, 116, 221, 0.61) 58.92%, rgba(81, 77, 236, 0.43) 83.94%, #6B1BFF 107.82%)"
               >
                 <Button
-                  w="98%"
-                  h="95%"
+                  w="190px"
+                  h="47px"
                   borderRadius="11px"
                   background="#202020"
                   color="white"
@@ -233,6 +233,7 @@ export default function IndividualSlot({ token }) {
                     background:
                       "linear-gradient(93.59deg, #00EAB1 -14.32%, rgba(23, 190, 194, 0.91) 12.24%, rgba(39, 158, 206, 0.65) 35.82%, rgba(61, 116, 221, 0.61) 58.92%, rgba(81, 77, 236, 0.43) 83.94%, #6B1BFF 107.82%)",
                   }}
+                  disabled={timePassed > 600 ? true : false}
                 >
                   Join Consensus
                 </Button>
@@ -261,7 +262,7 @@ export default function IndividualSlot({ token }) {
             gap={5}
           >
             <Image src="/static/animation/loading.gif" />
-            <Text fointSize="16px" w="fit-content">
+            <Text fontSize="16px" w="fit-content">
               Fetching slot details...
             </Text>
           </Flex>

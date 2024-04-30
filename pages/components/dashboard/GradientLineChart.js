@@ -1,4 +1,4 @@
-import { ComposedChart, Line, Area, XAxis, YAxis, Tooltip } from "recharts";
+import { ComposedChart, Area, XAxis, YAxis, Tooltip } from "recharts";
 
 export default function GradientLineChart({ calls }) {
   function transformJsonToArray(json) {

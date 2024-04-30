@@ -59,7 +59,13 @@ export default function HistoricalTable({ ipfsHistorical, ipfsLatest }) {
 
   return (
     <>
-      <Table p={5} bgcolor={"white"} color={"black"} borderRadius={20}>
+      <Table
+        p={5}
+        bgcolor={"white"}
+        color={"black"}
+        borderRadius={20}
+        width={"60%"}
+      >
         <Thead>
           <Tr>
             <Th>SNo</Th>

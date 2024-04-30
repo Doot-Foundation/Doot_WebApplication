@@ -1,4 +1,3 @@
-import { useState, useEffect } from "react";
 import { Text } from "@chakra-ui/react";
 
 export default function TimePassed({ timestamp }) {
@@ -22,7 +21,7 @@ export default function TimePassed({ timestamp }) {
   return (
     <>
       <Text fontSize="14px">
-        <i>Time left:{convertSecondsToMMSS(timestamp)}</i>
+        <i>Time left - {convertSecondsToMMSS(timestamp)}</i>
       </Text>
     </>
   );

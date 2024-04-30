@@ -2,13 +2,13 @@
 import { useRouter } from "next/router";
 
 import FeedsLayout from "../components/feeds/FeedsLayout";
-import FeedsHeader from "../components/feeds/FeedsHeader";
 import FeedsHero from "../components/feeds/FeedsHero";
 
 import IndividualAsset from "../components/feeds/IndividualAsset";
 import TokenNotSupported from "../components/feeds/TokenNotSupported";
 
 import { SUPPORTED_TOKENS } from "../../utils/constants/info";
+import Header from "../components/common/Header";
 
 export default function TokenPage() {
   const router = useRouter();
@@ -18,7 +18,7 @@ export default function TokenPage() {
 
   return (
     <FeedsLayout>
-      <FeedsHeader />
+      <Header />
       {isSupportedToken ? (
         <IndividualAsset token={token} />
       ) : (

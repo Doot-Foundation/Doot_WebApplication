@@ -59,14 +59,16 @@ export default function TokenDescriptionBox({ token }) {
           p={2}
           w={"100%"}
         >
-          <Flex direction={"row"} p={5} align={"center"} gap={1} w={"100%"}>
+          <Flex direction={"row"} p={3} align={"center"} gap={2} w={"80%"}>
             <Image src={src} h={5} w={5} />
-            <Text fontWeight={700}>{TOKEN_TO_SYMBOL[token]}/USD</Text>
+            <Text fontWeight={600}>{TOKEN_TO_SYMBOL[token]} / USD</Text>
           </Flex>
           <Spacer />
           <Flex direction={"column"} mr={5} justify={"center"} minW={"10%"}>
             {normalizedPrice && (
-              <Text fontWeight={800}>${normalizedPrice}</Text>
+              <Text fontFamily="Source Code Pro Variable" fontWeight={600}>
+                ${normalizedPrice}
+              </Text>
             )}
             <Text>{chain.chainName}</Text>
           </Flex>
