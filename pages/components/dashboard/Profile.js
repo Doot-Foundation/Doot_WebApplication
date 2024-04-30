@@ -2,23 +2,27 @@ import {
   Flex,
   Heading,
   Text,
-  Box,
   Spacer,
   useToast,
   Button,
 } from "@chakra-ui/react";
-import { CiUser } from "react-icons/ci";
+
 import { TfiKey, TfiUser } from "react-icons/tfi";
 import GradientLineChart from "./GradientLineChart";
+import { SignerContext } from "../../../lib/context/contexts";
+import { useState, useContext } from "react";
 
 export default function Profile({ info }) {
   const publicKey = info ? info.address : null;
   const timestamp = info ? info.created_at : null;
-  const api = info ? info.generated_key : null;
   const plan = info ? info.plan : null;
   const calls = info ? JSON.parse(info.calls) : null;
 
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [api, setAPI] = useState(info ? info.generated_key : null);
   const toast = useToast();
+  const { signer } = useContext(SignerContext);
+  const axios = require("axios");
 
   function formatDate(timestamp) {
     if (timestamp) {
@@ -46,6 +50,40 @@ export default function Profile({ info }) {
 
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
+
+  const handleUpdateAPI = async () => {
+    setIsSubmitted(true);
+    const key = process.env.NEXT_PUBLIC_API_INTERFACE_KEY;
+
+    const obj = {
+      address: signer ? signer : null,
+      api: api,
+    };
+    const userObj = JSON.stringify(obj);
+
+    const headers = {
+      Authorization: "Bearer " + key,
+      User: userObj,
+    };
+
+    await axios
+      .get(`/api/update/updateAPIKey`, {
+        headers: headers,
+      })
+      .then((res) => {
+        toast({
+          title: "Updated API Key Successfully!",
+          duration: "7000",
+          status: "success",
+          position: "top",
+        });
+        setAPI(res.data.key);
+      })
+      .catch((err) => {
+        console.log("Update Failed.");
+      });
+    setIsSubmitted(false);
+  };
 
   return (
     <>
@@ -102,7 +140,7 @@ export default function Profile({ info }) {
           </Flex>
           <Flex align="center" justify="center">
             <TfiKey size={26} />
-            <Text ml={2} mr={5} fontWeight="700">
+            <Text ml={2} mr={5}>
               API Key
             </Text>
             <Spacer />
@@ -114,7 +152,34 @@ export default function Profile({ info }) {
             <Spacer />
             <Text>Active</Text>
             <Spacer />
-            <Button>Regenrate</Button>
+
+            <Flex
+              width="150px"
+              height="48px"
+              p={0}
+              justify="center"
+              align="center"
+              borderRadius="12px"
+              background="linear-gradient(93.59deg, #00EAB1 -14.32%, rgba(23, 190, 194, 0.91) 12.24%, rgba(39, 158, 206, 0.65) 35.82%, rgba(61, 116, 221, 0.61) 58.92%, rgba(81, 77, 236, 0.43) 83.94%, #6B1BFF 107.82%)"
+            >
+              <Button
+                w="95%"
+                h="85%"
+                borderRadius="8px"
+                background="white"
+                fontWeight={400}
+                onClick={handleUpdateAPI}
+                _hover={{}}
+                _active={{
+                  color: "white",
+                  background:
+                    "linear-gradient(93.59deg, #00EAB1 -14.32%, rgba(23, 190, 194, 0.91) 12.24%, rgba(39, 158, 206, 0.65) 35.82%, rgba(61, 116, 221, 0.61) 58.92%, rgba(81, 77, 236, 0.43) 83.94%, #6B1BFF 107.82%)",
+                }}
+                disabled={isSubmitted}
+              >
+                Regenerate
+              </Button>
+            </Flex>
           </Flex>
         </Flex>
       </Flex>

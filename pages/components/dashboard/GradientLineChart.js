@@ -19,7 +19,6 @@ export default function GradientLineChart({ calls }) {
     ];
     let result = [];
 
-    // Iterate through the months up to the current month
     for (let i = 0; i <= currentMonth; i++) {
       const month = months[i];
       if (json[month]) {
@@ -29,40 +28,7 @@ export default function GradientLineChart({ calls }) {
     return result;
   }
 
-  // const data = transformJsonToArray(calls);
-
-  // const dummyCalls = {
-  //   JAN: 432,
-  //   FEB: 967,
-  //   MAR: 225,
-  //   APR: 751,
-  //   MAY: 834,
-  //   JUN: 445,
-  //   JUL: 220,
-  //   AUG: 177,
-  //   SEP: 934,
-  //   OCT: 662,
-  //   NOV: 491,
-  //   DEC: 301,
-  // };
-
   const data = transformJsonToArray(calls);
-
-  // const dummyData = [
-  //   { month: "Jan", count: 542 },
-  //   { month: "Feb", count: 312 },
-  //   { month: "Mar", count: 112 },
-  //   { month: "Apr", count: 112 },
-  //   { month: "May", count: 756 },
-  //   { month: "June", count: 563 },
-  //   { month: "July", count: 658 },
-  //   { month: "Aug", count: 657 },
-  //   { month: "Sept", count: 112 },
-  //   { month: "Oct", count: 852 },
-  //   { month: "Nov", count: 563 },
-  //   { month: "Dec", count: 651 },
-  // ];
-  console.log(calls);
 
   return (
     <>
@@ -81,7 +47,7 @@ export default function GradientLineChart({ calls }) {
           tickLine={false}
         />
         <YAxis
-          tickFormatter={(value) => (value === 0 ? "" : value)}
+          tickFormatter={(value) => (value === 0 ? "" : Math.round(value))}
           dataKey="count"
           tick={{ fontWeight: "500" }}
           tickLine={false}
