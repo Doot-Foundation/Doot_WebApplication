@@ -10,7 +10,7 @@ import { useEffect, useState, useContext } from "react";
 import { TOKEN_TO_SYMBOL } from "../../../utils/constants/info";
 
 import { SignerContext, ChainContext } from "../../../lib/context/contexts";
-import TimeLeft from "./TimeLeft";
+import TimePassed from "./TimePassed";
 
 export default function IndividualSlot({ token }) {
   const key = process.env.NEXT_PUBLIC_API_INTERFACE_KEY;
@@ -21,7 +21,7 @@ export default function IndividualSlot({ token }) {
 
   const axios = require("axios");
   const [result, setResult] = useState(null);
-  const [timeLeft, setTimeLeft] = useState(null);
+  const [timePassed, setTimePassed] = useState(null);
 
   const [timeLagError, setTimeLagError] = useState(false);
   const src = `/static/slot_token/${token}.png`;
@@ -41,7 +41,7 @@ export default function IndividualSlot({ token }) {
       if (Date.now() - response.data.information.aggregationTimestamp > 600000)
         setTimeLagError(true);
       else {
-        setTimeLeft(
+        setTimePassed(
           Math.floor(
             (Date.now() - response.data.information.aggregationTimestamp) / 1000
           )
@@ -57,14 +57,14 @@ export default function IndividualSlot({ token }) {
   }, []);
 
   useEffect(() => {
-    if (timeLeft != 0) {
+    if (timePassed != 0) {
       let interval = null;
       interval = setInterval(() => {
-        setTimeLeft((timeLeft) => timeLeft - 1);
+        setTimePassed((timePassed) => timePassed + 1);
       }, 1000);
       return () => clearInterval(interval);
-    } else fetchInitDetails();
-  }, [timeLeft]);
+    }
+  }, [timePassed]);
 
   function normalizePrice(str) {
     let num = parseInt(str);
@@ -82,6 +82,8 @@ export default function IndividualSlot({ token }) {
     ) {
       const account = await window.mina.requestAccounts();
       const network = await window.mina.requestNetwork();
+
+      console.log(account);
       setSigner(account[0]);
       setChain({ chainId: network.chainId, chainName: network.name });
 
@@ -152,7 +154,7 @@ export default function IndividualSlot({ token }) {
             {capitalizeFirstLetter(token) + "/" + TOKEN_TO_SYMBOL[token]}
           </Text>
         </Flex>
-        {result && result.signature && !timeLagError && timeLeft != 0 ? (
+        {result && result.signature && !timeLagError && timePassed != 0 ? (
           <>
             <Flex gap={10}>
               <Flex direction="column" gap={7} w="30%">
@@ -237,13 +239,13 @@ export default function IndividualSlot({ token }) {
               </Flex>
             </Flex>
             <Flex direction="column" gap={2}>
-              <TimeLeft timestamp={timeLeft} />
+              <TimePassed timestamp={600 - timePassed} />
               <Progress
                 hasStripe
                 isAnimated
                 max={600}
                 min={0}
-                value={timeLeft}
+                value={600 - timePassed}
                 colorScheme="purple"
                 borderRadius="20px"
               ></Progress>

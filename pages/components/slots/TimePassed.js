@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Text } from "@chakra-ui/react";
 
-export default function TimeLeft({ timestamp }) {
+export default function TimePassed({ timestamp }) {
   function convertSecondsToMMSS(sent) {
     if (sent < 0) return "00:00";
     let inMs = sent * 1000;
