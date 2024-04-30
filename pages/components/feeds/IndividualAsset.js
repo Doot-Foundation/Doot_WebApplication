@@ -14,7 +14,7 @@ import {
   ENDPOINT_TO_DATA_PROVIDER,
 } from "../../../utils/constants/info";
 
-import { SlArrowLeft } from "react-icons/sl";
+import { SlArrowDown, SlArrowLeft } from "react-icons/sl";
 
 import HistoricalTable from "./HistoricalTable";
 import PriceGraph from "./PriceGraph";
@@ -219,16 +219,31 @@ export default function IndividualAsset({ token }) {
             p={10}
           >
             {ipfsLatest ? (
-              <Text
-                textAlign="right"
-                color="black"
-                fontFamily="Montserrat Variable"
-                pb={10}
-                fontSize="30px"
-                fontWeight={500}
-              >
-                $ {normalizePrice(ipfsLatest[0].price)}
-              </Text>
+              <>
+                <Flex pb={10}>
+                  <Text
+                    display="inline-block"
+                    textAlign="left"
+                    color="black"
+                    fontFamily="Montserrat Variable"
+                    fontSize="30px"
+                    fontWeight={500}
+                  >
+                    24 Hr
+                  </Text>
+                  <Spacer />
+                  <Text
+                    display="inline-block"
+                    textAlign="right"
+                    color="black"
+                    fontFamily="Montserrat Variable"
+                    fontSize="30px"
+                    fontWeight={500}
+                  >
+                    $ {normalizePrice(ipfsLatest[0].price)}
+                  </Text>
+                </Flex>
+              </>
             ) : null}
 
             {graphData && graphMax && graphMin && (
@@ -257,7 +272,7 @@ export default function IndividualAsset({ token }) {
         <Flex
           direction="column"
           bgColor="#202020"
-          h={500}
+          h={550}
           w={930}
           p={10}
           borderRadius={20}
@@ -295,168 +310,116 @@ export default function IndividualAsset({ token }) {
               </Box>
             )}
           </Flex>
-          <Flex>
-            <Flex direction="column"></Flex>
-            <Flex direction="column"></Flex>
-          </Flex>
-        </Flex>
-        {/* <Flex direction={"row"} mb={100} gap={10}>
-            <Flex
-              direction={"column"}
-              background={
-                "linear-gradient(325deg, rgba(96,46,198,1) 0%, rgba(14,0,43,1) 100%)"
-              }
-              borderRadius={5}
-              w={"30%"}
-              p={10}
-              gap={10}
-              boxShadow="10px 10px 2px #6c35de"
-            >
-              {latest ? (
-                <>
-                  <Flex direction={"column"} gap={5}>
-                    <Flex direction={"column"}>
-                      <Text fontFamily={"Montserrat Variable"} fontWeight={400}>
-                        Price
-                      </Text>
-                      <Heading fontFamily={"Manrope Variable"} size={"2xl"}>
+          {latest ? (
+            <>
+              <Flex gap={10} w="100%">
+                <Flex
+                  gap={7}
+                  w="40%"
+                  direction="column"
+                  borderRight="2px solid white  "
+                >
+                  <Flex direction="column" gap={2}>
+                    <Text fontSize="18px" color="#BFBFBF">
+                      Price
+                    </Text>
+                    <Flex gap={3} align="center">
+                      <Image
+                        src="/static/images/wallet.png"
+                        w={"20px"}
+                        h={"15px"}
+                      />
+                      <Text fontSize="18px" fontWeight={500}>
                         ${normalizePrice(latest.price)}
-                      </Heading>
-                      <Box w="100%" borderBottom={"1px dashed gray"} mt={3} />
-                    </Flex>
-                    <Flex>
-                      <Flex direction={"column"}>
-                        <Text
-                          fontFamily={"Montserrat Variable"}
-                          fontWeight={400}
-                        >
-                          Providers
+                      </Text>
+                      <Flex align="center" gap={2}>
+                        <Text fontSize="12px" color="#F5F5F5">
+                          USD
                         </Text>
-                        <Heading fontFamily={"Manrope Variable"} size={"lg"}>
-                          {latest.urls.length}/13
-                        </Heading>
+                        <SlArrowDown size={12} />
                       </Flex>
-                      <Spacer />
-                      <Flex direction={"column"}>
-                        <Text
-                          fontFamily={"Montserrat Variable"}
-                          fontWeight={400}
-                        >
-                          Asset Type{" "}
-                        </Text>
-                        <Heading fontFamily={"Manrope Variable"} size={"lg"}>
-                          Crypto
-                        </Heading>
-                      </Flex>
-                    </Flex>
-                    <Box w="100%" borderBottom={"1px dashed gray"} />
-                    <Flex direction={"column"}>
-                      <Text fontFamily={"Montserrat Variable"} fontWeight={400}>
-                        Signature
-                      </Text>
-                      <Text
-                        onClick={handleCopySignature}
-                        fontFamily={"Manrope Variable"}
-                        fontWeight={800}
-                        _hover={{
-                          cursor: "pointer",
-                        }}
-                      >
-                        {latest.signature.signature}
-                      </Text>
-                      <Box w="100%" borderBottom={"1px dashed gray"} mt={3} />
-                    </Flex>
-                    <Flex direction={"column"}>
-                      <Text fontFamily={"Montserrat Variable"} fontWeight={400}>
-                        Data
-                      </Text>
-                      <Text fontFamily={"Manrope Variable"} fontWeight={800}>
-                        {latest.signature.data}
-                      </Text>
-                      <Box w="100%" borderBottom={"1px dashed gray"} mt={3} />
-                    </Flex>
-                    <Flex direction={"column"}>
-                      <Text fontFamily={"Montserrat Variable"} fontWeight={400}>
-                        Oracle Public Key
-                      </Text>
-                      <Text
-                        onClick={handleCopyPublicKey}
-                        fontFamily={"Manrope Variable"}
-                        fontWeight={800}
-                        _hover={{
-                          cursor: "pointer",
-                        }}
-                      >
-                        {latest.signature.publicKey}
-                      </Text>
-                      <Box w="100%" borderBottom={"1px dashed gray"} mt={3} />
-                    </Flex>
-                    <Flex direction={"column"}>
-                      <Text fontFamily={"Montserrat Variable"} fontWeight={400}>
-                        Timestamp
-                      </Text>
-                      <Text
-                        fontFamily={"Manrope Variable"}
-                        fontWeight={800}
-                        _hover={{
-                          cursor: "pointer",
-                        }}
-                      >
-                        {latest.aggregationTimestamp}
-                      </Text>
-                      <Box w="100%" borderBottom={"1px dashed gray"} mt={3} />
                     </Flex>
                   </Flex>
-                </>
-              ) : null}
-            </Flex>
-            <Flex
-              direction={"column"}
-              background={
-                "linear-gradient(455deg, rgba(96,46,198,1) 0%, rgba(14,0,43,1) 100%)"
-              }
-              boxShadow="10px 10px 2px #6c35de"
-              borderRadius={5}
-              p={10}
-              gap={10}
-              w={"100%"}
-            >
-              <Text fontFamily={"Montserrat Variable"} fontWeight={600}>
-                Data Providers
-              </Text>
-
-              <Wrap spacing={10} justify={"center"} align={"center"}>
-                {providers.map((provider, index) => {
-                  return (
-                    <Image
-                      key={index}
-                      bgColor={"white"}
-                      p={5}
-                      borderRadius={10}
-                      src={`/static/data_providers/${provider}.png`}
-                      boxSize={28}
-                    />
-                  );
-                })}
-              </Wrap>
-            </Flex>
-          </Flex> */}
+                  <Flex direction="column" gap={2}>
+                    <Text color="#BFBFBF" fontSize="18px">
+                      Decimals
+                    </Text>
+                    <Text fontSize="16px">10</Text>
+                  </Flex>
+                  <Flex direction="column" gap={2}>
+                    <Text color="#BFBFBF" fontSize="18px">
+                      {" "}
+                      Timestamp
+                    </Text>
+                    <Text fontSize="16px">
+                      {latest.aggregationTimestamp} Epoch
+                    </Text>
+                  </Flex>
+                  <Flex direction="column" gap={2}>
+                    <Text color="#BFBFBF" fontSize="18px">
+                      Data{" "}
+                    </Text>
+                    <Text fontSize="16px">{latest.signature.data}</Text>
+                  </Flex>
+                </Flex>
+                <Flex ml={6} w="50%" direction="column" gap={12}>
+                  <Flex direction={"column"} mt={10} gap={2}>
+                    <Text
+                      fontFamily={"Montserrat Variable"}
+                      fontWeight={400}
+                      fontSize="18px"
+                    >
+                      Signature
+                    </Text>
+                    <Text
+                      onClick={handleCopySignature}
+                      fontSize={"16px"}
+                      _hover={{
+                        cursor: "pointer",
+                      }}
+                    >
+                      {latest.signature.signature}
+                    </Text>
+                  </Flex>
+                  <Flex direction={"column"}>
+                    <Text
+                      fontFamily={"Montserrat Variable"}
+                      fontWeight={400}
+                      fontSize="18px"
+                    >
+                      Oracle Public Key
+                    </Text>
+                    <Text
+                      fontSize="16px"
+                      onClick={handleCopyPublicKey}
+                      _hover={{
+                        cursor: "pointer",
+                      }}
+                    >
+                      {latest.signature.publicKey}
+                    </Text>
+                  </Flex>
+                </Flex>{" "}
+              </Flex>
+            </>
+          ) : null}
+        </Flex>
         {/* historical */}
         <Flex
           direction={"column"}
-          bg={`linear-gradient(0deg, rgba(5,3,0,1) 0%, rgba(45,0,88,1) 100%)`}
-          borderRadius={5}
-          minH={400}
-          w={"100%"}
           p={10}
           gap={5}
+          align="center"
+          justify="center"
         >
-          <Heading fontFamily={"Montserrat Variable"}>
-            Historical Information
-          </Heading>
-          <Text pb={5} mb={5} fontSize={"sm"}>
-            (The prices are precise upto the 10th decimal)
-          </Text>
+          <Flex direction="column" w="1380px">
+            <Heading textAlign="left" fontFamily={"Montserrat Variable"}>
+              Historical Information
+            </Heading>
+            <Text pb={5} mb={5} fontSize={"sm"}>
+              (The prices are precise upto the 10th decimal)
+            </Text>
+          </Flex>
           {ipfsHistorical && ipfsLatest ? (
             <HistoricalTable
               ipfsLatest={ipfsLatest}
