@@ -17,28 +17,28 @@ import {
 const MULTIPLICATION_FACTOR = 10;
 
 const TOKEN_TO_CACHE = {
-  ethereum: "eth_cache",
-  chainlink: "link_cache",
-  solana: "sol_cache",
   mina: "mina_cache",
   bitcoin: "btc_cache",
+  ethereum: "eth_cache",
+  solana: "sol_cache",
   ripple: "xrp_cache",
   cardano: "ada_cache",
   avalanche: "avax_cache",
-  dogecoin: "doge_cache",
   polygon: "matic_cache",
+  chainlink: "link_cache",
+  dogecoin: "doge_cache",
 };
 const TOKEN_TO_SIGNED_SLOT = {
-  ethereum: "eth_latest_slot_cache",
-  chainlink: "link_latest_slot_cache",
-  solana: "sol_latest_slot_cache",
   mina: "mina_latest_slot_cache",
   bitcoin: "btc_latest_slot_cache",
+  ethereum: "eth_latest_slot_cache",
+  solana: "sol_latest_slot_cache",
   ripple: "xrp_latest_slot_cache",
   cardano: "ada_latest_slot_cache",
   avalanche: "avax_latest_slot_cache",
-  dogecoin: "doge_latest_slot_cache",
   polygon: "matic_latest_slot_cache",
+  chainlink: "link_latest_slot_cache",
+  dogecoin: "doge_latest_slot_cache",
 };
 
 const HISTORICAL_CACHE = "historical_cid";
@@ -118,39 +118,39 @@ function DATA_PROVIDER_TO_ENDPOINT(provider, token) {
 
 const SUPPORTED_TOKENS = [
   "MINA",
-  "ETH",
   "BTC",
-  "LINK",
+  "ETH",
   "SOL",
   "XRP",
   "ADA",
   "AVAX",
-  "DOGE",
   "MATIC",
+  "LINK",
+  "DOGE",
 ];
 const TOKEN_TO_SYMBOL = {
   mina: "MINA",
-  ethereum: "ETH",
-  chainlink: "LINK",
-  solana: "SOL",
   bitcoin: "BTC",
+  ethereum: "ETH",
+  solana: "SOL",
   ripple: "XRP",
   avalanche: "AVAX",
   cardano: "ADA",
-  dogecoin: "DOGE",
   polygon: "MATIC",
+  chainlink: "LINK",
+  dogecoin: "DOGE",
 };
 const SYMBOL_TO_TOKEN = {
   MINA: "mina",
-  ETH: "ethereum",
-  LINK: "chainlink",
-  SOL: "solana",
   BTC: "bitcoin",
+  ETH: "ethereum",
+  SOL: "solana",
   XRP: "ripple",
   AVAX: "avalanche",
   ADA: "cardano",
-  DOGE: "dogecoin",
   MATIC: "polygon",
+  LINK: "chainlink",
+  DOGE: "dogecoin",
 };
 
 module.exports = {

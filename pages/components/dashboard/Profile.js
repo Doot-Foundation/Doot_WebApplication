@@ -96,9 +96,7 @@ export default function Profile({ info }) {
         w={1300}
         m={"0 auto"}
       >
-        <Heading fontFamily={"Montserrat Variable"}>
-          Account Information
-        </Heading>
+        <Heading fontFamily={"Montserrat Variable"}>User Dashboard</Heading>
         <Flex
           backgroundColor="white"
           p={20}
@@ -136,7 +134,7 @@ export default function Profile({ info }) {
           <Flex align="center" justify="left">
             <TfiUser size={25} />
             <Text ml={"10px"}>Public Key</Text>
-            <Text ml={"103px"}>{publicKey}</Text>
+            <Text ml={"98px"}>{publicKey}</Text>
           </Flex>
           <Flex align="center" justify="center">
             <TfiKey size={26} />
