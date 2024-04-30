@@ -29,6 +29,12 @@ export default async function handler(req, res) {
     if (select_data.length == 0 || !uuidValidate(key)) {
       return res.status(401).json("Unauthorized.");
     }
+    /// ADD THE PART THAT INCREMENTS THE JSON WITH KEY 'CALLS' ON THE DATABASE.
+    /// CALLS = {
+    //      "JAN":1232,
+    //      "FEB":123,
+    // }
+    // JSON.stringify(CALLS)
 
     const cachedData = await redis.get(TOKEN_TO_CACHE[token.toLowerCase()]);
 

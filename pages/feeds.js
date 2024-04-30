@@ -1,12 +1,12 @@
 import FeedsLayout from "./components/feeds/FeedsLayout";
-import FeedsHeader from "./components/feeds/FeedsHeader";
+import Header from "./components/common/Header";
 import FeedsHero from "./components/feeds/FeedsHero";
 
 export default function Feeds() {
   return (
     <>
       <FeedsLayout>
-        <FeedsHeader />
+        <Header />
         <FeedsHero />
       </FeedsLayout>
     </>

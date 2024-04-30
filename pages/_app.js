@@ -4,6 +4,15 @@ import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import "@fontsource-variable/source-code-pro";
 import "@fontsource-variable/montserrat";
 import "@fontsource-variable/manrope";
+import "@fontsource/poppins/100.css";
+import "@fontsource/poppins/200.css";
+import "@fontsource/poppins/300.css";
+import "@fontsource/poppins/400.css";
+import "@fontsource/poppins/500.css";
+import "@fontsource/poppins/600.css";
+import "@fontsource/poppins/700.css";
+import "@fontsource/poppins/800.css";
+import "@fontsource/poppins/900.css";
 
 import { useState } from "react";
 import { SignerContext, ChainContext } from "../lib/context/contexts";
@@ -16,9 +25,9 @@ export default function App({ Component, pageProps }) {
     styles: {
       global: {
         body: {
-          bg: "#050505",
+          bg: "#171717",
           color: "white",
-          fontFamily: "'Manrope Variable', sans-serif",
+          fontFamily: "'Poppins', sans-serif",
         },
       },
     },

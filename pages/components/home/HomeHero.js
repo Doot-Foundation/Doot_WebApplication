@@ -1,5 +1,4 @@
 import {
-  Spacer,
   Flex,
   Box,
   Heading,
@@ -7,22 +6,17 @@ import {
   Button,
   FormControl,
   Link,
+  Image,
+  useToast,
+  Fade,
 } from "@chakra-ui/react";
-
-import { keyframes } from "@emotion/react";
-
-import axios from "axios";
 
 import { useState } from "react";
 
-import { GiAllSeeingEye } from "react-icons/gi";
-import { MdOutlineJoinInner } from "react-icons/md";
-import { MdOutlineCleaningServices } from "react-icons/md";
-import { FaArrowRightLong } from "react-icons/fa6";
-import { GoVerified } from "react-icons/go";
-import { LuPartyPopper } from "react-icons/lu";
+import { keyframes } from "@emotion/react";
 
-import InformationCard from "./InformationCard";
+import { MdOutlineContentCopy } from "react-icons/md";
+import HeroAnimatedText from "./HeroAnimatedText";
 
 import {
   AutoComplete,
@@ -31,16 +25,31 @@ import {
   AutoCompleteList,
 } from "@choc-ui/chakra-autocomplete";
 
+import axios from "axios";
+
+import Features from "./Features";
+
 export default function HomeHero() {
   const [asset, setAsset] = useState("Select asset");
   const [result, setResult] = useState(null);
   const [mode, setMode] = useState("res");
+
+  const toast = useToast();
+
+  const spin = keyframes`
+  to { transform: rotate(360deg); }
+ `;
 
   const blinking = keyframes`
   50% {
     opacity: 0;
   }
   `;
+
+  function sendEmail() {
+    window.location.href = "mailto:contact@doot.foundation";
+  }
+
   const assets = [
     "Mina",
     "Ethereum",
@@ -54,6 +63,10 @@ export default function HomeHero() {
     "Dogecoin",
   ];
 
+  function formatSign(sign) {
+    return sign.slice(0, 10) + "......." + sign.slice(-10);
+  }
+
   const handleSubmit = async () => {
     try {
       const key = process.env.NEXT_PUBLIC_API_INTERFACE_KEY;
@@ -66,11 +79,13 @@ export default function HomeHero() {
           headers: headers,
         }
       );
+      console.log(response.data);
       const finalObj = {
         asset: response.data.asset,
         price: response.data.information.price,
         decimals: 10,
-        timestamp: response.data.timestamp,
+        timestamp: response.data.information.aggregationTimestamp,
+        signature: formatSign(response.data.information.signature.signature),
       };
 
       const finalString = await formatString(finalObj);
@@ -98,395 +113,432 @@ export default function HomeHero() {
     return formattedString;
   }
 
+  const scrollToElement = (elementId) => {
+    const element = document.getElementById(elementId);
+    element?.scrollIntoView({
+      behavior: "smooth",
+      block: "end",
+      inline: "nearest",
+    });
+  };
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText("npm install @doot-oracles/client");
+      toast({
+        title: "Copied Successfully",
+        duration: "2000",
+        status: "success",
+        position: "top",
+      });
+    } catch (err) {
+      console.error("Failed to copy text: ", err);
+    }
+  };
+
   return (
     <>
-      <Flex direction={"column"} gap={120} mb={150}>
+      <Flex direction={"column"} gap={120}>
         {/* Opening */}
-        <Flex
-          direction={"column"}
-          maxW={"100%"}
-          gap={10}
-          p={10}
-          align={"center"}
-        >
-          <Heading
-            fontFamily={"Montserrat Variable"}
-            size={"4xl"}
-            textAlign={"center"}
-            w={"80%"}
-          >
-            Supercharged Oracle For The Mina Protocol
-          </Heading>
-          <Text
-            fontFamily={"Source Code Pro Variable"}
-            fontSize={"2xl"}
-            width={"100%"}
-            textAlign={"center"}
-          >
-            <Box
-              as={"span"}
-              color={"#8c54ff"}
-              fontSize={"3xl"}
-              fontWeight={800}
-            >
-              Verifiable, Transparent.
-            </Box>
-            <br />
-            That's how we like our asset feeds for the Mina Protocol.
-          </Text>
-          <Flex gap={5}>
-            <Link href="https://docs.doot.foundation/" target="_blank">
-              <Button
-                alignItems={"center"}
-                justifyItems={"center"}
-                p={"5px 30px"}
-                borderRadius={20}
-                gap={2}
-                transition={"0.2s"}
-                _hover={{ gap: "5" }}
-                _active={{}}
-                background={
-                  " linear-gradient(75deg, rgba(88,255,216,1) 16%, rgba(170,81,255,1) 100%);"
-                }
-                fontFamily={"Montserrat Variable"}
-              >
-                <Text fontWeight={"bold"}>TRY DOOT</Text>
-                <FaArrowRightLong />
-              </Button>
-            </Link>
-            <Link href="https://docs.doot.foundation/" target="_blank">
-              <Button
-                alignItems={"center"}
-                justifyItems={"center"}
-                p={"5px 30px"}
-                borderRadius={20}
-                gap={2}
-                transition={"0.2s"}
-                _hover={{ gap: "5" }}
-                _active={{}}
-                fontFamily={"Montserrat Variable"}
-              >
-                <Text fontWeight={"bold"}>Learn More</Text>
-                <FaArrowRightLong />
-              </Button>
-            </Link>
-          </Flex>
-        </Flex>
-
-        {/* Features */}
-        <Flex direction={"column"} align={"center"}>
-          <Heading size={"lg"} fontFamily={"Source Code Pro Variable"}>
-            for@developers:~${" "}
-            <Box
-              animation={`${blinking} 1.2s step-start infinite`}
-              display={"inline "}
-              color={"#0ce1ae"}
-            >
-              _
-            </Box>
-          </Heading>
-          <Text fontSize={"xl"}>
-            Who prioritize transparency, accuracy and verifiability.
-          </Text>
-
+        <Flex direction={"column"} maxW={"100%"} gap={7} align={"center"}>
           <Flex
-            direction={"row"}
-            padding={"0px 140px"}
-            gap={5}
-            mt={10}
-            // on
-            // animation={`${slideIn} 1s ease-in-out forwards`}
+            position="relative"
+            direction="column"
+            align="center"
+            justify="center"
+            fontSize="70px"
+            fontWeight={600}
           >
-            <InformationCard>
-              <GiAllSeeingEye size={100} />
-              <Heading
-                textAlign={"center"}
-                fontFamily={"Manrope Variable"}
-                fontWeight={900}
-              >
-                Asset Prices
-              </Heading>
-              <Text fontSize={20} textAlign={"center"}>
-                Mina-compatible asset feeds readily available for developers,
-                tracking several prominent assets. The accuracy of our final
-                results extends up to ten decimal places, providing developers
-                with highly precise data.
-              </Text>
-            </InformationCard>
-            <Spacer />
-            <InformationCard>
-              <MdOutlineJoinInner size={100} />
-              <Heading
-                textAlign={"center"}
-                fontFamily={"Manrope Variable"}
-                fontWeight={900}
-              >
-                Aggregated
-              </Heading>
-              <Text fontSize={20} textAlign={"center"}>
-                Pooling insights from diverse sources, our curated aggregation
-                method ensures an unadulterated stream of information. This
-                allows us to leave no room for manipulation or failure.
-              </Text>
-            </InformationCard>
-            <Spacer />
-            <InformationCard>
-              <MdOutlineCleaningServices size={100} />
-              <Heading
-                textAlign={"center"}
-                fontFamily={"Manrope Variable"}
-                fontWeight={900}
-              >
-                Filtered
-              </Heading>
-              <Text fontSize={20} textAlign={"center"}>
-                We meticulously eliminate outliers to extract the authentic
-                value, ensuring a signal devoid of disruptive noise that might
-                otherwise yield inaccurate outcomes.
-              </Text>
-            </InformationCard>
+            <Image
+              height="auto"
+              m="auto"
+              src={"/static/animation/dots.gif"}
+              zIndex={"-1"}
+              position={"absolute"}
+              maxW="180%"
+              filter="brightness(50%)"
+            />
+            <Box h={120}>
+              <HeroAnimatedText />
+            </Box>
+            <Box>Oracle</Box>
+            <Box>For Mina Protocol</Box>
           </Flex>
-          <Flex
-            direction={"row"}
-            mt={10}
-            mb={10}
-            p={"0px 100px"}
-            justify={"center"}
-            gap={10}
-          >
-            <InformationCard>
-              <GoVerified size={100} strokeWidth={1} />
-              <Heading
-                textAlign={"center"}
-                fontFamily={"Manrope Variable"}
-                fontWeight={900}
-              >
-                Verify
-              </Heading>
-              <Text textAlign={"center"}>
-                Every phase of our process is publically accessible, providing
-                transparency and enabling independent verification.
-                <br />
-                Individuals interested in validating the computed can use our
-                intuitive user interface. Additionally, they can also leverage
-                the smart contracts deployed on the Mina's Berkeley Testnet for
-                further verification.
-              </Text>
-            </InformationCard>
-            <InformationCard>
-              <LuPartyPopper size={100} />
-              <Heading
-                textAlign={"center"}
-                fontFamily={"Manrope Variable"}
-                fontWeight={900}
-              >
-                Much More!
-              </Heading>
-              <Text textAlign={"center"}>
-                We are commited to help streamline the developer experience for
-                Oracles on the Mina Protocol and let them focus on what matters
-                the most. In line with this objective, over the coming months,
-                we anticipate unveiling numerous exciting features and
-                improvements that will enhance the overall developer experience.
-              </Text>
-            </InformationCard>
-          </Flex>
-        </Flex>
-
-        {/* Testing  */}
-        <Flex direction={"column"}>
-          <Flex direction={"column"} alignItems={"left"}>
-            <Flex ml={200} direction={"row"} align={"center"} gap={10}>
+          <Flex gap={28}>
+            <Button
+              position={"relative"}
+              alignItems={"center"}
+              justifyItems={"center"}
+              p={"33px 54px"}
+              gap={2}
+              transition={"0.2s"}
+              _active={{}}
+              _hover={{}}
+              background="#6B1BFF"
+              boxShadow="0px 0px 200px #6B1BFF, inset 0px -3px 0px rgba(0, 0, 0, 0.2), inset 0px 1px 0px rgba(255, 255, 255, 0.4)"
+              borderRadius="100px"
+              fontSize={"20px"}
+              overflow="hidden"
+              onClick={() => scrollToElement("targetSection")}
+            >
               <Box
-                background={
-                  "linear-gradient(90deg, #6c35de 0%,rgba(23,0,44,1) 100%)"
-                }
-                w={200}
-                h={5}
-              ></Box>
+                position="absolute"
+                width="134px"
+                height="40px"
+                left="calc(50% - 134px/2)"
+                top="calc(50% - 40px/2 + 39.95px)"
+                background="#9470DD"
+                filter="blur(13px)"
+              />
+
+              <Image src="/static/images/stars.png" alt="Stars" />
+              <Text color="white" fontWeight={"700"}>
+                Try Doot
+              </Text>
+            </Button>
+
+            <Link
+              href="https://docs.doot.foundation/"
+              target="_blank"
+              _hover={{}}
+            >
+              <Flex
+                position="relative"
+                justify="center"
+                align="center"
+                borderRadius="100px"
+                p="4px"
+                overflow="hidden"
+              >
+                <Box
+                  position="absolute"
+                  top={0}
+                  h={"100%"}
+                  w={"100%"}
+                  background="linear-gradient(90deg, rgba(107,27,255,1) 0%, rgba(73,68,180,0) 35%, rgba(5,130,85,0) 50%, rgba(2,210,114,0) 65%, rgba(12,225,174,1) 100%)"
+                  animation={`${spin} 3s infinite ease-out`}
+                />
+                <Button
+                  p={"30px 53px"}
+                  alignItems={"center"}
+                  justifyItems={"center"}
+                  gap={2}
+                  transition={"0.2s"}
+                  _active={{}}
+                  _hover={{}}
+                  background="#202020"
+                  borderRadius="100px"
+                  fontSize={"20px"}
+                >
+                  <Image src="/static/images/stars.png" alt="Stars" />
+                  <Text color="white" fontWeight={"700"}>
+                    Learn More
+                  </Text>
+                </Button>
+              </Flex>
+            </Link>
+          </Flex>
+          <Flex
+            fontFamily="Source Code Pro Variable"
+            borderRadius={100}
+            backgroundColor="#202020"
+            fontSize="18px"
+            p="20px 50px"
+            w="fit-content"
+            gap={6}
+          >
+            <Flex align="center" gap={5}>
+              <MdOutlineContentCopy
+                color={"gray"}
+                size={22}
+                onClick={copyToClipboard}
+                cursor={"pointer"}
+              />
+              <Box border="1px solid gray" h="100%"></Box>
+              <Flex gap={2}>
+                <Flex>
+                  <Box fontFamily={"Source Code Pro Variable"}>
+                    revolutionary@zkapp
+                  </Box>
+                  <Text>:~$</Text>
+                </Flex>
+                <Text
+                  color="white"
+                  onClick={copyToClipboard}
+                  cursor={"pointer"}
+                >
+                  npm install @doot-oracles/client
+                </Text>
+                <Box
+                  fontWeight={900}
+                  animation={`${blinking} 1.2s step-start infinite`}
+                  display={"inline"}
+                  color={"#0ce1ae"}
+                >
+                  _
+                </Box>
+              </Flex>
+            </Flex>
+          </Flex>
+        </Flex>
+        {/* Features */}
+        <Features />
+        {/* Testing  */}
+        <section id="targetSection">
+          <Flex direction={"column"} maxW="1200" margin="0 auto">
+            <Flex direction={"column"} alignItems={"left"} gap={3}>
+              <Flex direction={"row"} align={"center"} gap={14}>
+                <Box
+                  background={
+                    "linear-gradient(90deg, #6c35de 0%,rgba(23,0,44,1) 100%)"
+                  }
+                  w={200}
+                  h={5}
+                />
+                <Heading
+                  letterSpacing={3}
+                  size={"3xl"}
+                  fontFamily={"Montserrat Variable"}
+                >
+                  TRY DOOT
+                </Heading>
+              </Flex>{" "}
               <Heading
                 letterSpacing={3}
                 size={"3xl"}
                 fontFamily={"Montserrat Variable"}
               >
-                TEST DOOT
+                DATA FEEDS
               </Heading>
-            </Flex>{" "}
-            <Heading
-              letterSpacing={3}
-              size={"3xl"}
-              fontFamily={"Montserrat Variable"}
-              ml={200}
-            >
-              ASSET FEEDS
-            </Heading>
-          </Flex>
-
-          <Flex
-            direction={"row"}
-            align={"center"}
-            justify={"center"}
-            mt={50}
-            gap={5}
-          >
-            <Flex
-              background={"linear-gradient(120deg,#2c0055 0%, #5126a9 100%)"}
-              direction={"column"}
-              borderRadius={10}
-              p={5}
-              minH={400}
-              w={"22%"}
-              pos={"relative"}
-            >
-              <Text fontSize={25}>
-                Choose the asset and run the asset feed.
-              </Text>
-
-              <FormControl
-                fontFamily={"Source Code Pro Variable"}
-                mt={5}
-                position={"relative"}
-              >
-                <AutoComplete
-                  openOnFocus
-                  value={asset}
-                  onChange={(e) => setAsset(e)}
-                >
-                  <Box
-                    position={"absolute"}
-                    top={0}
-                    left={0}
-                    borderRadius={10}
-                    backgroundColor={"white"}
-                    h={10}
-                    w={"100%"}
-                  ></Box>
-                  <AutoCompleteInput
-                    id={1}
-                    w={"100%"}
-                    variant="filled"
-                    placeholder="Select Asset"
-                    color={"black"}
-                  />
-                  <AutoCompleteList>
-                    {assets.map((asset, cid) => (
-                      <AutoCompleteItem
-                        key={`option-${cid}`}
-                        value={asset}
-                        color={"black"}
-                        textTransform="capitalize"
-                      >
-                        {asset}
-                      </AutoCompleteItem>
-                    ))}
-                  </AutoCompleteList>
-                </AutoComplete>
-              </FormControl>
-
-              <Button
-                backgroundColor={"#00eab1"}
-                position="absolute"
-                bottom={5}
-                onClick={handleSubmit}
-                fontFamily={"Source Code Pro Variable"}
-                _hover={{
-                  backgroundColor: "#00bc8f",
-                }}
-              >
-                RUN REQUEST
-              </Button>
             </Flex>
-            {/* Result Window */}
-            <Flex
-              direction={"column"}
-              h={400}
-              w={"50%"}
-              fontFamily={"Source Code Pro Variable"}
-            >
-              <Flex
-                gap={2}
-                background={
-                  "linear-gradient(190deg, rgba(23,0,44,1) 0%, #5126a9 100%)"
-                }
-                p={3}
-                borderTopRadius={10}
-              >
-                <Box
-                  borderRadius={"50%"}
-                  boxSize={3}
-                  backgroundColor={"green.300"}
-                ></Box>
-                <Box
-                  borderRadius={"50%"}
-                  boxSize={3}
-                  backgroundColor={"orange"}
-                ></Box>
-                <Box
-                  borderRadius={"50%"}
-                  boxSize={3}
-                  backgroundColor={"red"}
-                ></Box>
-              </Flex>
 
+            <Flex direction={"row"} align={"center"} mt={50} gap={5}>
               <Flex
-                backgroundColor="#2c0055"
-                borderBottomRadius={10}
-                p="0 20px 20px 20px"
-                h={"100%"}
+                background={"linear-gradient(120deg,#2c0055 0%, #5126a9 100%)"}
+                direction={"column"}
+                borderRadius={10}
+                p={5}
+                minH={450}
+                w={"30%"}
+                pos={"relative"}
               >
-                <Flex
-                  maxW={"100%"}
-                  borderRadius={10}
-                  backgroundColor={"#3f007a"}
-                  direction={"column"}
-                  w={"100%"}
+                <Text fontSize={25}>Choose the asset and run.</Text>
+
+                <FormControl
+                  fontFamily={"Source Code Pro Variable"}
+                  mt={5}
+                  position={"relative"}
                 >
-                  <Flex
-                    direction={"row"}
-                    borderBottom={"2px solid white"}
-                    p={5}
-                    pt={7}
-                    pl={5}
-                    gap={20}
-                    ml={10}
-                    mr={10}
+                  <AutoComplete
+                    openOnFocus
+                    value={asset}
+                    onChange={(e) => setAsset(e)}
                   >
                     <Box
-                      cursor={"pointer"}
-                      onClick={() => {
-                        setMode("res");
-                      }}
-                      fontWeight={mode == "res" ? 900 : 500}
+                      position={"absolute"}
+                      top={0}
+                      left={0}
+                      borderRadius={10}
+                      backgroundColor={"white"}
+                      h={10}
+                      w={"100%"}
+                    ></Box>
+                    <AutoCompleteInput
+                      id={1}
+                      w={"100%"}
+                      variant="filled"
+                      placeholder="Select Asset"
+                      color={"black"}
+                    />
+                    <AutoCompleteList>
+                      {assets.map((asset, cid) => (
+                        <AutoCompleteItem
+                          key={`option-${cid}`}
+                          value={asset}
+                          color={"black"}
+                          textTransform="capitalize"
+                        >
+                          {asset}
+                        </AutoCompleteItem>
+                      ))}
+                    </AutoCompleteList>
+                  </AutoComplete>
+                </FormControl>
+
+                <Button
+                  backgroundColor={"#00eab1"}
+                  position="absolute"
+                  bottom={5}
+                  onClick={handleSubmit}
+                  fontFamily={"Source Code Pro Variable"}
+                  _hover={{
+                    backgroundColor: "#00bc8f",
+                  }}
+                >
+                  RUN REQUEST
+                </Button>
+              </Flex>
+              {/* Result Window */}
+              <Flex direction={"column"} h={450} w={"70%"}>
+                <Flex gap={2} background="#5126a9" p={3} borderTopRadius={10}>
+                  <Box
+                    borderRadius={"50%"}
+                    boxSize={3}
+                    backgroundColor={"green.300"}
+                  ></Box>
+                  <Box
+                    borderRadius={"50%"}
+                    boxSize={3}
+                    backgroundColor={"orange"}
+                  ></Box>
+                  <Box
+                    borderRadius={"50%"}
+                    boxSize={3}
+                    backgroundColor={"red"}
+                  ></Box>
+                </Flex>
+
+                <Flex
+                  backgroundColor="#2c0055"
+                  borderBottomRadius={10}
+                  p="0 20px 20px 20px"
+                  h={"100%"}
+                >
+                  <Flex
+                    maxW={"100%"}
+                    borderRadius={10}
+                    backgroundColor={"#3f007a"}
+                    direction={"column"}
+                    w={"100%"}
+                  >
+                    <Flex
+                      direction={"row"}
+                      borderBottom={"2px solid white"}
+                      p={5}
+                      pt={7}
+                      pl={5}
+                      gap={20}
+                      ml={10}
+                      mr={10}
                       color={"#0ce1ae"}
                     >
-                      Response
-                    </Box>
-                    <Box
-                      cursor={"pointer"}
-                      onClick={() => {
-                        setMode("req");
-                      }}
-                      fontWeight={mode == "req" ? 900 : 500}
-                      color={"#0ce1ae"}
+                      <Box
+                        w={"20%"}
+                        cursor={"pointer"}
+                        onClick={() => {
+                          setMode("res");
+                        }}
+                        transition="0.2s"
+                        fontWeight={mode == "res" ? 700 : 500}
+                      >
+                        RESPONSE
+                      </Box>
+                      <Box
+                        cursor={"pointer"}
+                        onClick={() => {
+                          setMode("req");
+                        }}
+                        transition="0.2s"
+                        fontWeight={mode == "req" ? 700 : 500}
+                      >
+                        API ENDPOINT
+                      </Box>
+                    </Flex>
+                    <Flex
+                      p={10}
+                      position="relative"
+                      fontSize={"20px"}
+                      fontFamily="Montserrat Variable"
+                      fontWeight="500"
+                      letterSpacing="1px"
                     >
-                      API Endpoint
-                    </Box>
-                  </Flex>
-                  <Flex p={10} fontWeight={800}>
-                    <Text
-                      maxW={"100%"}
-                      hidden={mode == "req"}
-                      dangerouslySetInnerHTML={{
-                        __html: result,
-                      }}
-                    ></Text>
-                    <Text maxW={"100%"} hidden={mode == "res"}>
-                      {`https://doot.foundation/api/get/getPrice?token=${asset}`}
-                    </Text>
+                      <Box position="absolute">
+                        <Fade in={mode == "res"}>
+                          <Text
+                            maxW={"100%"}
+                            dangerouslySetInnerHTML={{
+                              __html: result,
+                            }}
+                          ></Text>
+                        </Fade>
+                      </Box>
+                      <Box position="absolute">
+                        <Fade in={mode == "req"}>
+                          <Text maxW={"100%"}>
+                            {`https://doot.foundation/api/get/getPrice?token=${asset}`}
+                          </Text>
+                        </Fade>
+                      </Box>
+                    </Flex>
                   </Flex>
                 </Flex>
               </Flex>
             </Flex>
+          </Flex>
+        </section>
+        <Flex
+          direction={"column"}
+          align={"center"}
+          gap={5}
+          mt={20}
+          justify="center"
+        >
+          <Heading fontFamily={"Montserrat Variable"} textAlign={"center"}>
+            Begin your journey with
+            <Box color="#6B1BFF" display="inline-block" ml={2} mr={2}>
+              {" "}
+              Doot{" "}
+            </Box>
+            today.
+          </Heading>
+          <Heading
+            maxW="1200px"
+            fontFamily={"Montserrat Variable"}
+            fontSize="30px"
+            textAlign="center"
+          >
+            Seemlessly integrate it with your next{" "}
+            <b>
+              <i>BIG THING&#9889; </i>
+            </b>
+            on the Mina Protocol and we'll be there to support you through every
+            step.
+          </Heading>
+          <Flex
+            mt={10}
+            mb={20}
+            w="224px"
+            h="61px"
+            position="relative"
+            p="4px 2px"
+            justify="center"
+            align="center"
+            borderRadius="100px"
+            overflow="hidden"
+          >
+            <Box
+              position="absolute"
+              h={"600%"}
+              w={"150%"}
+              backgroundImage="linear-gradient(228.09deg, #5E5EE5 -9.95%, rgba(129, 129, 222, 0.8) 12.47%, rgba(94, 94, 229, 0.62) 30.87%, rgba(28, 25, 26, 0.89) 53.87%, rgba(68, 220, 183, 0.65) 70.34%, #00EAB1 100.44%)"
+              animation={`${spin} 3s infinite linear`}
+            />
+            <Button
+              borderRadius="100px"
+              _hover={{}}
+              _active={{}}
+              bgColor="#171717"
+              color="white"
+              h="100%"
+              w="100%"
+              fontFamily={"Poppins"}
+              onClick={sendEmail}
+            >
+              <Flex gap={1} justify="center" align="center">
+                <Image src="/static/images/stars.png" />
+                Contact Us
+              </Flex>
+            </Button>
           </Flex>
         </Flex>
       </Flex>

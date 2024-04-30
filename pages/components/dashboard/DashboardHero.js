@@ -1,16 +1,14 @@
 import {
   Flex,
-  Link,
-  Spacer,
   Modal,
   ModalOverlay,
   ModalContent,
   ModalHeader,
   ModalBody,
   ModalFooter,
+  Box,
   Button,
   useDisclosure,
-  Image,
 } from "@chakra-ui/react";
 
 import { useEffect, useState, useContext } from "react";
@@ -19,11 +17,7 @@ import { SignerContext } from "../../../lib/context/contexts";
 
 import axios from "axios";
 
-import MenuItem from "./MenuItem";
 import Profile from "./Profile";
-
-import { HiHome } from "react-icons/hi2";
-import ConnectButton from "../common/ConnectButton";
 
 export default function DashboardHero() {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -107,49 +101,75 @@ export default function DashboardHero() {
   return (
     <>
       <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent color={"black"} mt={200} fontFamily={"Manrope Variable"}>
-          <ModalHeader>Good to see you here :D</ModalHeader>
-          <ModalBody>
-            It looks like you are a new user! We would love to onboard and help
-            you get started using Doot for the Mina Protocol.
+        <ModalOverlay
+          bg="rgba(0, 0, 0, 0.5)" // This sets the background to semi-transparent black
+          backdropFilter="blur(10px)"
+        />
+        <ModalContent
+          mt="17%"
+          borderRadius="14px"
+          color={"black"}
+          justify="center"
+          align="center"
+          p={5}
+        >
+          <ModalHeader
+            textAlign="center"
+            fontSize="24px"
+            fontFamily="Montserrat Variable"
+          >
+            Welcome aboard!
+          </ModalHeader>
+          <ModalBody
+            textAlign="center"
+            textShadow="2px 2px 4px rgba(0, 0, 0, 0.3)"
+            fontSize="20px"
+          >
+            It seems you're new here! <br />
+            We're excited to guide you through your journey with Doot for the
+            Mina Protocol.
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme="purple" mr={3} onClick={handleOnboard}>
-              Onboard
-            </Button>
+            <Flex
+              m={"0 auto"}
+              w="154px"
+              h="61px"
+              position="relative"
+              p="2px"
+              justify="center"
+              align="center"
+              borderRadius="10px"
+              overflow="hidden"
+            >
+              <Box
+                position="absolute"
+                h={"100%"}
+                w={"100%"}
+                backgroundImage="linear-gradient(93.59deg, #00EAB1 -14.32%, rgba(23, 190, 194, 0.91) 12.24%, rgba(39, 158, 206, 0.65) 35.82%, rgba(61, 116, 221, 0.61) 58.92%, rgba(81, 77, 236, 0.43) 83.94%, #6B1BFF 107.82%)"
+              />
+              <Button
+                borderRadius="10px"
+                _hover={{
+                  background:
+                    "linear-gradient(93.59deg, #00EAB1 -14.32%, rgba(23, 190, 194, 0.91) 12.24%, rgba(39, 158, 206, 0.65) 35.82%, rgba(61, 116, 221, 0.61) 58.92%, rgba(81, 77, 236, 0.43) 83.94%, #6B1BFF 107.82%)",
+                  color: "white",
+                }}
+                transition="0.2s"
+                _active={{}}
+                h="100%"
+                w="100%"
+                backgroundColor="white"
+                fontWeight="500"
+                onClick={handleOnboard}
+              >
+                Get Started
+              </Button>
+            </Flex>
           </ModalFooter>
         </ModalContent>
       </Modal>
-      <Flex h={"100vh"}>
-        <Flex
-          direction={"column"}
-          h={"100%"}
-          w={"20%"}
-          bgColor={"#3f007a"}
-          align={"center"}
-          gap={100}
-          p={10}
-        >
-          <Link href="/" mt={10}>
-            <Image src="/static/images/Doot.png" boxSize={24} />
-          </Link>
-          <Flex>
-            <MenuItem>
-              <HiHome size={20} />
-              Dashboard
-            </MenuItem>
-          </Flex>
-        </Flex>
-
-        <Flex direction={"column"} bgColor={"#2c0055"} w={"80%"}>
-          <Flex p={5}>
-            <Flex />
-            <Spacer />
-            <ConnectButton />
-          </Flex>
-          {userDetails && <Profile info={userDetails} />}
-        </Flex>
+      <Flex mb={100} minH={600}>
+        {userDetails && <Profile info={userDetails} />}
       </Flex>
     </>
   );

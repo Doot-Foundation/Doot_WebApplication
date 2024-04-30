@@ -1,13 +1,30 @@
-import { Flex, Heading, Text, Box, Spacer, useToast } from "@chakra-ui/react";
-import { PiUserRectangle } from "react-icons/pi";
+import {
+  Flex,
+  Heading,
+  Text,
+  Spacer,
+  useToast,
+  Button,
+} from "@chakra-ui/react";
 
-export default function Profile({ info }) {
-  const publicKey = info ? info.address : null;
-  const timestamp = info ? info.created_at : null;
-  const api = info ? info.generated_key : null;
-  const plan = info ? info.plan : null;
+import { TfiKey, TfiUser } from "react-icons/tfi";
+import GradientLineChart from "./GradientLineChart";
+import { SignerContext } from "../../../lib/context/contexts";
+import { useState, useContext } from "react";
 
+export default function Profile({ info = {} }) {
+  const publicKey = info ? (info.address ? info.address : null) : null;
+  const timestamp = info ? (info.created_at ? info.created_at : null) : null;
+  const calls =
+    info.calls && typeof info.calls === "string"
+      ? JSON.parse(info.calls)
+      : null;
+
+  const { signer } = useContext(SignerContext);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [api, setAPI] = useState(info ? info.generated_key : null);
   const toast = useToast();
+  const axios = require("axios");
 
   function formatDate(timestamp) {
     if (timestamp) {
@@ -33,125 +50,135 @@ export default function Profile({ info }) {
     }
   };
 
+  const currentMonth = new Date().getMonth();
+  const currentYear = new Date().getFullYear();
+
+  const handleUpdateAPI = async () => {
+    setIsSubmitted(true);
+    const key = process.env.NEXT_PUBLIC_API_INTERFACE_KEY;
+
+    const obj = {
+      address: signer ? signer : null,
+      api: api,
+    };
+    const userObj = JSON.stringify(obj);
+
+    const headers = {
+      Authorization: "Bearer " + key,
+      User: userObj,
+    };
+
+    await axios
+      .get(`/api/update/updateAPIKey`, {
+        headers: headers,
+      })
+      .then((res) => {
+        toast({
+          title: "Updated API Key Successfully!",
+          duration: "7000",
+          status: "success",
+          position: "top",
+        });
+        setAPI(res.data.key);
+      })
+      .catch((err) => {
+        console.log("Update Failed.");
+      });
+    setIsSubmitted(false);
+  };
+
   return (
     <>
-      <Flex direction={"column"} p={20} pt={14} textAlign={"left"} gap={20}>
-        <Flex direction={"column"}>
-          <Heading fontFamily={"Montserrat Variable"}>Dashboard</Heading>
-          <Text fontFamily={"Manrope Variable"} fontWeight={400}>
-            Easily view important details about your account...
-          </Text>
+      <Flex
+        direction={"column"}
+        p={20}
+        pt={11}
+        textAlign={"left"}
+        gap={10}
+        w={1300}
+        m={"0 auto"}
+      >
+        <Heading fontFamily={"Montserrat Variable"}>User Dashboard</Heading>
+        <Flex
+          backgroundColor="white"
+          p={20}
+          pt={16}
+          pl={16}
+          borderRadius="14px"
+          align="left"
+          direction="column"
+          gap={16}
+        >
+          <Flex color="black" direction="column" gap={3}>
+            <Heading fontFamily="Poppins" fontSize="26px" fontWeight="600">
+              API Usage Volume
+            </Heading>
+            <Text fontFamily="Montserrat Variable">
+              ( {1 + " / " + currentYear} - {currentMonth + " / " + currentYear}{" "}
+              )
+            </Text>
+          </Flex>
+          <GradientLineChart calls={calls} />
         </Flex>
-        <Flex direction={"column"} gap={5}>
-          <Flex
-            direction={"row"}
-            gap={3}
-            align={"center"}
-            w={"fit-content"}
-            p={3}
-            bgColor={"white"}
-            borderRadius={10}
-            fontWeight={800}
-          >
-            <PiUserRectangle color="#6c35de" size={30} />
-            <Text color={"black"}>{publicKey}</Text>
+        <Flex
+          gap={5}
+          backgroundColor="white"
+          p={20}
+          pt={16}
+          pb={16}
+          borderRadius={14}
+          color="black"
+          direction="column"
+        >
+          <Heading fontSize={26} mb={5} fontFamily="Montserrat Variable">
+            Keys
+          </Heading>
+          <Flex align="center" justify="left">
+            <TfiUser size={25} />
+            <Text ml={"10px"}>Public Key</Text>
+            <Text ml={"98px"}>{publicKey}</Text>
           </Flex>
-          <Flex gap={5}>
+          <Flex align="center" justify="center">
+            <TfiKey size={26} />
+            <Text ml={2} mr={5}>
+              API Key
+            </Text>
+            <Spacer />
+            <Text onClick={handleCopy} cursor="pointer">
+              {api ? api.slice(0, 5) + "......" + api.slice(-5) : null}
+            </Text>
+            <Spacer />
+            <Text>{formatDate(timestamp)}</Text>
+            <Spacer />
+            <Text>Active</Text>
+            <Spacer />
+
             <Flex
-              h={"fit-content"}
-              direction={"column"}
-              p={3}
-              pl={5}
-              pr={5}
-              borderRadius={10}
-              align={"center"}
-              bgColor={"white"}
-              color={"black"}
-              justify={"center"}
-              gap={2}
+              width="150px"
+              height="48px"
+              p={0}
+              justify="center"
+              align="center"
+              borderRadius="12px"
+              background="linear-gradient(93.59deg, #00EAB1 -14.32%, rgba(23, 190, 194, 0.91) 12.24%, rgba(39, 158, 206, 0.65) 35.82%, rgba(61, 116, 221, 0.61) 58.92%, rgba(81, 77, 236, 0.43) 83.94%, #6B1BFF 107.82%)"
             >
-              <Text
-                borderBottom={"1px solid black"}
-                fontWeight={700}
-                w={"100%"}
-                textAlign={"center"}
+              <Button
+                w="95%"
+                h="85%"
+                borderRadius="8px"
+                background="white"
+                fontWeight={400}
+                onClick={handleUpdateAPI}
+                _hover={{}}
+                _active={{
+                  color: "white",
+                  background:
+                    "linear-gradient(93.59deg, #00EAB1 -14.32%, rgba(23, 190, 194, 0.91) 12.24%, rgba(39, 158, 206, 0.65) 35.82%, rgba(61, 116, 221, 0.61) 58.92%, rgba(81, 77, 236, 0.43) 83.94%, #6B1BFF 107.82%)",
+                }}
+                disabled={isSubmitted}
               >
-                Created On
-              </Text>
-              <Text>{formatDate(timestamp)}</Text>
-            </Flex>
-            <Flex
-              h={"fit-content"}
-              direction={"column"}
-              p={3}
-              pl={5}
-              pr={5}
-              borderRadius={10}
-              align={"center"}
-              bgColor={"white"}
-              color={"black"}
-              justify={"center"}
-              gap={2}
-            >
-              <Text
-                borderBottom={"1px solid black"}
-                fontWeight={700}
-                w={"100%"}
-                textAlign={"center"}
-              >
-                Plan
-              </Text>
-              <Text>{plan == "10" ? "Premium" : "Free"}</Text>
-            </Flex>
-          </Flex>
-          <Flex mt={5} maxW={"fit-content"} minW={"70%"} direction={"column"}>
-            <Flex
-              p={2}
-              bgColor={"#6c35de"}
-              w={"100%"}
-              gap={1}
-              textAlign={"left"}
-              align={"center"}
-              borderTopRadius={20}
-            >
-              <Flex gap={2} ml={2}>
-                <Box
-                  borderRadius={"50%"}
-                  boxSize={3}
-                  backgroundColor={"green.300"}
-                ></Box>
-                <Box
-                  borderRadius={"50%"}
-                  boxSize={3}
-                  backgroundColor={"orange"}
-                ></Box>
-                <Box
-                  borderRadius={"50%"}
-                  boxSize={3}
-                  backgroundColor={"red"}
-                ></Box>
-              </Flex>
-              <Spacer />
-              <Text fontFamily={"Source Code Pro Variable"} mr={2}>
-                api_key.html
-              </Text>
-            </Flex>
-            <Flex
-              p={10}
-              h={"40%"}
-              bgColor={"white"}
-              borderBottomRadius={20}
-              align={"center"}
-              justify={"center"}
-              color={"black"}
-            >
-              <Text
-                fontWeight={600}
-                onClick={handleCopy}
-                _hover={{ cursor: "pointer" }}
-              >
-                {api}
-              </Text>
+                Regenerate
+              </Button>
             </Flex>
           </Flex>
         </Flex>
