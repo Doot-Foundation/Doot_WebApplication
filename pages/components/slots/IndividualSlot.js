@@ -164,7 +164,7 @@ export default function IndividualSlot({ token }) {
         {result && result.signature && !timeLagError && timePassed <= 600 ? (
           <>
             <Flex gap={10}>
-              <Flex direction="column" gap={7} w="30%">
+              <Flex direction="column" gap={7} w="35%">
                 <Flex direction="column">
                   <Text fontSize="18px" color="#BFBFBF">
                     Price
