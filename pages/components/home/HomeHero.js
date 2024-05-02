@@ -158,10 +158,12 @@ export default function HomeHero() {
             <Box h={120}>
               <HeroAnimatedText />
             </Box>
-            <Box>Oracle</Box>
-            <Box>For Mina Protocol</Box>
+            <Flex direction="column" align="center">
+              <Box h={"102px"}>Oracle</Box>
+              <Box>For Mina Protocol</Box>
+            </Flex>
           </Flex>
-          <Flex gap={28}>
+          <Flex gap={20}>
             <Button
               position={"relative"}
               alignItems={"center"}
@@ -243,6 +245,7 @@ export default function HomeHero() {
             p="20px 50px"
             w="fit-content"
             gap={6}
+            mt={3}
           >
             <Flex align="center" gap={5}>
               <MdOutlineContentCopy
