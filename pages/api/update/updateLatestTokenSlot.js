@@ -46,7 +46,7 @@ export default async function handler(req, res) {
     compatibleSignatureObject,
     publicKey
   );
-  console.log(publicKey, "joined", token, "consensus.");
 
+  console.log(publicKey, "joined", token, "consensus.", "\n");
   res.status(201).json({ status: 1 });
 }

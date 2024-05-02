@@ -95,9 +95,6 @@ export default function HomeHero() {
     }
   };
 
-  // const handleAssetChange = (event) => {
-  //   setAsset(event.target.value);
-  // };
   async function formatString(obj) {
     if (obj == null || obj == undefined) return "";
 
@@ -428,7 +425,7 @@ export default function HomeHero() {
                         onClick={() => {
                           setMode("res");
                         }}
-                        transition="0.2s"
+                        transition="0.1s linear"
                         fontWeight={mode == "res" ? 700 : 500}
                       >
                         RESPONSE
@@ -438,7 +435,7 @@ export default function HomeHero() {
                         onClick={() => {
                           setMode("req");
                         }}
-                        transition="0.2s"
+                        transition="0.1s linear"
                         fontWeight={mode == "req" ? 700 : 500}
                       >
                         API ENDPOINT

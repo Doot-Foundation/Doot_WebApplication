@@ -39,8 +39,6 @@ export default async function pinHistoricalObject(previousCID, latestPrices) {
     const res = await axios.get(`https://${GATEWAY}/ipfs/${previousCID}`);
     const previousObject = res.data;
 
-    console.log(previousObject);
-
     const previousTimestamp = previousObject.latest.timestamp;
     const previousPrices = previousObject.latest.prices;
     const previousHistorical = previousObject.historical;

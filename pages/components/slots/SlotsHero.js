@@ -33,7 +33,7 @@ export default function SlotsHero() {
           )}
         </Flex>
         <Collapse fontSize="24px" in={isOpen} animateOpacity>
-          Upon clicking the "Join Consensus" button for a specific coin, you
+          Upon clicking the "Join Consensus" button for a specific token, you
           become an active participant in the consensus process. Your
           involvement enhances the security and decentralization of Doot,
           thereby contributing to its robustness and reliability. This process
@@ -43,9 +43,10 @@ export default function SlotsHero() {
           30-minute span are prioritized when considered for historical
           information. Similarly, slots that have been signed over the most
           within a 2-hour span are given priority when being considered for
-          on-chain inclusion. Additionally, by participating in the consensus,
-          you may be eligible to receive rewards or incentives for your
-          contribution to the network's integrity and sustainability.
+          on-chain inclusion. <br />
+          {/* Additionally, by participating in the consensus, you may be eligible
+          to receive rewards or incentives for your contribution to the
+          network's integrity and sustainability after the mainnet launch. */}
         </Collapse>
         <SimpleGrid
           mt={20}

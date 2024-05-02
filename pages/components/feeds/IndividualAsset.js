@@ -210,7 +210,7 @@ export default function IndividualAsset({ token }) {
             <SlArrowLeft size={"44px"} />
           </Link>
           <Heading fontSize={"3xl"} fontFamily={"Montserrat Variable"} mb={5}>
-            {token} / USD
+            {capitalizeFirstLetter(SYMBOL_TO_TOKEN[token])}
           </Heading>
           <Text mb={14} fontSize={"24px"}>
             The displayed price and data may vary due to conversion.

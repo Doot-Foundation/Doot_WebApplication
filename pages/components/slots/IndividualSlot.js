@@ -57,12 +57,16 @@ export default function IndividualSlot({ token }) {
   }, []);
 
   useEffect(() => {
-    if (timePassed != 0) {
+    if (timePassed <= 600) {
       let interval = null;
       interval = setInterval(() => {
         setTimePassed((timePassed) => timePassed + 1);
       }, 1000);
       return () => clearInterval(interval);
+    } else {
+      setTimeout(() => {
+        fetchInitDetails();
+      }, 10000);
     }
   }, [timePassed]);
 
@@ -110,7 +114,7 @@ export default function IndividualSlot({ token }) {
 
       await axios
         .post(
-          `/api/update/updateLatestTokenSlot?signature=${signedObj}&publicKey=${signer.toString()}&token=${token}`
+          `/api/update/updateLatestTokenSlot?signature=${signedObj}&publicKey=${account.toString()}&token=${token}`
         )
         .then((res) => {
           if (res.data.status == 1) {
@@ -137,6 +141,8 @@ export default function IndividualSlot({ token }) {
     else return "";
   }
 
+  useEffect(() => {}, [timePassed]);
+
   return (
     <>
       <Flex
@@ -155,7 +161,7 @@ export default function IndividualSlot({ token }) {
             {capitalizeFirstLetter(token) + "/" + TOKEN_TO_SYMBOL[token]}
           </Text>
         </Flex>
-        {result && result.signature && !timeLagError && timePassed != 0 ? (
+        {result && result.signature && !timeLagError && timePassed <= 600 ? (
           <>
             <Flex gap={10}>
               <Flex direction="column" gap={7} w="30%">

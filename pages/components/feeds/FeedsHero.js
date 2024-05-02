@@ -19,7 +19,7 @@ export default function FeedsHero() {
         <Flex direction={"column"} m={16} gap={10}>
           <Flex gap={5} direction={"column"}>
             <Heading size={"3xl"} fontFamily={"Montserrat Variable"}>
-              Doot Data Feeds
+              Data Feeds
             </Heading>
             <Text fontSize={"lg"}>
               Explore our range of data feeds available on the Mina Protocol.

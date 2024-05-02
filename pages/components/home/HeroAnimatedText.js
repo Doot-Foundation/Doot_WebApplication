@@ -6,13 +6,13 @@ export default function HeroAnimatedText() {
       <TypeAnimation
         sequence={[
           "Supercharged",
-          1200,
+          1500,
           "Transparent",
-          1200,
+          1500,
           "Trustless",
-          1200,
+          1500,
           "Provable",
-          1200,
+          1500,
         ]}
         wrapper="span"
         cursor={false}
