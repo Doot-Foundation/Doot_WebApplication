@@ -5,6 +5,7 @@ import {
   Spacer,
   useToast,
   Button,
+  Tooltip,
 } from "@chakra-ui/react";
 
 import { TfiKey, TfiUser } from "react-icons/tfi";
@@ -123,9 +124,7 @@ export default function Profile({ info = {} }) {
         <Flex
           gap={5}
           backgroundColor="white"
-          p={20}
-          pt={16}
-          pb={16}
+          p={16}
           borderRadius={14}
           color="black"
           direction="column"
@@ -133,52 +132,73 @@ export default function Profile({ info = {} }) {
           <Heading fontSize={26} mb={5} fontFamily="Montserrat Variable">
             Keys
           </Heading>
-          <Flex align="center" justify="left">
-            <TfiUser size={25} />
-            <Text ml={"10px"}>Public Key</Text>
-            <Text ml={"98px"}>{publicKey}</Text>
-          </Flex>
-          <Flex align="center" justify="center">
-            <TfiKey size={26} />
-            <Text ml={2} mr={5}>
-              API Key
-            </Text>
-            <Spacer />
-            <Text onClick={handleCopy} cursor="pointer">
-              {api ? api.slice(0, 5) + "......" + api.slice(-5) : null}
-            </Text>
-            <Spacer />
-            <Text>{formatDate(timestamp)}</Text>
-            <Spacer />
-            <Text>Active</Text>
-            <Spacer />
+          <Flex>
+            <Flex direction="column" w="20%" gap={7}>
+              <Flex gap={2}>
+                <TfiUser size={25} />
+                <Text ml={"10px"}>Public Key</Text>
+              </Flex>
+              <Flex gap={2}>
+                <TfiKey size={26} />
+                <Text ml={2} mr={5}>
+                  API Key
+                </Text>
+              </Flex>
+            </Flex>
+            <Flex direction="column" w="80%" gap={5}>
+              <Text>{publicKey}</Text>
 
-            <Flex
-              width="150px"
-              height="48px"
-              p={0}
-              justify="center"
-              align="center"
-              borderRadius="12px"
-              background="linear-gradient(93.59deg, #00EAB1 -14.32%, rgba(23, 190, 194, 0.91) 12.24%, rgba(39, 158, 206, 0.65) 35.82%, rgba(61, 116, 221, 0.61) 58.92%, rgba(81, 77, 236, 0.43) 83.94%, #6B1BFF 107.82%)"
-            >
-              <Button
-                w="95%"
-                h="85%"
-                borderRadius="8px"
-                background="white"
-                fontWeight={400}
-                onClick={handleUpdateAPI}
-                _hover={{}}
-                _active={{
-                  color: "white",
-                  background:
-                    "linear-gradient(93.59deg, #00EAB1 -14.32%, rgba(23, 190, 194, 0.91) 12.24%, rgba(39, 158, 206, 0.65) 35.82%, rgba(61, 116, 221, 0.61) 58.92%, rgba(81, 77, 236, 0.43) 83.94%, #6B1BFF 107.82%)",
-                }}
-                disabled={isSubmitted}
-              >
-                Regenerate
-              </Button>
+              <Flex align="center">
+                {api ? (
+                  <>
+                    <Tooltip label={api} placement="top">
+                      <Text
+                        onClick={handleCopy}
+                        cursor="pointer"
+                        letterSpacing="1px"
+                        fontWeight="500"
+                      >
+                        {api
+                          ? api.slice(0, 6) + " ..... " + api.slice(-6)
+                          : null}
+                      </Text>
+                    </Tooltip>
+                  </>
+                ) : null}
+
+                <Spacer />
+                <Text>{formatDate(timestamp)}</Text>
+                <Spacer />
+                {api ? <Text>Active</Text> : <Text>NA</Text>}
+                <Spacer />
+                <Flex
+                  width="150px"
+                  height="48px"
+                  p={0}
+                  justify="center"
+                  align="center"
+                  borderRadius="12px"
+                  background="linear-gradient(93.59deg, #00EAB1 -14.32%, rgba(23, 190, 194, 0.91) 12.24%, rgba(39, 158, 206, 0.65) 35.82%, rgba(61, 116, 221, 0.61) 58.92%, rgba(81, 77, 236, 0.43) 83.94%, #6B1BFF 107.82%)"
+                >
+                  <Button
+                    w="95%"
+                    h="85%"
+                    borderRadius="8px"
+                    background="white"
+                    fontWeight={400}
+                    onClick={handleUpdateAPI}
+                    _hover={{}}
+                    _active={{
+                      color: "white",
+                      background:
+                        "linear-gradient(93.59deg, #00EAB1 -14.32%, rgba(23, 190, 194, 0.91) 12.24%, rgba(39, 158, 206, 0.65) 35.82%, rgba(61, 116, 221, 0.61) 58.92%, rgba(81, 77, 236, 0.43) 83.94%, #6B1BFF 107.82%)",
+                    }}
+                    disabled={isSubmitted}
+                  >
+                    Regenerate
+                  </Button>
+                </Flex>
+              </Flex>
             </Flex>
           </Flex>
         </Flex>

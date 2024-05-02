@@ -66,7 +66,7 @@ export default function IndividualSlot({ token }) {
     } else {
       setTimeout(() => {
         fetchInitDetails();
-      }, 10000);
+      }, 20000);
     }
   }, [timePassed]);
 

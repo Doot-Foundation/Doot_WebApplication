@@ -12,10 +12,14 @@ export default function Dashboard() {
 
   async function init() {
     if (window && window.mina) {
-      const account = await window.mina.requestAccounts();
-      const network = await window.mina.requestNetwork();
-      setSigner(account[0]);
-      setChain({ chainId: network.chainId, chainName: network.name });
+      try {
+        const account = await window.mina.requestAccounts();
+        const network = await window.mina.requestNetwork();
+        setSigner(account[0]);
+        setChain({ chainId: network.chainId, chainName: network.name });
+      } catch (err) {
+        console.log("USER DENIED THE REQUEST");
+      }
     }
   }
 

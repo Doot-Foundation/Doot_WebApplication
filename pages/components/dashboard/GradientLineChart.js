@@ -42,7 +42,12 @@ export default function GradientLineChart({ calls = {} }) {
             <stop offset="95%" stopColor="#d5bfff" stopOpacity={0} />
           </linearGradient>
         </defs>
-        <Tooltip />
+        <Tooltip
+          contentStyle={{
+            margin: "0",
+            padding: "0 30px 25px 30px",
+          }}
+        />
         <XAxis
           dataKey="month"
           tick={{ fontWeight: "500" }}

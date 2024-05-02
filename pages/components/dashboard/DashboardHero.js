@@ -168,9 +168,7 @@ export default function DashboardHero() {
           </ModalFooter>
         </ModalContent>
       </Modal>
-      <Flex mb={100} minH={600}>
-        {userDetails && <Profile info={userDetails} />}
-      </Flex>
+      <Flex mb={100}>{userDetails && <Profile info={userDetails} />}</Flex>
     </>
   );
 }
