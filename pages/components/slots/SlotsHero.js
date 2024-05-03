@@ -18,7 +18,15 @@ export default function SlotsHero() {
 
   return (
     <>
-      <Flex direction="column" w="1300px" m="0 auto" p={20} pt={11} gap={5}>
+      <Flex
+        direction="column"
+        w="1300px"
+        m="0 auto"
+        p={20}
+        pt={10}
+        gap={5}
+        mb={100}
+      >
         <Heading fontFamily="Montserrat Variable">Slots</Heading>
         <Flex mb={2}>
           <Text fontSize="24px">
@@ -33,7 +41,7 @@ export default function SlotsHero() {
           )}
         </Flex>
         <Collapse fontSize="24px" in={isOpen} animateOpacity>
-          Upon clicking the "Join Consensus" button for a specific coin, you
+          Upon clicking the "Join Consensus" button for a specific token, you
           become an active participant in the consensus process. Your
           involvement enhances the security and decentralization of Doot,
           thereby contributing to its robustness and reliability. This process
@@ -43,9 +51,7 @@ export default function SlotsHero() {
           30-minute span are prioritized when considered for historical
           information. Similarly, slots that have been signed over the most
           within a 2-hour span are given priority when being considered for
-          on-chain inclusion. Additionally, by participating in the consensus,
-          you may be eligible to receive rewards or incentives for your
-          contribution to the network's integrity and sustainability.
+          on-chain inclusion.
         </Collapse>
         <SimpleGrid
           mt={20}

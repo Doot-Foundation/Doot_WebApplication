@@ -1,13 +1,10 @@
 import { Flex, Text, Spacer, Image, Link } from "@chakra-ui/react";
 import axios from "axios";
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 
 import { TOKEN_TO_SYMBOL } from "../../../utils/constants/info";
 
-import { ChainContext } from "../../../lib/context/contexts";
-
 export default function TokenDescriptionBox({ token }) {
-  const { chain } = useContext(ChainContext);
   const src = `/static/tokens/${token}.png`;
 
   const [information, setInformation] = useState(null);
@@ -51,27 +48,22 @@ export default function TokenDescriptionBox({ token }) {
 
   return (
     <>
-      <Link href={linkSource} w={"80%"}>
+      <Link href={linkSource}>
         <Flex
+          borderRadius={10}
           bgColor={"white"}
           color={"black"}
-          borderRadius={10}
-          p={2}
+          align="center"
           w={"100%"}
+          p={5}
+          fontWeight={500}
         >
-          <Flex direction={"row"} p={3} align={"center"} gap={2} w={"80%"}>
+          <Flex direction={"row"} align={"center"} gap={2} w={"80%"}>
             <Image src={src} h={5} w={5} />
-            <Text fontWeight={600}>{TOKEN_TO_SYMBOL[token]} / USD</Text>
+            <Text>{TOKEN_TO_SYMBOL[token]} / USD</Text>
           </Flex>
           <Spacer />
-          <Flex direction={"column"} mr={5} justify={"center"} minW={"10%"}>
-            {normalizedPrice && (
-              <Text fontFamily="Source Code Pro Variable" fontWeight={600}>
-                ${normalizedPrice}
-              </Text>
-            )}
-            <Text>{chain.chainName}</Text>
-          </Flex>
+          {normalizedPrice && <Text>${normalizedPrice}</Text>}
         </Flex>
       </Link>
     </>

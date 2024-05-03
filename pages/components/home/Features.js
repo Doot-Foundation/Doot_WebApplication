@@ -137,9 +137,9 @@ export default function Features() {
                   Trustless
                 </Heading>
                 <Text textAlign={"center"} fontSize={20}>
-                  Leveraging Mina Protocol's ZkProgram, we can prove the
-                  interactions with data providers, thereby eliminating the need
-                  for trust. Everything is hence provable by nature on Doot.
+                  Leveraging ZkProgram by O1JS, we can prove the interactions
+                  with data providers, thereby eliminating the need for trust.
+                  Everything is hence provable by nature on Doot.
                 </Text>
               </InformationCard>
             </Box>

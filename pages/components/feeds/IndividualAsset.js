@@ -37,6 +37,9 @@ export default function IndividualAsset({ token }) {
   const [graphMax, setGraphMax] = useState(null);
 
   const [latest, setLatest] = useState(null);
+  // Representation of above as an array of length 1
+  const [unpinnedLatest, setUnpinnedLatest] = useState(null);
+
   const [ipfsData, setIPFSData] = useState(null);
   const [ipfsLatest, setIPFSLatest] = useState(null);
   const [ipfsHistorical, setIPFSHistorical] = useState(null);
@@ -82,7 +85,11 @@ export default function IndividualAsset({ token }) {
           headers: headers,
         }
       );
+      const immediateArray = new Array();
+      immediateArray.push(response.data.information);
+      setUnpinnedLatest(immediateArray);
       setLatest(response.data.information);
+      // console.log(response.data);
     } catch (error) {
       console.error("Error fetching price:", error);
     }
@@ -154,12 +161,12 @@ export default function IndividualAsset({ token }) {
     return num;
   }
 
-  function mergeAndTransformArrays(latest, historical) {
+  function mergeAndTransformArrays(immediate, latest, historical) {
     let minPrice = Infinity;
     let maxPrice = -Infinity;
 
     // Concatenate the reversed historical array with the latest array
-    const combinedArray = [...historical, ...latest];
+    const combinedArray = [...historical, ...latest, ...immediate];
 
     combinedArray.forEach((item) => {
       const price = normalizePrice(item.price);
@@ -168,9 +175,9 @@ export default function IndividualAsset({ token }) {
     });
 
     const firstHistoricalPrice = parseFloat(historical[0].price);
-    const latestPrice = parseFloat(latest[0].price);
+    const immediatePrice = parseFloat(immediate[0].price);
     const percentageChange =
-      ((latestPrice - firstHistoricalPrice) / firstHistoricalPrice) * 100;
+      ((immediatePrice - firstHistoricalPrice) / firstHistoricalPrice) * 100;
     const formattedPercentageChange =
       percentageChange >= 0
         ? `+${percentageChange.toFixed(2)}%`
@@ -191,10 +198,10 @@ export default function IndividualAsset({ token }) {
   }
 
   useEffect(() => {
-    if (ipfsLatest && ipfsHistorical) {
-      mergeAndTransformArrays(ipfsLatest, ipfsHistorical);
+    if (ipfsLatest && ipfsHistorical && unpinnedLatest) {
+      mergeAndTransformArrays(unpinnedLatest, ipfsLatest, ipfsHistorical);
     }
-  }, [ipfsLatest, ipfsHistorical]);
+  }, [ipfsLatest, ipfsHistorical, unpinnedLatest]);
 
   return (
     <>
@@ -210,7 +217,7 @@ export default function IndividualAsset({ token }) {
             <SlArrowLeft size={"44px"} />
           </Link>
           <Heading fontSize={"3xl"} fontFamily={"Montserrat Variable"} mb={5}>
-            {token} / USD
+            {capitalizeFirstLetter(SYMBOL_TO_TOKEN[token])}
           </Heading>
           <Text mb={14} fontSize={"24px"}>
             The displayed price and data may vary due to conversion.
@@ -223,7 +230,7 @@ export default function IndividualAsset({ token }) {
             direction="column"
             p={10}
           >
-            {ipfsLatest ? (
+            {latest ? (
               <>
                 <Flex pb={10}>
                   <Text
@@ -245,7 +252,7 @@ export default function IndividualAsset({ token }) {
                     fontSize="30px"
                     fontWeight={500}
                   >
-                    $ {normalizePrice(ipfsLatest[0].price)}
+                    $ {normalizePrice(latest.price)}
                   </Text>
                 </Flex>
               </>

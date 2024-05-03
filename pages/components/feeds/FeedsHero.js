@@ -11,7 +11,7 @@ export default function FeedsHero() {
       <Box
         w={1200}
         m="0 auto"
-        mt={0}
+        mb={100}
         borderRadius={20}
         border={"1px solid #8c54ff"}
         background=" linear-gradient(200deg, rgba(140,84,255,0) 0%, rgba(140,84,255,0.2) 100%)"
@@ -19,7 +19,7 @@ export default function FeedsHero() {
         <Flex direction={"column"} m={16} gap={10}>
           <Flex gap={5} direction={"column"}>
             <Heading size={"3xl"} fontFamily={"Montserrat Variable"}>
-              Doot Data Feeds
+              Data Feeds
             </Heading>
             <Text fontSize={"lg"}>
               Explore our range of data feeds available on the Mina Protocol.

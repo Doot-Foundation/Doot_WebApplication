@@ -6,20 +6,22 @@ import {
   Image,
   useToast,
 } from "@chakra-ui/react";
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import { TOKEN_TO_SYMBOL } from "../../../utils/constants/info";
 
-import { SignerContext, ChainContext } from "../../../lib/context/contexts";
 import TimePassed from "./TimePassed";
 
+import { useSelector } from "react-redux";
+
 export default function IndividualSlot({ token }) {
+  const axios = require("axios");
   const key = process.env.NEXT_PUBLIC_API_INTERFACE_KEY;
-  const { signer, setSigner } = useContext(SignerContext);
-  const { setChain } = useContext(ChainContext);
+
+  const signer = useSelector((state) => state.network.signer);
+  const chainName = useSelector((state) => state.network.chainName);
 
   const toast = useToast();
 
-  const axios = require("axios");
   const [result, setResult] = useState(null);
   const [timePassed, setTimePassed] = useState(null);
 
@@ -57,12 +59,16 @@ export default function IndividualSlot({ token }) {
   }, []);
 
   useEffect(() => {
-    if (timePassed != 0) {
+    if (timePassed <= 600) {
       let interval = null;
       interval = setInterval(() => {
         setTimePassed((timePassed) => timePassed + 1);
       }, 1000);
       return () => clearInterval(interval);
+    } else {
+      setTimeout(() => {
+        fetchInitDetails();
+      }, 20000);
     }
   }, [timePassed]);
 
@@ -74,20 +80,8 @@ export default function IndividualSlot({ token }) {
   }
 
   async function handleSign() {
-    if (
-      typeof window !== "undefined" &&
-      window.mina &&
-      result &&
-      result.signature
-    ) {
-      const account = await window.mina.requestAccounts();
-      const network = await window.mina.requestNetwork();
-
-      console.log(account);
-      setSigner(account[0]);
-      setChain({ chainId: network.chainId, chainName: network.name });
-
-      if (!account[0] || !network.chainId) {
+    if (result && result.signature) {
+      if (!signer || !chainName) {
         toast({
           title: "Wallet Not Connected!",
           status: "info",
@@ -110,7 +104,7 @@ export default function IndividualSlot({ token }) {
 
       await axios
         .post(
-          `/api/update/updateLatestTokenSlot?signature=${signedObj}&publicKey=${signer.toString()}&token=${token}`
+          `/api/update/updateLatestTokenSlot?signature=${signedObj}&publicKey=${account.toString()}&token=${token}`
         )
         .then((res) => {
           if (res.data.status == 1) {
@@ -137,6 +131,8 @@ export default function IndividualSlot({ token }) {
     else return "";
   }
 
+  useEffect(() => {}, [timePassed]);
+
   return (
     <>
       <Flex
@@ -155,10 +151,10 @@ export default function IndividualSlot({ token }) {
             {capitalizeFirstLetter(token) + "/" + TOKEN_TO_SYMBOL[token]}
           </Text>
         </Flex>
-        {result && result.signature && !timeLagError && timePassed != 0 ? (
+        {result && result.signature && !timeLagError && timePassed <= 600 ? (
           <>
             <Flex gap={10}>
-              <Flex direction="column" gap={7} w="30%">
+              <Flex direction="column" gap={7} w="35%">
                 <Flex direction="column">
                   <Text fontSize="18px" color="#BFBFBF">
                     Price

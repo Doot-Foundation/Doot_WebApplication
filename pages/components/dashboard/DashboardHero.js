@@ -11,26 +11,23 @@ import {
   useDisclosure,
 } from "@chakra-ui/react";
 
-import { useEffect, useState, useContext } from "react";
-
-import { SignerContext } from "../../../lib/context/contexts";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 import axios from "axios";
 
 import Profile from "./Profile";
+import WalletNotConnected from "./WalletNotConnected";
 
 export default function DashboardHero() {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const key = process.env.NEXT_PUBLIC_API_INTERFACE_KEY;
-  const { signer } = useContext(SignerContext);
 
   const [userStatus, setUserStatus] = useState(null);
   const [userDetails, setUserDetails] = useState(null);
 
-  useEffect(() => {
-    if (signer) checkUserStatus();
-  }, [signer]);
+  const signer = useSelector((state) => state.network.signer);
 
   async function checkUserStatus() {
     try {
@@ -41,6 +38,10 @@ export default function DashboardHero() {
       console.log("Failed Fetching The Status.");
     }
   }
+
+  useEffect(() => {
+    if (signer) checkUserStatus();
+  }, [signer]);
 
   useEffect(() => {
     if (userStatus == 1 && userDetails == null) {
@@ -168,8 +169,8 @@ export default function DashboardHero() {
           </ModalFooter>
         </ModalContent>
       </Modal>
-      <Flex mb={100} minH={600}>
-        {userDetails && <Profile info={userDetails} />}
+      <Flex mb={100}>
+        {userDetails ? <Profile info={userDetails} /> : <WalletNotConnected />}
       </Flex>
     </>
   );
