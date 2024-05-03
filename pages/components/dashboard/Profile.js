@@ -10,10 +10,13 @@ import {
 
 import { TfiKey, TfiUser } from "react-icons/tfi";
 import GradientLineChart from "./GradientLineChart";
-import { SignerContext } from "../../../lib/context/contexts";
-import { useState, useContext } from "react";
+
+import { useState } from "react";
+import { useSelector } from "react-redux";
 
 export default function Profile({ info = {} }) {
+  const signer = useSelector((state) => state.network.signer);
+
   const publicKey = info ? (info.address ? info.address : null) : null;
   const timestamp = info ? (info.created_at ? info.created_at : null) : null;
   const calls =
@@ -21,10 +24,10 @@ export default function Profile({ info = {} }) {
       ? JSON.parse(info.calls)
       : null;
 
-  const { signer } = useContext(SignerContext);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [api, setAPI] = useState(info ? info.generated_key : null);
   const toast = useToast();
+
   const axios = require("axios");
 
   function formatDate(timestamp) {

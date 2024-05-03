@@ -43,10 +43,7 @@ export default function SlotsHero() {
           30-minute span are prioritized when considered for historical
           information. Similarly, slots that have been signed over the most
           within a 2-hour span are given priority when being considered for
-          on-chain inclusion. <br />
-          {/* Additionally, by participating in the consensus, you may be eligible
-          to receive rewards or incentives for your contribution to the
-          network's integrity and sustainability after the mainnet launch. */}
+          on-chain inclusion.
         </Collapse>
         <SimpleGrid
           mt={20}

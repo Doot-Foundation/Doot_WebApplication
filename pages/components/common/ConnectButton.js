@@ -1,25 +1,40 @@
-import { Button, Flex, Image, Box, PseudoBox } from "@chakra-ui/react";
-import { SlArrowDown } from "react-icons/sl";
+import { Button, Flex, Image } from "@chakra-ui/react";
+
+import { useDispatch, useSelector } from "react-redux";
+import { setSigner, setChainId, setChainName } from "../../../lib/redux/slice";
 
 import WalletError from "./WalletError";
 
-import { useState } from "react";
-
-import { useContext } from "react";
-import { SignerContext, ChainContext } from "../../../lib/context/contexts";
+import { useEffect, useState } from "react";
 
 export default function ConnectButton() {
-  const { signer, setSigner } = useContext(SignerContext);
-  const { chain, setChain } = useContext(ChainContext);
+  const dispatch = useDispatch();
+
+  const signer = useSelector((state) => state.network.signer);
+  const chainId = useSelector((state) => state.network.chainId);
+  const chainName = useSelector((state) => state.network.chainName);
 
   const [showWalletPopup, setShowWalletPopup] = useState(false);
 
   if (typeof window === "undefined") {
   } else {
     window.mina?.on("chainChanged", (network) => {
-      setChain({ chainId: network.chainId, chainName: network.name });
+      dispatch(setChainId(network.chainId));
+      dispatch(setChainName(network.name));
     });
   }
+
+  async function handleAutonomousConnection() {
+    const account = await window.mina.requestAccounts();
+    const network = await window.mina.requestNetwork();
+    dispatch(setSigner(account[0]));
+    dispatch(setChainId(network.chainId));
+    dispatch(setChainName(network.name));
+  }
+
+  useEffect(() => {
+    handleAutonomousConnection();
+  }, []);
 
   const handleConnection = async () => {
     if (typeof window.mina == "undefined") {
@@ -27,8 +42,9 @@ export default function ConnectButton() {
     } else {
       const account = await window.mina.requestAccounts();
       const network = await window.mina.requestNetwork();
-      setSigner(account[0]);
-      setChain({ chainId: network.chainId, chainName: network.name });
+      dispatch(setSigner(account[0]));
+      dispatch(setChainId(network.chainId));
+      dispatch(setChainName(network.name));
     }
   };
 
@@ -56,7 +72,7 @@ export default function ConnectButton() {
                 fontWeight="300"
               >
                 <Image src="/static/images/mina.png" h="16px" />
-                {chain.chainName}
+                {chainName}
               </Flex>
             </Button>
             <Button

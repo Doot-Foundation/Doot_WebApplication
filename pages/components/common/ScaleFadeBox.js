@@ -1,4 +1,4 @@
-import { Box, Flex, ScaleFade } from "@chakra-ui/react";
+import { Box, ScaleFade } from "@chakra-ui/react";
 import { useRef, useState, useEffect } from "react";
 
 export default function ScaleFadeBox({ children }) {

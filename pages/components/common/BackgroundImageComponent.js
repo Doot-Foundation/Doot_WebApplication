@@ -5,8 +5,7 @@ export default function BackgroundImageComponent({ children, imageURL }) {
     <>
       <Flex position={"relative"} h={"fit-content"} direction={"column"}>
         <Box
-          h={"100%"}
-          w={"100%"}
+          h={500}
           position={"absolute"}
           top={0}
           left={0}
@@ -17,17 +16,14 @@ export default function BackgroundImageComponent({ children, imageURL }) {
           bgRepeat={"no-repeat"}
         />
         <Box
-          h={"100%"}
-          w={"100%"}
+          h={500}
           zIndex={-1}
           direction={"column"}
           position={"absolute"}
           top={0}
           left={0}
-          background={
-            "linear-gradient(0deg, rgba(7,7,7,1) 0%, rgba(7,7,7,0.9) 30%, rgba(7,7,7,0.8) 50%, rgba(7,7,7,0.9) 80%, rgba(7,7,7,1) 100%);"
-          }
-        />{" "}
+          background="radial-gradient(circle, rgba(23,23,23,0.9) 0%, rgba(23,23,23,1) 100%)"
+        />
         {children}
       </Flex>
     </>

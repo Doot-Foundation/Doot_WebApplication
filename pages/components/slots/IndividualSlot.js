@@ -6,20 +6,22 @@ import {
   Image,
   useToast,
 } from "@chakra-ui/react";
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import { TOKEN_TO_SYMBOL } from "../../../utils/constants/info";
 
-import { SignerContext, ChainContext } from "../../../lib/context/contexts";
 import TimePassed from "./TimePassed";
 
+import { useSelector } from "react-redux";
+
 export default function IndividualSlot({ token }) {
+  const axios = require("axios");
   const key = process.env.NEXT_PUBLIC_API_INTERFACE_KEY;
-  const { signer, setSigner } = useContext(SignerContext);
-  const { setChain } = useContext(ChainContext);
+
+  const signer = useSelector((state) => state.network.signer);
+  const chainName = useSelector((state) => state.network.chainName);
 
   const toast = useToast();
 
-  const axios = require("axios");
   const [result, setResult] = useState(null);
   const [timePassed, setTimePassed] = useState(null);
 
@@ -78,20 +80,8 @@ export default function IndividualSlot({ token }) {
   }
 
   async function handleSign() {
-    if (
-      typeof window !== "undefined" &&
-      window.mina &&
-      result &&
-      result.signature
-    ) {
-      const account = await window.mina.requestAccounts();
-      const network = await window.mina.requestNetwork();
-
-      console.log(account);
-      setSigner(account[0]);
-      setChain({ chainId: network.chainId, chainName: network.name });
-
-      if (!account[0] || !network.chainId) {
+    if (result && result.signature) {
+      if (!signer || !chainName) {
         toast({
           title: "Wallet Not Connected!",
           status: "info",
