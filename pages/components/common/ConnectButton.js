@@ -24,19 +24,7 @@ export default function ConnectButton() {
     });
   }
 
-  async function handleAutonomousConnection() {
-    const account = await window.mina.requestAccounts();
-    const network = await window.mina.requestNetwork();
-    dispatch(setSigner(account[0]));
-    dispatch(setChainId(network.chainId));
-    dispatch(setChainName(network.name));
-  }
-
-  useEffect(() => {
-    handleAutonomousConnection();
-  }, []);
-
-  const handleConnection = async () => {
+  async function handleConnection() {
     if (typeof window.mina == "undefined") {
       setShowWalletPopup(true);
     } else {
@@ -46,7 +34,11 @@ export default function ConnectButton() {
       dispatch(setChainId(network.chainId));
       dispatch(setChainName(network.name));
     }
-  };
+  }
+
+  useEffect(() => {
+    handleConnection();
+  }, []);
 
   const handleCloseWalletPopup = () => {
     setShowWalletPopup(false); // Close the WalletPopup
@@ -105,7 +97,7 @@ export default function ConnectButton() {
                 color="white"
                 _hover={{}}
                 _active={{}}
-                onClick={handleConnection}
+                onClick={() => handleConnection()}
               >
                 Connect
               </Button>
