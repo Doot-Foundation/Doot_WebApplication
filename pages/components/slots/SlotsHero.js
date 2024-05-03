@@ -18,7 +18,15 @@ export default function SlotsHero() {
 
   return (
     <>
-      <Flex direction="column" w="1300px" m="0 auto" p={20} pt={11} gap={5}>
+      <Flex
+        direction="column"
+        w="1300px"
+        m="0 auto"
+        p={20}
+        pt={10}
+        gap={5}
+        mb={100}
+      >
         <Heading fontFamily="Montserrat Variable">Slots</Heading>
         <Flex mb={2}>
           <Text fontSize="24px">

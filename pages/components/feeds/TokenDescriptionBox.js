@@ -1,18 +1,14 @@
 import { Flex, Text, Spacer, Image, Link } from "@chakra-ui/react";
 import axios from "axios";
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 
 import { TOKEN_TO_SYMBOL } from "../../../utils/constants/info";
-
-import { useSelector } from "react-redux";
 
 export default function TokenDescriptionBox({ token }) {
   const src = `/static/tokens/${token}.png`;
 
   const [information, setInformation] = useState(null);
   const [normalizedPrice, setNormalizedPrice] = useState(null);
-
-  const chainName = useSelector((state) => state.network.chainName);
 
   function normalizePrice(str) {
     let num = parseInt(str);
