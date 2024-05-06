@@ -84,7 +84,8 @@ export default function IndividualSlot({ token }) {
       if (!signer || !chainName) {
         toast({
           title: "Wallet Not Connected!",
-          status: "info",
+          status: "error",
+          position: "top",
         });
         return;
       }
@@ -104,7 +105,7 @@ export default function IndividualSlot({ token }) {
 
       await axios
         .post(
-          `/api/update/updateLatestTokenSlot?signature=${signedObj}&publicKey=${account.toString()}&token=${token}`
+          `/api/update/updateLatestTokenSlot?signature=${signedObj}&publicKey=${signer.toString()}&token=${token}`
         )
         .then((res) => {
           if (res.data.status == 1) {

@@ -2,7 +2,6 @@ const {
   TOKEN_TO_CACHE,
   TOKEN_TO_SIGNED_SLOT,
   ORACLE_PUBLIC_KEY,
-  SLOT_STATUS_CACHE,
 } = require("../../../utils/constants/info.js");
 const { redis } = require("../../../utils/helper/InitRedis.js");
 const getPriceOf = require("../../../utils/helper/GetPriceOf.js");
@@ -44,8 +43,6 @@ export default async function handler(req, res) {
 
   const keys = Object.keys(TOKEN_TO_CACHE);
   await startFetchAndUpdates(keys);
-
-  await redis.set(SLOT_STATUS_CACHE, true);
 
   res.status(200).json({
     status: `Updated Prices Successfully!`,
