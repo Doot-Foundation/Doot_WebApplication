@@ -23,22 +23,26 @@ export default function SlotsHero() {
         w="1300px"
         m="0 auto"
         p={20}
-        pt={10}
-        gap={5}
+        pt={0}
         mb={100}
+        gap={5}
       >
-        <Heading fontFamily="Montserrat Variable">Slots</Heading>
-        <Flex mb={2}>
-          <Text fontSize="24px">
-            Participate in this community consensus to support the protocol's
-            decentralization initiative and help strengthen the community. This
-            won't cost any Mina.
-          </Text>
-          {!isOpen ? (
-            <IoIosArrowDown size={50} cursor={"pointer"} onClick={onToggle} />
-          ) : (
-            <IoIosArrowUp size={50} cursor={"pointer"} onClick={onToggle} />
-          )}
+        <Flex direction={"column"} gap="43px">
+          <Heading fontFamily="Montserrat Variable" fontWeight={600}>
+            Slots
+          </Heading>
+          <Flex>
+            <Text fontSize="24px">
+              Participate in this community consensus to support the protocol's
+              decentralization initiative and help strengthen the community.
+              This won't cost any Mina.
+            </Text>
+            {!isOpen ? (
+              <IoIosArrowDown size={50} cursor={"pointer"} onClick={onToggle} />
+            ) : (
+              <IoIosArrowUp size={50} cursor={"pointer"} onClick={onToggle} />
+            )}
+          </Flex>
         </Flex>
         <Collapse fontSize="24px" in={isOpen} animateOpacity>
           Upon clicking the "Join Consensus" button for a specific token, you

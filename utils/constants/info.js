@@ -41,12 +41,28 @@ const TOKEN_TO_SIGNED_SLOT = {
   dogecoin: "doge_latest_slot_cache",
 };
 
-const HISTORICAL_CACHE = "historical_cid";
-const MINA_CACHE = "mina_cid";
-const HISTORICAL_SIGNED_MAX_CACHE = "historical_signed_max";
-const MINA_SIGNED_MAX_CACHE = "mina_signed_max";
+// {
+//    mina_graph_cache -> {graph_data, max_price, min_price, percentage_change }
+//    ...
+// }
+const TOKEN_TO_GRAPH_DATA = {
+  mina: "mina_graph_cache",
+  bitcoin: "btc_graph_cache",
+  ethereum: "eth_graph_cache",
+  solana: "sol_graph_cache",
+  ripple: "xrp_graph_cache",
+  cardano: "ada_graph_cache",
+  avalanche: "avax_graph_cache",
+  polygon: "matic_graph_cache",
+  chainlink: "link_graph_cache",
+  dogecoin: "doge_graph_cache",
+};
 
-const SLOT_STATUS_CACHE = "slot_logic_allowed";
+const HISTORICAL_CACHE = "historical_cid";
+const HISTORICAL_SIGNED_MAX_CACHE = "historical_signed_max";
+
+const MINA_CACHE = "mina_cid";
+const MINA_SIGNED_MAX_CACHE = "mina_signed_max";
 
 const ORACLE_PUBLIC_KEY =
   "B62qjm48BJuzaZmu2wA5YaZeKknkovbx9kDmu8E83jcYsg4sPgTDgPF";
@@ -155,19 +171,19 @@ const SYMBOL_TO_TOKEN = {
 
 module.exports = {
   DOOT_PUBLIC_KEY,
+  ORACLE_PUBLIC_KEY,
+  TOKEN_TO_CACHE,
   TOKEN_TO_SYMBOL,
   TOKEN_TO_SIGNED_SLOT,
+  TOKEN_TO_GRAPH_DATA,
   HISTORICAL_CACHE,
-  MINA_CACHE,
   HISTORICAL_SIGNED_MAX_CACHE,
+  MINA_CACHE,
   MINA_SIGNED_MAX_CACHE,
-  SYMBOL_TO_TOKEN,
   MULTIPLICATION_FACTOR,
-  PROVIDERS,
-  TOKEN_TO_CACHE,
-  SLOT_STATUS_CACHE,
+  SYMBOL_TO_TOKEN,
   SUPPORTED_TOKENS,
-  ORACLE_PUBLIC_KEY,
+  PROVIDERS,
   ENDPOINT_TO_DATA_PROVIDER,
   DATA_PROVIDER_TO_ENDPOINT,
 };

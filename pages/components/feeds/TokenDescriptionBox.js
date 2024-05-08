@@ -3,12 +3,17 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 
 import { TOKEN_TO_SYMBOL } from "../../../utils/constants/info";
+import MiniChartDescriptionBox from "./MiniChartDescriptionBox";
 
 export default function TokenDescriptionBox({ token }) {
   const src = `/static/tokens/${token}.png`;
 
-  const [information, setInformation] = useState(null);
   const [normalizedPrice, setNormalizedPrice] = useState(null);
+  const [direction, setDirection] = useState("+");
+  const [graphData, setGraphData] = useState(null);
+  const [graphMin, setGraphMin] = useState(null);
+  const [graphMax, setGraphMax] = useState(null);
+  const [percentage, setPercentage] = useState("0.00%");
 
   function normalizePrice(str) {
     let num = parseInt(str);
@@ -17,24 +22,32 @@ export default function TokenDescriptionBox({ token }) {
     return num;
   }
 
-  if (information && normalizedPrice == null) {
-    const res = normalizePrice(information.price);
-    setNormalizedPrice(res);
-  }
-
   async function getInformation() {
     try {
       const key = process.env.NEXT_PUBLIC_API_INTERFACE_KEY;
       const headers = {
         Authorization: "Bearer " + key,
       };
-      const response = await axios.get(
+      const priceResponse = await axios.get(
         `/api/get/getPriceInterface?token=${token}`,
         {
           headers: headers,
         }
       );
-      setInformation(response.data.information);
+      const graphResponse = await axios.get(
+        `/api/get/getGraphDataInterface?token=${token}`,
+        {
+          headers: headers,
+        }
+      );
+
+      setGraphData(graphResponse.data.information.graph_data);
+      setGraphMin(graphResponse.data.information.min_price);
+      setGraphMax(graphResponse.data.information.max_price);
+      setPercentage(graphResponse.data.information.percentage_change);
+      setDirection(graphResponse.data.information.percentage_change[0]);
+
+      setNormalizedPrice(normalizePrice(priceResponse.data.information.price));
     } catch (error) {
       console.error("Error fetching price:", error);
     }
@@ -58,12 +71,27 @@ export default function TokenDescriptionBox({ token }) {
           p={5}
           fontWeight={500}
         >
-          <Flex direction={"row"} align={"center"} gap={2} w={"80%"}>
-            <Image src={src} h={5} w={5} />
-            <Text>{TOKEN_TO_SYMBOL[token]} / USD</Text>
+          <Flex direction={"row"} align={"center"} gap={4} w="40%">
+            <Image src={src} h={6} w={6} />
+            <Text fontSize="24px">{TOKEN_TO_SYMBOL[token]} / USD</Text>
+          </Flex>
+          <Flex align="center" justify="center" cursor="pointer">
+            <Text color={direction == "+" ? "green.400" : "red.400"}>
+              {percentage}
+            </Text>
+            <MiniChartDescriptionBox
+              direction={direction}
+              data={graphData}
+              graphMax={graphMax}
+              graphMin={graphMin}
+            />
           </Flex>
           <Spacer />
-          {normalizedPrice && <Text>${normalizedPrice}</Text>}
+          {normalizedPrice && (
+            <Text fontWeight={300} fontSize="24px">
+              ${normalizedPrice}
+            </Text>
+          )}
         </Flex>
       </Link>
     </>

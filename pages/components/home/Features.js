@@ -94,7 +94,7 @@ export default function Features() {
                   w={1200}
                   h={"10px"}
                   borderRadius={"50%"}
-                  background="linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0) 100%)"
+                  background="linear-gradient(90deg, rgba(255,255,255,0) 30%, rgba(255,255,255,0.5) 50%, rgba(255,255,255,0) 70%)"
                 ></Box>
               </Box>
             </Flex>

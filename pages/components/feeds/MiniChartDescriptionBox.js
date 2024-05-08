@@ -1,22 +1,24 @@
 import { ComposedChart, Area, XAxis, YAxis } from "recharts";
-import { Text, Flex } from "@chakra-ui/react";
-export default function NegativeMiniChart({
+import { Flex } from "@chakra-ui/react";
+
+export default function MiniChartDescriptionBox({
+  direction,
   data,
   graphMax,
   graphMin,
-  percentage,
 }) {
   return (
     <>
-      <Flex position="relative">
-        <Text color="red.400" position="absolute">
-          {percentage}
-        </Text>
-        <ComposedChart width={300} height={120} data={data} p={0}>
+      <Flex>
+        <ComposedChart width={200} height={70} data={data} cursor="pointer">
           <defs>
+            <linearGradient id="gradientgreen" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="10%" stopColor="white" stopOpacity={0.2} />
+              <stop offset="90%" stopColor="white" stopOpacity={0} />
+            </linearGradient>
             <linearGradient id="gradientred" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="10%" stopColor="#ff0000" stopOpacity={0.2} />
-              <stop offset="90%" stopColor="#ff0000" stopOpacity={0} />
+              <stop offset="10%" stopColor="white" stopOpacity={0.2} />
+              <stop offset="90%" stopColor="white" stopOpacity={0} />
             </linearGradient>
           </defs>
           <XAxis dataKey="timestamp" tick={false} axisLine={false} />
@@ -29,10 +31,9 @@ export default function NegativeMiniChart({
           <Area
             type="monotone"
             dataKey="price"
-            stroke="red"
+            stroke={direction == "+" ? "#14C67A" : "#ff0000"}
             strokeWidth={2}
-            fillOpacity={1}
-            fill="url(#gradientred)"
+            fillOpacity={0}
             activeDot={{ r: 5 }}
           />
         </ComposedChart>

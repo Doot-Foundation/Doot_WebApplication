@@ -202,37 +202,37 @@ export default function HomeHero() {
               _hover={{}}
             >
               <Flex
+                w="224px"
+                h="67px"
                 position="relative"
+                p="4px 2px"
                 justify="center"
                 align="center"
                 borderRadius="100px"
-                p="4px"
                 overflow="hidden"
               >
                 <Box
                   position="absolute"
-                  top={0}
-                  h={"100%"}
-                  w={"100%"}
-                  background="linear-gradient(90deg, rgba(107,27,255,1) 0%, rgba(73,68,180,0) 35%, rgba(5,130,85,0) 50%, rgba(2,210,114,0) 65%, rgba(12,225,174,1) 100%)"
-                  animation={`${spin} 3s infinite ease-out`}
+                  h={"600%"}
+                  w={"150%"}
+                  backgroundImage="linear-gradient(228.09deg, #5E5EE5 -9.95%, rgba(129, 129, 222, 0.8) 12.47%, rgba(94, 94, 229, 0.62) 30.87%, rgba(28, 25, 26, 0.89) 53.87%, rgba(68, 220, 183, 0.65) 70.34%, #00EAB1 100.44%)"
+                  animation={`${spin} 3s infinite linear`}
                 />
                 <Button
-                  p={"30px 53px"}
-                  alignItems={"center"}
-                  justifyItems={"center"}
-                  gap={2}
-                  transition={"0.2s"}
-                  _active={{}}
-                  _hover={{}}
-                  background="#202020"
                   borderRadius="100px"
-                  fontSize={"20px"}
+                  _hover={{}}
+                  _active={{}}
+                  bgColor="#171717"
+                  color="white"
+                  h="100%"
+                  w="100%"
+                  fontFamily={"Poppins"}
+                  onClick={sendEmail}
                 >
-                  <Image src="/static/images/stars.png" alt="Stars" />
-                  <Text color="white" fontWeight={"700"}>
+                  <Flex gap={2} justify="center" align="center">
+                    <Image src="/static/images/stars.png" />
                     Learn More
-                  </Text>
+                  </Flex>
                 </Button>
               </Flex>
             </Link>

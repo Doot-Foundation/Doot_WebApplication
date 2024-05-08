@@ -117,7 +117,15 @@ export default function VerifyHero() {
 
   return (
     <>
-      <Flex direction="column" maxW="1120" margin="0 auto" gap={28} mb={200}>
+      <Flex
+        direction="column"
+        w="1300px"
+        margin="0 auto"
+        p={20}
+        pt={0}
+        gap={20}
+        mb={100}
+      >
         <Flex direction={"column"} gap="43px">
           <Heading fontFamily={"Montserrat Variable"} fontWeight={600}>
             Oracle Signature Verification
