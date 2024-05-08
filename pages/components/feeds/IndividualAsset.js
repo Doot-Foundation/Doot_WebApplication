@@ -16,11 +16,10 @@ import {
 
 import { SlArrowDown, SlArrowLeft } from "react-icons/sl";
 
-import HistoricalTable from "./HistoricalTable";
 import PriceGraph from "./PriceGraph";
+import MiniChart from "./MiniChart";
+import HistoricalTable from "./HistoricalTable";
 import MarqueeDataProviders from "./MarqueeDataProviders";
-import PositiveMiniChart from "./PositiveMiniChart";
-import NegativeMiniChart from "./NegativeMiniChart";
 
 export default function IndividualAsset({ token }) {
   if (!token) {
@@ -30,15 +29,13 @@ export default function IndividualAsset({ token }) {
   const axios = require("axios");
   const GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
 
-  const [percentage, setPercentage] = useState("0.00%");
-  const [net, setNet] = useState("+");
+  const [direction, setDirection] = useState("+");
   const [graphData, setGraphData] = useState(null);
   const [graphMin, setGraphMin] = useState(null);
   const [graphMax, setGraphMax] = useState(null);
+  const [percentage, setPercentage] = useState("0.00%");
 
   const [latest, setLatest] = useState(null);
-  // Representation of above as an array of length 1
-  const [unpinnedLatest, setUnpinnedLatest] = useState(null);
 
   const [ipfsData, setIPFSData] = useState(null);
   const [ipfsLatest, setIPFSLatest] = useState(null);
@@ -47,6 +44,20 @@ export default function IndividualAsset({ token }) {
   const toast = useToast();
 
   const providers = Object.keys(ENDPOINT_TO_DATA_PROVIDER);
+
+  const src = `/static/slot_token/${SYMBOL_TO_TOKEN[token]}.png`;
+
+  function capitalizeFirstLetter(word) {
+    if (word) return word.charAt(0).toUpperCase() + word.slice(1);
+    else return "";
+  }
+
+  function normalizePrice(str) {
+    let num = parseInt(str);
+    num = num / Math.pow(10, 10);
+    num = Math.round(num * 100) / 100;
+    return num;
+  }
 
   async function produceHistoricalForToken(historicalObj) {
     const tokenHistoricalArray = [];
@@ -62,38 +73,17 @@ export default function IndividualAsset({ token }) {
 
     setIPFSHistorical(tokenHistoricalArray);
   }
-  function capitalizeFirstLetter(word) {
-    if (word) return word.charAt(0).toUpperCase() + word.slice(1);
-    else return "";
-  }
-  function normalizePrice(str) {
-    let num = parseInt(str);
-    num = num / Math.pow(10, 10);
-    num = Math.round(num * 100) / 100;
-    return num;
-  }
 
-  async function getInformation() {
-    try {
-      const key = process.env.NEXT_PUBLIC_API_INTERFACE_KEY;
-      const headers = {
-        Authorization: "Bearer " + key,
-      };
-      const response = await axios.get(
-        `/api/get/getPriceInterface?token=${SYMBOL_TO_TOKEN[token]}`,
-        {
-          headers: headers,
-        }
-      );
-      const immediateArray = new Array();
-      immediateArray.push(response.data.information);
-      setUnpinnedLatest(immediateArray);
-      setLatest(response.data.information);
-      // console.log(response.data);
-    } catch (error) {
-      console.error("Error fetching price:", error);
+  useEffect(() => {
+    if (ipfsData) {
+      const toPush = ipfsData.latest.prices[SYMBOL_TO_TOKEN[token]];
+      const arr = new Array();
+      arr.push(toPush);
+
+      setIPFSLatest(arr);
+      produceHistoricalForToken(ipfsData.historical);
     }
-  }
+  }, [ipfsData]);
 
   async function getCID() {
     const response = await axios.get("/api/get/getLatestCID");
@@ -105,6 +95,37 @@ export default function IndividualAsset({ token }) {
     } catch (err) {
       const ipfsData = await axios.get(`https://ipfs.io/ipfs/${cid}`);
       setIPFSData(ipfsData.data);
+    }
+  }
+
+  async function getInformation() {
+    try {
+      const key = process.env.NEXT_PUBLIC_API_INTERFACE_KEY;
+      const headers = {
+        Authorization: "Bearer " + key,
+      };
+      const priceResponse = await axios.get(
+        `/api/get/getPriceInterface?token=${SYMBOL_TO_TOKEN[token]}`,
+        {
+          headers: headers,
+        }
+      );
+      const graphResponse = await axios.get(
+        `/api/get/getGraphDataInterface?token=${SYMBOL_TO_TOKEN[token]}`,
+        {
+          headers: headers,
+        }
+      );
+
+      setGraphData(graphResponse.data.information.graph_data);
+      setGraphMin(graphResponse.data.information.min_price);
+      setGraphMax(graphResponse.data.information.max_price);
+      setPercentage(graphResponse.data.information.percentage_change);
+      setDirection(graphResponse.data.information.percentage_change[0]);
+
+      setLatest(priceResponse.data.information);
+    } catch (error) {
+      console.error("Error fetching price:", error);
     }
   }
 
@@ -121,6 +142,7 @@ export default function IndividualAsset({ token }) {
       console.error("Failed to copy text: ", err);
     }
   };
+
   const handleCopyPublicKey = async () => {
     try {
       await navigator.clipboard.writeText(latest.signature.publicKey);
@@ -140,78 +162,10 @@ export default function IndividualAsset({ token }) {
     getCID();
   }, []);
 
-  useEffect(() => {
-    if (ipfsData) {
-      const toPush = ipfsData.latest.prices[SYMBOL_TO_TOKEN[token]];
-      // toPush.timestamp = ipfsData.latest.timestamp.toString();
-      const latestArr = new Array();
-      latestArr.push(toPush);
-
-      setIPFSLatest(latestArr);
-      produceHistoricalForToken(ipfsData.historical);
-    }
-  }, [ipfsData]);
-
-  const src = `/static/slot_token/${SYMBOL_TO_TOKEN[token]}.png`;
-
-  function normalizePrice(str) {
-    let num = parseInt(str);
-    num = num / Math.pow(10, 10);
-    num = Math.round(num * 100) / 100;
-    return num;
-  }
-
-  function mergeAndTransformArrays(immediate, latest, historical) {
-    let minPrice = Infinity;
-    let maxPrice = -Infinity;
-
-    // Concatenate the reversed historical array with the latest array
-    const combinedArray = [...historical, ...latest, ...immediate];
-
-    combinedArray.forEach((item) => {
-      const price = normalizePrice(item.price);
-      minPrice = Math.min(minPrice, price);
-      maxPrice = Math.max(maxPrice, price);
-    });
-
-    const firstHistoricalPrice = parseFloat(historical[0].price);
-    const immediatePrice = parseFloat(immediate[0].price);
-    const percentageChange =
-      ((immediatePrice - firstHistoricalPrice) / firstHistoricalPrice) * 100;
-    const formattedPercentageChange =
-      percentageChange >= 0
-        ? `+${percentageChange.toFixed(2)}%`
-        : `${percentageChange.toFixed(2)}%`;
-
-    setPercentage(formattedPercentageChange);
-    setNet(percentageChange >= 0 ? "+" : "-");
-
-    // Map over the combined array to create a new array of objects
-    const finalArray = combinedArray.map((item) => ({
-      timestamp: item.aggregationTimestamp,
-      price: normalizePrice(item.price),
-    }));
-
-    setGraphData(finalArray);
-    setGraphMax(maxPrice);
-    setGraphMin(minPrice);
-  }
-
-  useEffect(() => {
-    if (ipfsLatest && ipfsHistorical && unpinnedLatest) {
-      mergeAndTransformArrays(unpinnedLatest, ipfsLatest, ipfsHistorical);
-    }
-  }, [ipfsLatest, ipfsHistorical, unpinnedLatest]);
-
   return (
     <>
-      <Flex
-        margin="0 auto"
-        direction="column"
-        gap={32}
-        align="center"
-        maxW="1200px"
-      >
+      <Flex direction="column" gap={32} align="center" w={1200} margin="0 auto">
+        {/* top-graph */}
         <Flex direction={"column"} minH={"100%"} minW={"100%"}>
           <Link href="/feeds" w="fit-content" mb={10}>
             <SlArrowLeft size={"44px"} />
@@ -220,7 +174,7 @@ export default function IndividualAsset({ token }) {
             {capitalizeFirstLetter(SYMBOL_TO_TOKEN[token])}
           </Heading>
           <Text mb={14} fontSize={"24px"}>
-            The displayed price and data may vary due to conversion.
+            (The displayed price and data may vary due to conversion.)
           </Text>
           <Flex
             h="455px"
@@ -267,6 +221,7 @@ export default function IndividualAsset({ token }) {
             )}
           </Flex>
         </Flex>
+        {/* providers */}
         <Flex w="100%" direction="column" align="center">
           <Heading
             fontFamily="Montserrat Variable"
@@ -281,6 +236,7 @@ export default function IndividualAsset({ token }) {
             <MarqueeDataProviders providers={providers} />
           </Box>
         </Flex>
+        {/* stats card */}
         <Flex
           direction="column"
           bgColor="#202020"
@@ -302,24 +258,23 @@ export default function IndividualAsset({ token }) {
               </Flex>
             </Flex>
             <Spacer />
-            {percentage && net && graphData && (
-              <Box>
-                {net == "+" ? (
-                  <PositiveMiniChart
-                    data={graphData}
-                    graphMax={graphMax}
-                    graphMin={graphMin}
-                    percentage={percentage}
-                  />
-                ) : (
-                  <NegativeMiniChart
-                    data={graphData}
-                    graphMax={graphMax}
-                    graphMin={graphMin}
-                    percentage={percentage}
-                  />
-                )}
-              </Box>
+            {percentage && direction && graphData && (
+              <Flex position="relative">
+                <Text
+                  position="absolute"
+                  color={direction == "+" ? "green.400" : "red.400"}
+                  left={-3}
+                >
+                  {percentage}
+                </Text>
+                <MiniChart
+                  direction={direction}
+                  data={graphData}
+                  graphMax={graphMax}
+                  graphMin={graphMin}
+                  percentage={percentage}
+                />
+              </Flex>
             )}
           </Flex>
           {latest ? (
@@ -419,16 +374,16 @@ export default function IndividualAsset({ token }) {
         {/* historical */}
         <Flex
           direction={"column"}
-          p={10}
           gap={5}
           align="center"
           justify="center"
+          mb={100}
         >
-          <Flex direction="column" w="1380px">
+          <Flex direction="column" align="center">
             <Heading textAlign="left" fontFamily={"Montserrat Variable"}>
               Historical Information
             </Heading>
-            <Text pb={5} mb={5} fontSize={"sm"}>
+            <Text pb={5} fontSize={"sm"}>
               (The prices are precise upto the 10th decimal)
             </Text>
           </Flex>

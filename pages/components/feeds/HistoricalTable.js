@@ -63,8 +63,9 @@ export default function HistoricalTable({ ipfsHistorical, ipfsLatest }) {
         p={5}
         bgcolor={"white"}
         color={"black"}
-        borderRadius={20}
-        width={"60%"}
+        borderRadius={10}
+        overflow="hidden"
+        border="none"
       >
         <Thead>
           <Tr>
@@ -84,7 +85,7 @@ export default function HistoricalTable({ ipfsHistorical, ipfsLatest }) {
             <Th>Timestamp</Th>
           </Tr>
         </Thead>
-        <Tbody>
+        <Tbody border={"none"} borderRadius={20} overflow="hidden">
           {Array.isArray(ipfsHistorical) &&
             Array.isArray(ipfsLatest) &&
             [...ipfsLatest, ...ipfsHistorical].map((item, key) => {
@@ -101,8 +102,8 @@ export default function HistoricalTable({ ipfsHistorical, ipfsLatest }) {
                 const limit = timestamps.length;
 
                 return Array.from({ length: limit }).map((_, x) => (
-                  <Tr key={`${key}-${x}`} fontFamily={"Manrope Variable"} p={2}>
-                    <Td>{key + 1}</Td>
+                  <Tr key={`${key}-${x}`} p={2} borderRadius={20}>
+                    <Td>{x == 0 ? key + 1 : ""}</Td>
                     <Td
                       _hover={{ cursor: "pointer" }}
                       onClick={() => handleCopy(collectiveSignature)}
