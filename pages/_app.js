@@ -12,8 +12,6 @@ import "@fontsource/poppins/900.css";
 
 import { Provider } from "react-redux";
 import { store } from "../lib/redux/store";
-import Header from "./components/common/Header";
-import Footer from "./components/common/Footer";
 
 export default function App({ Component, pageProps }) {
   const theme = extendTheme({
@@ -35,9 +33,7 @@ export default function App({ Component, pageProps }) {
           <title>Doot</title>
         </Head>
         <ChakraProvider theme={theme}>
-          <Header />
           <Component {...pageProps} />
-          <Footer />
         </ChakraProvider>
       </Provider>
     </>
