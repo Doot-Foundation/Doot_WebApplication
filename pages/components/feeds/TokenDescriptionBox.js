@@ -6,7 +6,7 @@ import { TOKEN_TO_SYMBOL } from "../../../utils/constants/info";
 import MiniChartDescriptionBox from "./MiniChartDescriptionBox";
 
 export default function TokenDescriptionBox({ token }) {
-  const src = `/static/tokens/${token}.png`;
+  const src = `/static/slot_token/${token}.png`;
 
   const [normalizedPrice, setNormalizedPrice] = useState(null);
   const [direction, setDirection] = useState("+");
@@ -72,8 +72,10 @@ export default function TokenDescriptionBox({ token }) {
           fontWeight={500}
         >
           <Flex direction={"row"} align={"center"} gap={4} w="40%">
-            <Image src={src} h={6} w={6} />
-            <Text fontSize="24px">{TOKEN_TO_SYMBOL[token]} / USD</Text>
+            <Image src={src} h={7} w={7} />
+            <Text fontSize="22px" fontFamily="Montserrat Variable">
+              {TOKEN_TO_SYMBOL[token]} / USD
+            </Text>
           </Flex>
           <Flex align="center" justify="center" cursor="pointer">
             <Text color={direction == "+" ? "green.400" : "red.400"}>
@@ -88,9 +90,15 @@ export default function TokenDescriptionBox({ token }) {
           </Flex>
           <Spacer />
           {normalizedPrice && (
-            <Text fontWeight={300} fontSize="24px">
-              ${normalizedPrice}
-            </Text>
+            <Flex w="15%">
+              <Text
+                fontFamily="Montserrat Variable"
+                letterSpacing="2px"
+                fontSize="22px"
+              >
+                ${normalizedPrice}
+              </Text>
+            </Flex>
           )}
         </Flex>
       </Link>

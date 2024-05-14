@@ -91,8 +91,8 @@ export default function ConnectButton() {
               background="linear-gradient(93.59deg, #00EAB1 -14.32%, rgba(23, 190, 194, 0.91) 12.24%, rgba(39, 158, 206, 0.65) 35.82%, rgba(61, 116, 221, 0.61) 58.92%, rgba(81, 77, 236, 0.43) 83.94%, #6B1BFF 107.82%)"
             >
               <Button
-                w="98%"
-                h="95%"
+                w="96%"
+                h="90%"
                 bg="#171717" // Ensure the button's background is transparent
                 color="white"
                 _hover={{}}
