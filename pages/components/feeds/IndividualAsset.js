@@ -329,8 +329,27 @@ export default function IndividualAsset({ token }) {
                     <Text fontSize="16px">{latest.signature.data}</Text>
                   </Flex>
                 </Flex>
-                <Flex ml={6} w="50%" direction="column" gap={12}>
-                  <Flex direction={"column"} mt={10} gap={2}>
+                <Flex ml={6} w="50%" direction="column" gap={8}>
+                  <Flex direction={"column"} gap={2}>
+                    <Text
+                      fontFamily={"Montserrat Variable"}
+                      fontWeight={400}
+                      fontSize="18px"
+                    >
+                      Providers
+                    </Text>
+                    <Text
+                      onClick={handleCopySignature}
+                      fontSize={"16px"}
+                      _hover={{
+                        cursor: "pointer",
+                      }}
+                    >
+                      {latest.signatures.length} / 13
+                    </Text>
+                  </Flex>
+
+                  <Flex direction={"column"} gap={2}>
                     <Text
                       fontFamily={"Montserrat Variable"}
                       fontWeight={400}

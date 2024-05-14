@@ -187,10 +187,16 @@ export default function IndividualSlot({ token }) {
               <Flex
                 direction="column"
                 w="60%"
-                gap={7}
+                gap={5}
                 borderLeft="1px solid white"
                 pl={10}
               >
+                <Flex direction="column">
+                  <Text color="#BFBFBF" fontSize="18px">
+                    Providers
+                  </Text>
+                  <Text fontSize="16px">{result.signatures.length} / 13</Text>
+                </Flex>
                 <Flex direction="column">
                   <Text color="#BFBFBF" fontSize="18px">
                     Sign
