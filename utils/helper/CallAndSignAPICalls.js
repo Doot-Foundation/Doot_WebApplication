@@ -67,8 +67,6 @@ async function callSignAPICall(url, resultPath, headerName) {
     ORACLE_KEY
   );
 
-  /// The data field is a BigInt and it gives TypeError: Do not know how to serialize a BigInt
-  /// at JSON.stringify (<anonymous>) when passing the final result as the response.
   var JsonCompatibleSignature = {};
   JsonCompatibleSignature["signature"] = signature.signature;
   JsonCompatibleSignature["publicKey"] = signature.publicKey;
