@@ -332,6 +332,7 @@ export default function IndividualAsset({ token }) {
                 <Flex ml={6} w="50%" direction="column" gap={8}>
                   <Flex direction={"column"} gap={2}>
                     <Text
+                      color="#BFBFBF"
                       fontFamily={"Montserrat Variable"}
                       fontWeight={400}
                       fontSize="18px"
@@ -351,6 +352,7 @@ export default function IndividualAsset({ token }) {
 
                   <Flex direction={"column"} gap={2}>
                     <Text
+                      color="#BFBFBF"
                       fontFamily={"Montserrat Variable"}
                       fontWeight={400}
                       fontSize="18px"
@@ -367,9 +369,10 @@ export default function IndividualAsset({ token }) {
                       {latest.signature.signature}
                     </Text>
                   </Flex>
-                  <Flex direction={"column"}>
+                  <Flex direction={"column"} gap={2}>
                     <Text
                       fontFamily={"Montserrat Variable"}
+                      color="#BFBFBF"
                       fontWeight={400}
                       fontSize="18px"
                     >
