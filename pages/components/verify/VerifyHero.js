@@ -50,15 +50,12 @@ export default function VerifyHero() {
       return;
     }
 
-    console.log(price, signature);
-
     if (!url && !timestamp && !mode) {
       const apiEndpoint_1 = `/api/verify/verifyAggregated?price=${price}&signature=${signature}`;
       try {
         const response = await axios.post(apiEndpoint_1);
 
         const status = response.data.status;
-        console.log(status);
         if (status == 1)
           toast({
             title: "Verified Successfully!",
@@ -78,6 +75,7 @@ export default function VerifyHero() {
           });
         setIsSubmitting(false);
       } catch (error) {
+        setIsSubmitting(false);
         console.error(error);
       }
     } else {
@@ -91,7 +89,6 @@ export default function VerifyHero() {
       try {
         const response = await axios.post(apiEndpoint_2);
         const status = response.data.status;
-        console.log(status);
         if (status == 1)
           toast({
             title: "Verified Successfully!",
@@ -109,7 +106,10 @@ export default function VerifyHero() {
             status: "error",
             position: "top",
           });
+
+        setIsSubmitting(false);
       } catch (error) {
+        setIsSubmitting(false);
         console.error(error);
       }
     }
