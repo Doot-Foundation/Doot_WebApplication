@@ -282,7 +282,6 @@ function getMAD(array) {
   return getMedian(deviations);
 }
 
-// MODIFIED Z-SCORE OUTLIER MECHANISM
 async function removeOutliers(array, timestamps, signatures, urls, threshold) {
   const median = getMedian(array);
   const mad = getMAD(array);

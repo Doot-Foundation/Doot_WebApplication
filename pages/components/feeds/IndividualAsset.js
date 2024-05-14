@@ -339,13 +339,7 @@ export default function IndividualAsset({ token }) {
                     >
                       Providers
                     </Text>
-                    <Text
-                      onClick={handleCopySignature}
-                      fontSize={"16px"}
-                      _hover={{
-                        cursor: "pointer",
-                      }}
-                    >
+                    <Text fontSize={"16px"}>
                       {latest.signatures.length} / 13
                     </Text>
                   </Flex>

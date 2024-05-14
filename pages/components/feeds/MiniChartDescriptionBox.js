@@ -9,8 +9,14 @@ export default function MiniChartDescriptionBox({
 }) {
   return (
     <>
-      <Flex>
-        <ComposedChart width={200} height={70} data={data} cursor="pointer">
+      <Flex ml="-10">
+        <ComposedChart
+          width={200}
+          height={50}
+          data={data}
+          cursor="pointer"
+          position="absolute"
+        >
           <defs>
             <linearGradient id="gradientgreen" x1="0" y1="0" x2="0" y2="1">
               <stop offset="10%" stopColor="white" stopOpacity={0.2} />
@@ -21,7 +27,6 @@ export default function MiniChartDescriptionBox({
               <stop offset="90%" stopColor="white" stopOpacity={0} />
             </linearGradient>
           </defs>
-          <XAxis dataKey="timestamp" tick={false} axisLine={false} />
           <YAxis
             dataKey="price"
             axisLine={false}
