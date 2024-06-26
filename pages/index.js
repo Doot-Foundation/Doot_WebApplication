@@ -13,7 +13,7 @@ export default function Home() {
   return (
     <>
       <HomeLayout>
-        <Header />
+        {/* <Header /> */}
         <HomeHero />
         <Footer />
       </HomeLayout>

@@ -17,13 +17,16 @@ export default function ConnectButton() {
 
   if (typeof window === "undefined") {
   } else {
+    window.mina?.on("accountsChanged", (accounts) => {
+      dispatch(setSigner(accounts[0]));
+    });
+
     window.mina?.on("chainChanged", (network) => {
       let chName = network.networkID;
       chName = chName.split(":");
       chName = chName[1];
       chName = chName.toUpperCase();
 
-      // dispatch(setChainId(network.chainId));
       dispatch(setChainName(chName));
     });
   }
@@ -32,17 +35,18 @@ export default function ConnectButton() {
     if (typeof window.mina == "undefined") {
       setShowWalletPopup(true);
     } else {
-      const account = await window.mina.requestAccounts();
-      const network = await window.mina.requestNetwork();
+      if (!signer) {
+        const accounts = await window.mina.requestAccounts();
+        const network = await window.mina.requestNetwork();
 
-      let chName = network.networkID;
-      chName = chName.split(":");
-      chName = chName[1];
-      chName = chName.toUpperCase();
+        let chName = network.networkID;
+        chName = chName.split(":");
+        chName = chName[1];
+        chName = chName[0].toUpperCase() + chName.slice(1);
 
-      dispatch(setSigner(account[0]));
-      // dispatch(setChainId(network.chainId));
-      dispatch(setChainName(chName));
+        dispatch(setSigner(accounts[0]));
+        dispatch(setChainName(chName));
+      }
     }
   }
 
@@ -71,7 +75,7 @@ export default function ConnectButton() {
                 justify={"center"}
                 align={"center"}
                 gap={2}
-                fontWeight="300"
+                fontWeight="200"
               >
                 <Image src="/static/images/mina.png" h="16px" />
                 {chainName}

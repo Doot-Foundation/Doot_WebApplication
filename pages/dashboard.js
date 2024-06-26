@@ -7,7 +7,7 @@ export default function Dashboard() {
   return (
     <>
       <DashboardLayout>
-        <Header />
+        {/* <Header /> */}
         <DashboardHero />
         <Footer />
       </DashboardLayout>
