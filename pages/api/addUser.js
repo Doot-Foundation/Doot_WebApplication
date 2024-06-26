@@ -23,7 +23,7 @@ export default async function handler(req, res) {
     .select("address")
     .eq("address", address);
 
-  if (select_data.length != 0) {
+  if (select_data != null && select_data.length != 0) {
     await supabase.auth.signOut();
     res.status(200).json({ message: "Already Exists." });
     return;

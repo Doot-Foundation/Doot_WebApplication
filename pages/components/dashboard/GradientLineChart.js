@@ -22,20 +22,26 @@ export default function GradientLineChart({ calls = {} }) {
 
       for (let i = 0; i <= currentMonth; i++) {
         const month = months[i];
-        if (json[month]) {
-          result.push({ month, count: json[month] });
-        }
+        // if (json[month]) {
+        result.push({ month, count: json[month] });
+        // }
       }
       return result;
     }
     return [];
   }
 
+  console.log(calls);
   const data = transformJsonToArray(calls);
 
   return (
     <>
-      <ComposedChart width={940} height={300} data={data}>
+      <ComposedChart
+        width={940}
+        height={300}
+        data={data}
+        margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
+      >
         <defs>
           <linearGradient id="gradient" x1="0" y1="0" x2="0" y2="1">
             <stop offset="5%" stopColor="#d5bfff" stopOpacity={0.4} />
@@ -50,14 +56,15 @@ export default function GradientLineChart({ calls = {} }) {
         />
         <XAxis
           dataKey="month"
-          tick={{ fontWeight: "500" }}
+          tick={{ fontWeight: "700", dy: 15 }}
           axisLine={false}
           tickLine={false}
         />
         <YAxis
-          tickFormatter={(value) => (value === 0 ? "" : Math.round(value))}
+          // tickFormatter={(value) => (value === 0 ? "" : Math.round(value))}
+          tickFormatter={(value) => Math.round(value)}
           dataKey="count"
-          tick={{ fontWeight: "500" }}
+          tick={{ fontWeight: "500", dx: -10 }}
           tickLine={false}
           axisLine={false}
         />

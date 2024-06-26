@@ -1,7 +1,7 @@
 import { Button, Flex, Image } from "@chakra-ui/react";
 
 import { useDispatch, useSelector } from "react-redux";
-import { setSigner, setChainId, setChainName } from "../../../lib/redux/slice";
+import { setSigner, setChainName } from "../../../lib/redux/slice";
 
 import WalletError from "./WalletError";
 
@@ -11,7 +11,6 @@ export default function ConnectButton() {
   const dispatch = useDispatch();
 
   const signer = useSelector((state) => state.network.signer);
-  const chainId = useSelector((state) => state.network.chainId);
   const chainName = useSelector((state) => state.network.chainName);
 
   const [showWalletPopup, setShowWalletPopup] = useState(false);
@@ -19,8 +18,13 @@ export default function ConnectButton() {
   if (typeof window === "undefined") {
   } else {
     window.mina?.on("chainChanged", (network) => {
-      dispatch(setChainId(network.chainId));
-      dispatch(setChainName(network.name));
+      let chName = network.networkID;
+      chName = chName.split(":");
+      chName = chName[1];
+      chName = chName.toUpperCase();
+
+      // dispatch(setChainId(network.chainId));
+      dispatch(setChainName(chName));
     });
   }
 
@@ -30,9 +34,15 @@ export default function ConnectButton() {
     } else {
       const account = await window.mina.requestAccounts();
       const network = await window.mina.requestNetwork();
+
+      let chName = network.networkID;
+      chName = chName.split(":");
+      chName = chName[1];
+      chName = chName.toUpperCase();
+
       dispatch(setSigner(account[0]));
-      dispatch(setChainId(network.chainId));
-      dispatch(setChainName(network.name));
+      // dispatch(setChainId(network.chainId));
+      dispatch(setChainName(chName));
     }
   }
 

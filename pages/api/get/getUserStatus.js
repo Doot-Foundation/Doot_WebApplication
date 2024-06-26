@@ -18,7 +18,7 @@ export default async function handler(req, res) {
 
   await supabase.auth.signOut();
 
-  if (select_data.length != 0) {
+  if (select_data != null && select_data.length != 0) {
     return res
       .status(200)
       .json({ status_message: "Address_Exists", status: 1 });

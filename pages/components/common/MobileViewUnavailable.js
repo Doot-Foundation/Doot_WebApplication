@@ -1,6 +1,21 @@
+import React, { useState, useEffect } from "react";
 import { Image, Heading, Flex, Text } from "@chakra-ui/react";
 
 export default function MobileViewUnavailable() {
+  const [isContentVisible, setIsContentVisible] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsContentVisible(true);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (!isContentVisible) {
+    return null;
+  }
+
   return (
     <>
       <Flex
