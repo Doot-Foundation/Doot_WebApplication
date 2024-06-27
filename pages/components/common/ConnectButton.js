@@ -1,7 +1,7 @@
 import { Button, Flex, Image } from "@chakra-ui/react";
 
 import { useDispatch, useSelector } from "react-redux";
-import { setSigner, setChainId, setChainName } from "../../../lib/redux/slice";
+import { setSigner, setChainName } from "../../../lib/redux/slice";
 
 import WalletError from "./WalletError";
 
@@ -11,16 +11,27 @@ export default function ConnectButton() {
   const dispatch = useDispatch();
 
   const signer = useSelector((state) => state.network.signer);
-  const chainId = useSelector((state) => state.network.chainId);
   const chainName = useSelector((state) => state.network.chainName);
 
   const [showWalletPopup, setShowWalletPopup] = useState(false);
 
   if (typeof window === "undefined") {
   } else {
+    window.mina?.on("accountsChanged", (accounts) => {
+      localStorage.clear();
+
+      localStorage.setItem("signer", accounts[0]);
+
+      dispatch(setSigner(accounts[0]));
+    });
+
     window.mina?.on("chainChanged", (network) => {
-      dispatch(setChainId(network.chainId));
-      dispatch(setChainName(network.name));
+      let chName = network.networkID;
+      chName = chName.split(":");
+      chName = chName[1];
+      chName = chName.toUpperCase();
+
+      dispatch(setChainName(chName));
     });
   }
 
@@ -28,16 +39,27 @@ export default function ConnectButton() {
     if (typeof window.mina == "undefined") {
       setShowWalletPopup(true);
     } else {
-      const account = await window.mina.requestAccounts();
-      const network = await window.mina.requestNetwork();
-      dispatch(setSigner(account[0]));
-      dispatch(setChainId(network.chainId));
-      dispatch(setChainName(network.name));
+      if (!signer) {
+        const accounts = await window.mina.requestAccounts();
+        const network = await window.mina.requestNetwork();
+
+        let chName = network.networkID;
+        chName = chName.split(":");
+        chName = chName[1];
+        chName = chName[0].toUpperCase() + chName.slice(1);
+
+        localStorage.setItem("signer", accounts[0]);
+
+        dispatch(setSigner(accounts[0]));
+        dispatch(setChainName(chName));
+      }
     }
   }
 
   useEffect(() => {
-    handleConnection();
+    const sign = localStorage.getItem("signer");
+
+    if (sign != "undefined") handleConnection();
   }, []);
 
   const handleCloseWalletPopup = () => {
@@ -61,7 +83,7 @@ export default function ConnectButton() {
                 justify={"center"}
                 align={"center"}
                 gap={2}
-                fontWeight="300"
+                fontWeight="200"
               >
                 <Image src="/static/images/mina.png" h="16px" />
                 {chainName}

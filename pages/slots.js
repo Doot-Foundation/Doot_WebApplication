@@ -7,7 +7,7 @@ export default function Slots() {
   return (
     <>
       <SlotsLayout>
-        <Header />
+        {/* <Header /> */}
         <SlotsHero />
         <Footer />
       </SlotsLayout>

@@ -8,7 +8,6 @@ import IndividualAsset from "../components/feeds/IndividualAsset";
 import TokenNotSupported from "../components/feeds/TokenNotSupported";
 
 import { SUPPORTED_TOKENS } from "../../utils/constants/info";
-import Header from "../components/common/Header";
 import Footer from "../components/common/Footer";
 
 export default function TokenPage() {
@@ -19,7 +18,6 @@ export default function TokenPage() {
 
   return (
     <FeedsLayout>
-      <Header />
       {isSupportedToken ? (
         <IndividualAsset token={token} />
       ) : (

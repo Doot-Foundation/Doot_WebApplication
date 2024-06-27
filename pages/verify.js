@@ -7,7 +7,7 @@ export default function Verify() {
   return (
     <>
       <VerifyLayout>
-        <Header />
+        {/* <Header /> */}
         <VerifyHero />
         <Footer />
       </VerifyLayout>

@@ -7,7 +7,7 @@ export default function Feeds() {
   return (
     <>
       <FeedsLayout>
-        <Header />
+        {/* <Header /> */}
         <FeedsHero />
         <Footer />
       </FeedsLayout>
