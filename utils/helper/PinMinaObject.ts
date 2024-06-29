@@ -17,18 +17,33 @@ export default async function pinMinaObject(
   const chainlinkKey = await frameKey(CircuitString.fromString("Chainlink"));
   const solanaKey = await frameKey(CircuitString.fromString("Solana"));
   const ethereumKey = await frameKey(CircuitString.fromString("Ethereum"));
+  const polygonKey = await frameKey(CircuitString.fromString("Polygon"));
+  const avalancheKey = await frameKey(CircuitString.fromString("Avalanche"));
+  const dogeKey = await frameKey(CircuitString.fromString("Dogecoin"));
+  const rippleKey = await frameKey(CircuitString.fromString("Ripple"));
+  const cardanoKey = await frameKey(CircuitString.fromString("Cardano"));
 
   const minaPrice = Field.from(obj.mina.price);
   const chainlinkPrice = Field.from(obj.chainlink.price);
   const solanaPrice = Field.from(obj.solana.price);
   const ethereumPrice = Field.from(obj.ethereum.price);
   const bitcoinPrice = Field.from(obj.bitcoin.price);
+  const polygonPrice = Field.from(obj.polygon.price);
+  const avalanchePrice = Field.from(obj.avalanche.price);
+  const dogePrice = Field.from(obj.dogecoin.price);
+  const ripplePrice = Field.from(obj.ripple.price);
+  const cardanoPrice = Field.from(obj.cardano.price);
 
   Map.set(minaKey, minaPrice);
   Map.set(bitcoinKey, bitcoinPrice);
   Map.set(chainlinkKey, chainlinkPrice);
   Map.set(solanaKey, solanaPrice);
   Map.set(ethereumKey, ethereumPrice);
+  Map.set(polygonKey, polygonPrice);
+  Map.set(avalancheKey, avalanchePrice);
+  Map.set(dogeKey, dogePrice);
+  Map.set(rippleKey, ripplePrice);
+  Map.set(cardanoKey, cardanoPrice);
 
   const COMMITMENT = Map.getRoot();
 
@@ -37,19 +52,40 @@ export default async function pinMinaObject(
   const solanaWitness = Map.getWitness(solanaKey);
   const bitcoinWitness = Map.getWitness(bitcoinKey);
   const ethereumWitness = Map.getWitness(ethereumKey);
+  const polygonWitness = Map.getWitness(polygonKey);
+  const avalancheWitness = Map.getWitness(avalancheKey);
+  const dogeWitness = Map.getWitness(dogeKey);
+  const rippleWitness = Map.getWitness(rippleKey);
+  const cardanoWitness = Map.getWitness(cardanoKey);
 
   const timestamp = Date.now();
   const toUploadObject = {
     merkle_map: {
       last_updated: timestamp,
       commitment: COMMITMENT,
-      keys: [ethereumKey, chainlinkKey, solanaKey, minaKey, bitcoinKey],
+      keys: [
+        ethereumKey,
+        chainlinkKey,
+        solanaKey,
+        minaKey,
+        bitcoinKey,
+        polygonKey,
+        avalancheKey,
+        dogeKey,
+        rippleKey,
+        cardanoKey,
+      ],
       values: [
         ethereumPrice,
         chainlinkPrice,
         solanaPrice,
         minaPrice,
         bitcoinPrice,
+        polygonPrice,
+        avalanchePrice,
+        dogePrice,
+        ripplePrice,
+        cardanoPrice,
       ],
       witnesses: [
         ethereumWitness,
@@ -57,6 +93,11 @@ export default async function pinMinaObject(
         solanaWitness,
         minaWitness,
         bitcoinWitness,
+        polygonWitness,
+        avalancheWitness,
+        dogeWitness,
+        rippleWitness,
+        cardanoWitness,
       ],
     },
     assets: obj,
@@ -81,6 +122,7 @@ export default async function pinMinaObject(
   );
   const data = await response.json();
   const IPFS = data.IpfsHash;
+  console.log("PINNED MINA OBJECT", IPFS);
 
   await unpin(previousCID, "Mina");
 
