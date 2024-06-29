@@ -9,12 +9,16 @@ async function generateGraphData(subone, immediate, latest, historical) {
   let minPrice = Infinity;
   let maxPrice = -Infinity;
 
+  console.log(historical, latest, immediate);
+
   const combinedArray = [...historical, ...latest, ...immediate];
 
   combinedArray.forEach((item) => {
-    const price = normalizePrice(subone, item.price);
-    minPrice = Math.min(minPrice, price);
-    maxPrice = Math.max(maxPrice, price);
+    if (item && item.price != undefined) {
+      const price = normalizePrice(subone, item.price);
+      minPrice = Math.min(minPrice, price);
+      maxPrice = Math.max(maxPrice, price);
+    }
   });
 
   const firstHistoricalPrice = parseFloat(historical[0].price);

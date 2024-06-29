@@ -18,7 +18,7 @@ function removeOldTimestamps(obj) {
   });
 }
 
-export default async function pinHistoricalObject(previousCID, latestPrices) {
+export async function pinHistoricalObject(previousCID, latestPrices) {
   let isFirst;
   let toUploadObject;
 

@@ -18,9 +18,9 @@ export default function ConnectButton() {
   if (typeof window === "undefined") {
   } else {
     window.mina?.on("accountsChanged", (accounts) => {
-      localStorage.clear();
+      sessionStorage.clear();
 
-      localStorage.setItem("signer", accounts[0]);
+      sessionStorage.setItem("signer", accounts[0]);
 
       dispatch(setSigner(accounts[0]));
     });
@@ -48,7 +48,7 @@ export default function ConnectButton() {
         chName = chName[1];
         chName = chName[0].toUpperCase() + chName.slice(1);
 
-        localStorage.setItem("signer", accounts[0]);
+        sessionStorage.setItem("signer", accounts[0]);
 
         dispatch(setSigner(accounts[0]));
         dispatch(setChainName(chName));
@@ -57,7 +57,7 @@ export default function ConnectButton() {
   }
 
   useEffect(() => {
-    const sign = localStorage.getItem("signer");
+    const sign = sessionStorage.getItem("signer");
 
     if (sign != "undefined") handleConnection();
   }, []);

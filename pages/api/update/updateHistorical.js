@@ -1,4 +1,6 @@
-import pinHistoricalObject from "../../../utils/helper/PinHistorical";
+const {
+  pinHistoricalObject,
+} = require("../../../utils/helper/PinHistorical.js");
 
 const {
   HISTORICAL_SIGNED_MAX_CACHE,
