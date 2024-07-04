@@ -3,7 +3,7 @@ const DOOT_KEY: string | undefined = process.env.DOOT_KEY;
 const MINA_SECRET: string | undefined = process.env.MINA_SECRET;
 const ENDPOINT: string | undefined = process.env.NEXT_PUBLIC_MINA_ENDPOINT;
 
-import { Doot, IpfsCID } from "./Doot";
+import { Doot, IpfsCID, PricesArray } from "./Doot";
 import { Mina, PrivateKey, Field, fetchAccount } from "o1js";
 import { DootFileSystem, fetchFiles } from "./LoadCache";
 
@@ -15,9 +15,9 @@ export default async function sendMinaTxn(array: string[]) {
     const SECRET: Field = Field.from(MINA_SECRET);
 
     const doot = PrivateKey.fromBase58(DOOT_KEY);
+    const dootPub = doot.toPublicKey();
     const oracle = PrivateKey.fromBase58(ORACLE_KEY);
     const oraclePub = oracle.toPublicKey();
-    const dootPub = doot.toPublicKey();
 
     const Berkeley = Mina.Network(ENDPOINT);
     Mina.setActiveInstance(Berkeley);
@@ -34,16 +34,15 @@ export default async function sendMinaTxn(array: string[]) {
     const cacheFiles = await fetchFiles();
     await Doot.compile({ cache: DootFileSystem(cacheFiles) });
     const zkapp = new Doot(dootPub);
-    // await Doot.compile();
-    // const zkapp = new Doot(dootPub);
 
     const transactionFee = 100_000_000;
+    const PRICES = new PricesArray({ prices: [Field.from(0)] });
 
     console.log("Proving and sending txn...");
     const txn = await Mina.transaction(
       { sender: oraclePub, fee: transactionFee },
       () => {
-        zkapp.updateBase(COMMITMENT, IPFS_HASH, SECRET);
+        zkapp.update(COMMITMENT, IPFS_HASH, PRICES, SECRET);
       }
     );
     await txn.prove();
