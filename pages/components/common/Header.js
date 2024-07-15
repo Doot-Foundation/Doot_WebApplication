@@ -1,7 +1,12 @@
 import { Link, Flex, Image, Spacer } from "@chakra-ui/react";
 import ConnectButton from "./ConnectButton";
 
+import { useMediaQuery } from "@chakra-ui/react";
+
 export default function Header() {
+  const [isLargerThanMd] = useMediaQuery("(min-width: 1280px)");
+  if (!isLargerThanMd) return;
+
   return (
     <>
       <Flex

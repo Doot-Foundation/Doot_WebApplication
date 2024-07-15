@@ -27,80 +27,277 @@ import {
   SmartContract,
   Field,
   method,
-  MerkleMapWitness,
   State,
   state,
   PublicKey,
   Signature,
   Poseidon,
+  Experimental,
+  CircuitString,
+  Struct,
+  Provable,
 } from "o1js";
 import { MultiPackedStringFactory } from "o1js-pack";
+const { OffchainState } = Experimental;
+export const offchainState = OffchainState({
+  prices: OffchainState.Map(Field, Field),
+});
+export class PriceProof extends offchainState.Proof {}
 export class IpfsCID extends MultiPackedStringFactory(2) {}
+export class PricesArray extends Struct({
+  prices: Provable.Array(Field, 10),
+  // aggregationProofs: Provable.Array(SelfProof<Prices, Field>, 10),
+}) {}
 export class Doot extends SmartContract {
   constructor() {
     super(...arguments);
-    /// @notice Merkle Map Root to make sure the values are valid.
     this.commitment = State();
-    /// @notice IPFS URL of the off-chain file which holds the asset price info upto the past 2 hours.
-    /// @notice The historical data and latest data is separated.
+    this.secret = State();
     this.ipfsCID = State();
     this.oraclePublicKey = State();
-    this.secretToken = State();
+    this.offchainState = offchainState.commitments();
   }
   init() {
     super.init();
-    this.oraclePublicKey.set(this.sender);
+    this.oraclePublicKey.set(this.sender.getUnconstrained());
   }
-  updateIndividual(
-    keyWitness,
-    keyToChange,
-    valueBefore,
-    valueToChange,
-    updatedCID,
-    secret
+  async initBase(
+    updatedCommitment,
+    updatedIpfsCID,
+    pricesArray,
+    updatedSecret
   ) {
     this.oraclePublicKey.getAndRequireEquals();
-    this.secretToken.getAndRequireEquals();
-    this.commitment.getAndRequireEquals();
-    this.ipfsCID.getAndRequireEquals();
-    const sentSecret = Poseidon.hash([secret]);
-    this.secretToken.assertEquals(sentSecret);
-    const [previousCommitment, key] = keyWitness.computeRootAndKey(valueBefore);
-    previousCommitment.assertEquals(this.commitment.get());
-    key.assertEquals(keyToChange);
-    const updatedCommitment = keyWitness.computeRootAndKey(valueToChange)[0];
-    this.commitment.set(updatedCommitment);
-    this.ipfsCID.set(updatedCID);
-  }
-  updateBase(updatedCommitment, updatedIpfsCID, secret) {
-    this.oraclePublicKey.getAndRequireEquals();
-    this.secretToken.getAndRequireEquals();
-    this.commitment.getAndRequireEquals();
-    this.ipfsCID.getAndRequireEquals();
-    const sentSecret = Poseidon.hash([secret]);
-    this.secretToken.requireEquals(sentSecret);
-    this.commitment.set(updatedCommitment);
-    this.ipfsCID.set(updatedIpfsCID);
-  }
-  initBase(updatedCommitment, updatedIpfsCID, updatedSecret) {
-    this.oraclePublicKey.getAndRequireEquals();
-    this.secretToken.getAndRequireEquals();
+    this.secret.getAndRequireEquals();
     this.commitment.getAndRequireEquals();
     this.ipfsCID.getAndRequireEquals();
     /// Can only be called once
-    this.secretToken.requireEquals(Field.from(0));
+    this.secret.requireEquals(Field.from(0));
     this.commitment.set(updatedCommitment);
     this.ipfsCID.set(updatedIpfsCID);
-    this.secretToken.set(Poseidon.hash([updatedSecret]));
+    let lastPriceOption = await offchainState.fields.prices.get(
+      CircuitString.fromString("Mina").hash()
+    );
+    offchainState.fields.prices.update(
+      CircuitString.fromString("Mina").hash(),
+      {
+        from: lastPriceOption,
+        to: pricesArray.prices[0],
+      }
+    );
+    lastPriceOption = await offchainState.fields.prices.get(
+      CircuitString.fromString("Bitcoin").hash()
+    );
+    offchainState.fields.prices.update(
+      CircuitString.fromString("Bitcoin").hash(),
+      {
+        from: lastPriceOption,
+        to: pricesArray.prices[1],
+      }
+    );
+    lastPriceOption = await offchainState.fields.prices.get(
+      CircuitString.fromString("Ethereum").hash()
+    );
+    offchainState.fields.prices.update(
+      CircuitString.fromString("Ethereum").hash(),
+      {
+        from: lastPriceOption,
+        to: pricesArray.prices[2],
+      }
+    );
+    lastPriceOption = await offchainState.fields.prices.get(
+      CircuitString.fromString("Solana").hash()
+    );
+    offchainState.fields.prices.update(
+      CircuitString.fromString("Solana").hash(),
+      {
+        from: lastPriceOption,
+        to: pricesArray.prices[3],
+      }
+    );
+    lastPriceOption = await offchainState.fields.prices.get(
+      CircuitString.fromString("Ripple").hash()
+    );
+    offchainState.fields.prices.update(
+      CircuitString.fromString("Ripple").hash(),
+      {
+        from: lastPriceOption,
+        to: pricesArray.prices[4],
+      }
+    );
+    lastPriceOption = await offchainState.fields.prices.get(
+      CircuitString.fromString("Cardano").hash()
+    );
+    offchainState.fields.prices.update(
+      CircuitString.fromString("Cardano").hash(),
+      {
+        from: lastPriceOption,
+        to: pricesArray.prices[5],
+      }
+    );
+    lastPriceOption = await offchainState.fields.prices.get(
+      CircuitString.fromString("Avalanche").hash()
+    );
+    offchainState.fields.prices.update(
+      CircuitString.fromString("Avalanche").hash(),
+      {
+        from: lastPriceOption,
+        to: pricesArray.prices[6],
+      }
+    );
+    lastPriceOption = await offchainState.fields.prices.get(
+      CircuitString.fromString("Polygon").hash()
+    );
+    offchainState.fields.prices.update(
+      CircuitString.fromString("Polygon").hash(),
+      {
+        from: lastPriceOption,
+        to: pricesArray.prices[7],
+      }
+    );
+    lastPriceOption = await offchainState.fields.prices.get(
+      CircuitString.fromString("Chainlink").hash()
+    );
+    offchainState.fields.prices.update(
+      CircuitString.fromString("Chainlink").hash(),
+      {
+        from: lastPriceOption,
+        to: pricesArray.prices[8],
+      }
+    );
+    lastPriceOption = await offchainState.fields.prices.get(
+      CircuitString.fromString("Dogecoin").hash()
+    );
+    offchainState.fields.prices.update(
+      CircuitString.fromString("Dogecoin").hash(),
+      {
+        from: lastPriceOption,
+        to: pricesArray.prices[9],
+      }
+    );
+    this.secret.set(Poseidon.hash([updatedSecret]));
   }
-  verify(signature, Price) {
-    // Get the oracle public key from the contract state
+  async update(updatedCommitment, updatedIpfsCID, pricesArray, secret) {
     this.oraclePublicKey.getAndRequireEquals();
-    // Evaluate whether the signature is valid for the provided data
+    this.secret.getAndRequireEquals();
+    this.commitment.getAndRequireEquals();
+    this.ipfsCID.getAndRequireEquals();
+    const sentSecret = Poseidon.hash([secret]);
+    this.secret.requireEquals(sentSecret);
+    let lastPriceOption = await offchainState.fields.prices.get(
+      CircuitString.fromString("Mina").hash()
+    );
+    offchainState.fields.prices.update(
+      CircuitString.fromString("Mina").hash(),
+      {
+        from: lastPriceOption,
+        to: pricesArray.prices[0],
+      }
+    );
+    lastPriceOption = await offchainState.fields.prices.get(
+      CircuitString.fromString("Bitcoin").hash()
+    );
+    offchainState.fields.prices.update(
+      CircuitString.fromString("Bitcoin").hash(),
+      {
+        from: lastPriceOption,
+        to: pricesArray.prices[1],
+      }
+    );
+    lastPriceOption = await offchainState.fields.prices.get(
+      CircuitString.fromString("Ethereum").hash()
+    );
+    offchainState.fields.prices.update(
+      CircuitString.fromString("Ethereum").hash(),
+      {
+        from: lastPriceOption,
+        to: pricesArray.prices[2],
+      }
+    );
+    lastPriceOption = await offchainState.fields.prices.get(
+      CircuitString.fromString("Solana").hash()
+    );
+    offchainState.fields.prices.update(
+      CircuitString.fromString("Solana").hash(),
+      {
+        from: lastPriceOption,
+        to: pricesArray.prices[3],
+      }
+    );
+    lastPriceOption = await offchainState.fields.prices.get(
+      CircuitString.fromString("Ripple").hash()
+    );
+    offchainState.fields.prices.update(
+      CircuitString.fromString("Ripple").hash(),
+      {
+        from: lastPriceOption,
+        to: pricesArray.prices[4],
+      }
+    );
+    lastPriceOption = await offchainState.fields.prices.get(
+      CircuitString.fromString("Cardano").hash()
+    );
+    offchainState.fields.prices.update(
+      CircuitString.fromString("Cardano").hash(),
+      {
+        from: lastPriceOption,
+        to: pricesArray.prices[5],
+      }
+    );
+    lastPriceOption = await offchainState.fields.prices.get(
+      CircuitString.fromString("Avalanche").hash()
+    );
+    offchainState.fields.prices.update(
+      CircuitString.fromString("Avalanche").hash(),
+      {
+        from: lastPriceOption,
+        to: pricesArray.prices[6],
+      }
+    );
+    lastPriceOption = await offchainState.fields.prices.get(
+      CircuitString.fromString("Polygon").hash()
+    );
+    offchainState.fields.prices.update(
+      CircuitString.fromString("Polygon").hash(),
+      {
+        from: lastPriceOption,
+        to: pricesArray.prices[7],
+      }
+    );
+    lastPriceOption = await offchainState.fields.prices.get(
+      CircuitString.fromString("Chainlink").hash()
+    );
+    offchainState.fields.prices.update(
+      CircuitString.fromString("Chainlink").hash(),
+      {
+        from: lastPriceOption,
+        to: pricesArray.prices[8],
+      }
+    );
+    lastPriceOption = await offchainState.fields.prices.get(
+      CircuitString.fromString("Dogecoin").hash()
+    );
+    offchainState.fields.prices.update(
+      CircuitString.fromString("Dogecoin").hash(),
+      {
+        from: lastPriceOption,
+        to: pricesArray.prices[9],
+      }
+    );
+    this.commitment.set(updatedCommitment);
+    this.ipfsCID.set(updatedIpfsCID);
+  }
+  async getPrice(token) {
+    return (await offchainState.fields.prices.get(token.hash())).orElse(0n);
+  }
+  async settle(proof) {
+    await offchainState.settle(proof);
+  }
+  async verify(signature, Price) {
+    this.oraclePublicKey.getAndRequireEquals();
     const validSignature = signature.verify(this.oraclePublicKey.get(), [
       Price,
     ]);
-    // Check that the signature is valid
     validSignature.assertTrue();
   }
 }
@@ -108,6 +305,12 @@ __decorate(
   [state(Field), __metadata("design:type", Object)],
   Doot.prototype,
   "commitment",
+  void 0
+);
+__decorate(
+  [state(Field), __metadata("design:type", Object)],
+  Doot.prototype,
+  "secret",
   void 0
 );
 __decorate(
@@ -123,57 +326,17 @@ __decorate(
   void 0
 );
 __decorate(
-  [state(Field), __metadata("design:type", Object)],
+  [state(OffchainState.Commitments), __metadata("design:type", Object)],
   Doot.prototype,
-  "secretToken",
+  "offchainState",
   void 0
 );
 __decorate(
   [
     method,
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0),
-  ],
-  Doot.prototype,
-  "init",
-  null
-);
-__decorate(
-  [
-    method,
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [
-      MerkleMapWitness,
-      Field,
-      Field,
-      Field,
-      IpfsCID,
-      Field,
-    ]),
-    __metadata("design:returntype", void 0),
-  ],
-  Doot.prototype,
-  "updateIndividual",
-  null
-);
-__decorate(
-  [
-    method,
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Field, IpfsCID, Field]),
-    __metadata("design:returntype", void 0),
-  ],
-  Doot.prototype,
-  "updateBase",
-  null
-);
-__decorate(
-  [
-    method,
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Field, IpfsCID, Field]),
-    __metadata("design:returntype", void 0),
+    __metadata("design:paramtypes", [Field, IpfsCID, PricesArray, Field]),
+    __metadata("design:returntype", Promise),
   ],
   Doot.prototype,
   "initBase",
@@ -183,8 +346,41 @@ __decorate(
   [
     method,
     __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Field, IpfsCID, PricesArray, Field]),
+    __metadata("design:returntype", Promise),
+  ],
+  Doot.prototype,
+  "update",
+  null
+);
+__decorate(
+  [
+    method.returns(Field),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [CircuitString]),
+    __metadata("design:returntype", Promise),
+  ],
+  Doot.prototype,
+  "getPrice",
+  null
+);
+__decorate(
+  [
+    method,
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [PriceProof]),
+    __metadata("design:returntype", Promise),
+  ],
+  Doot.prototype,
+  "settle",
+  null
+);
+__decorate(
+  [
+    method,
+    __metadata("design:type", Function),
     __metadata("design:paramtypes", [Signature, Field]),
-    __metadata("design:returntype", void 0),
+    __metadata("design:returntype", Promise),
   ],
   Doot.prototype,
   "verify",

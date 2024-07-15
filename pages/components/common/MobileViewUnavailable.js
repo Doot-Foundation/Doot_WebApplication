@@ -31,9 +31,6 @@ export default function MobileViewUnavailable() {
         <Heading fontFamily="Montserrat Variable" textAlign="center">
           Sorry, We don't support mobile view.
         </Heading>
-        <Text textAlign="center">
-          Come back looking for the treasure in a while.
-        </Text>
       </Flex>
     </>
   );

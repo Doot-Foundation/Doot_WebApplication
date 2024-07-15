@@ -1,12 +1,10 @@
 import { Cache } from "o1js";
 
 const cacheFiles = [
-  { name: "srs-fp-65536", type: "string" },
-  { name: "srs-fq-32768", type: "string" },
-  { name: "step-vk-doot-init", type: "string" },
+  { name: "step-vk-doot-getprice", type: "string" },
   { name: "step-vk-doot-initbase", type: "string" },
-  { name: "step-vk-doot-updatebase", type: "string" },
-  { name: "step-vk-doot-updateindividual", type: "string" },
+  { name: "step-vk-doot-settle", type: "string" },
+  { name: "step-vk-doot-update", type: "string" },
   { name: "step-vk-doot-verify", type: "string" },
   { name: "wrap-vk-doot", type: "string" },
 ];
@@ -57,7 +55,6 @@ export const DootFileSystem = (files: any): Cache => ({
   read({ persistentId, uniqueId, dataType }: any) {
     // read current uniqueId, return data if it matches
     if (!files[persistentId]) {
-      console.log("read");
       return undefined;
     }
 
@@ -72,8 +69,6 @@ export const DootFileSystem = (files: any): Cache => ({
 
     return undefined;
   },
-  write({ persistentId, uniqueId, dataType }: any, data: any) {
-    console.log("write");
-  },
+  write({ persistentId, uniqueId, dataType }: any, data: any) {},
   canWrite: true,
 });

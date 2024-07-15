@@ -1,6 +1,5 @@
 import HomeLayout from "./components/home/HomeLayout";
 import HomeHero from "./components/home/HomeHero";
-import Header from "./components/common/Header";
 import Footer from "./components/common/Footer";
 
 import { useMediaQuery } from "@chakra-ui/react";
@@ -13,7 +12,6 @@ export default function Home() {
   return (
     <>
       <HomeLayout>
-        {/* <Header /> */}
         <HomeHero />
         <Footer />
       </HomeLayout>
