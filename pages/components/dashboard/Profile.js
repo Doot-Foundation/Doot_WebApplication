@@ -16,19 +16,25 @@ import { useSelector } from "react-redux";
 
 export default function Profile({ info = {} }) {
   const signer = useSelector((state) => state.network.signer);
-
-  const publicKey = info ? (info.address ? info.address : null) : null;
-  const timestamp = info ? (info.created_at ? info.created_at : null) : null;
-  const calls =
-    info.calls && typeof info.calls === "string"
-      ? JSON.parse(info.calls)
-      : null;
-
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [api, setAPI] = useState(info ? info.generated_key : null);
   const toast = useToast();
 
   const axios = require("axios");
+
+  let publicKey = null;
+  let timestamp = null;
+  let calls = null;
+  try {
+    publicKey = info ? (info.address ? info.address : null) : null;
+    timestamp = info ? (info.created_at ? info.created_at : null) : null;
+    calls =
+      info.calls && typeof info.calls === "string"
+        ? JSON.parse(info.calls)
+        : null;
+  } catch (err) {
+    console.log("Unable to update state variables appropriately.");
+  }
 
   function formatDate(timestamp) {
     if (timestamp) {

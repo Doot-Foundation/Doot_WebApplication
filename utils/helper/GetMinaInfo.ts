@@ -1,7 +1,8 @@
 const GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
 const ENDPOINT = process.env.NEXT_PUBLIC_MINA_ENDPOINT;
+const DOOT_PUBLIC_KEY = process.env.NEXT_PUBLIC_DOOT_PUBLIC_KEY;
 
-import { Doot, IpfsCID } from "./Doot";
+import { Doot, IpfsCID } from "../constants/Doot";
 import { Mina, fetchAccount, PublicKey } from "o1js";
 
 export default async function getMinaDetails(latestCID: string): Promise<
@@ -10,14 +11,12 @@ export default async function getMinaDetails(latestCID: string): Promise<
     }
   | undefined
 > {
-  if (GATEWAY && ENDPOINT) {
+  if (GATEWAY && ENDPOINT && DOOT_PUBLIC_KEY) {
     const axios = require("axios");
-    const Berkeley = Mina.Network(ENDPOINT);
-    Mina.setActiveInstance(Berkeley);
+    const Devnet = Mina.Network(ENDPOINT);
+    Mina.setActiveInstance(Devnet);
 
-    const zkAppAddress = PublicKey.fromBase58(
-      "B62qjaQEw1PcdETvJyLMtKxYgz8GAXv3cGeJ575Cgf3Hpw5qybr1jFE"
-    );
+    const zkAppAddress = PublicKey.fromBase58(DOOT_PUBLIC_KEY);
     const accountInfo: any = {
       publicKey: zkAppAddress,
     };

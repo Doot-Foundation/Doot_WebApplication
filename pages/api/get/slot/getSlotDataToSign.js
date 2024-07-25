@@ -1,5 +1,5 @@
-import { redis } from "../../../utils/helper/InitRedis";
-import { TOKEN_TO_CACHE } from "../../../utils/constants/info";
+import { redis } from "../../../../utils/helper/InitRedis";
+import { TOKEN_TO_CACHE } from "../../../../utils/constants/info";
 
 export default async function handler(req, res) {
   const authHeader = req.headers.authorization;

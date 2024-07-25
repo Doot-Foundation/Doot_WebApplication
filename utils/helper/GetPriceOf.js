@@ -377,10 +377,10 @@ async function getPriceOf(token) {
   });
 
   const meanPrice = parseFloat(sum / count);
-  const processedPrice = processFloatString(meanPrice);
+  const processedMeanPrice = processFloatString(meanPrice);
   const aggregatedAt = Date.now();
   const signedPrice = signatureClient.signFields(
-    [BigInt(processedPrice)],
+    [BigInt(processedMeanPrice)],
     ORACLE_KEY
   );
 
@@ -392,7 +392,7 @@ async function getPriceOf(token) {
   jsonCompatibleSignature["data"] = signedPrice.data[0].toString();
 
   const assetCacheObject = {
-    price: processedPrice,
+    price: processedMeanPrice,
     decimals: 10,
     signature: jsonCompatibleSignature,
     aggregationTimestamp: aggregatedAt,
@@ -403,7 +403,7 @@ async function getPriceOf(token) {
   };
 
   console.log("Mean :", meanPrice);
-  console.log("Processed :", processedPrice, "\n");
+  console.log("Processed :", processedMeanPrice, "\n");
   return [meanPrice, assetCacheObject];
 }
 

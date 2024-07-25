@@ -1,9 +1,9 @@
-const MAIL = process.env.SUPABASE_USER;
-const PASS = process.env.SUPABASE_USER_PASS;
-
-import { supabase } from "../../utils/helper/InitSupabase.js";
+import { supabase } from "../../../utils/helper/InitSupabase.js";
 
 import { v4 as uuidv4 } from "uuid";
+
+const MAIL = process.env.SUPABASE_USER;
+const PASS = process.env.SUPABASE_USER_PASS;
 
 export default async function handler(req, res) {
   const { address } = req.query;

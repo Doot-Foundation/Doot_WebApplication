@@ -1,9 +1,9 @@
 const {
   TOKEN_TO_CACHE,
   TOKEN_TO_SIGNED_SLOT,
-  ORACLE_PUBLIC_KEY,
-  HISTORICAL_CACHE,
   TOKEN_TO_GRAPH_DATA,
+  ORACLE_PUBLIC_KEY,
+  HISTORICAL_CID_CACHE,
 } = require("../../../utils/constants/info.js");
 
 const { redis } = require("../../../utils/helper/InitRedis.js");
@@ -46,7 +46,7 @@ async function PriceOf(token) {
 }
 
 async function startFetchAndUpdates(tokens) {
-  const cid = await redis.get(HISTORICAL_CACHE);
+  const cid = await redis.get(HISTORICAL_CID_CACHE);
   const pinnedData = await axios.get(`https://${GATEWAY}/ipfs/${cid}`);
   const ipfs = pinnedData.data;
 

@@ -46,7 +46,6 @@ export class PriceProof extends offchainState.Proof {}
 export class IpfsCID extends MultiPackedStringFactory(2) {}
 export class PricesArray extends Struct({
   prices: Provable.Array(Field, 10),
-  // aggregationProofs: Provable.Array(SelfProof<Prices, Field>, 10),
 }) {}
 export class Doot extends SmartContract {
   constructor() {

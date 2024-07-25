@@ -82,20 +82,19 @@ export default function DashboardHero() {
         Signed: finalObj,
       };
 
-      await axios
-        .get(
+      try {
+        const res = await axios.get(
           `/api/get/getUserInformation?address=${signer}&timestamp=${timestamp}`,
           {
             headers: headers,
           }
-        )
-        .then((res) => {
-          const data = JSON.parse(res.data);
-          setUserDetails(data);
-        })
-        .catch((err) => {
-          console.log("Verification Failed.");
-        });
+        );
+
+        const data = JSON.parse(res.data);
+        setUserDetails(data);
+      } catch (err) {
+        console.log("Something went wrong!");
+      }
     } else return;
   }
 

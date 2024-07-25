@@ -27,6 +27,8 @@ export default async function handler(req, res) {
     finalSlotState[item] = { community: {} };
   }
 
+  console.log(obj);
+
   if (Object.keys(obj).length === 0) {
     res.status(200).json({ latest: "Not updated." });
     return;

@@ -1,21 +1,15 @@
-// Sign a message on ui, check the sign here and if the originator is the address sent in the req.query,
-// return the api key.
 const {
-  signatureClient,
+  testnetSignatureClient,
   mainnetSignatureClient,
-} = require("../../../utils/helper/SignatureClient");
+} = require("../../../../utils/helper/SignatureClient.js");
+const { supabase } = require("../../../../utils/helper/InitSupabase.js");
+
 const KEY = process.env.NEXT_PUBLIC_API_INTERFACE_KEY;
-
-const MAIL = process.env.SUPABASE_USER;
-const PASS = process.env.SUPABASE_USER_PASS;
-
-import { supabase } from "../../../utils/helper/InitSupabase.js";
 
 // MESSAGE
 // Sign this message to prove you have access to this wallet in order to sign in to doot.foundation/dashboard.
 // This won't cost you any Mina.
 // Timestamp: Date.now()
-
 // https://docs.aurowallet.com/general/reference/api-reference/methods/mina_signmessage
 
 export default async function handler(req, res) {
@@ -47,13 +41,17 @@ export default async function handler(req, res) {
       signature: signHeader.signature,
     };
 
-    const originsVerified = signatureClient.verifyMessage(verifyBody);
+    const testnetOriginsVerified =
+      testnetSignatureClient.verifyMessage(verifyBody);
     const mainnetOriginsVerified =
       mainnetSignatureClient.verifyMessage(verifyBody);
 
-    if (!originsVerified && !mainnetOriginsVerified) {
+    if (!testnetOriginsVerified && !mainnetOriginsVerified) {
       return res.status(401).json({ status: "Signature Failed." });
     }
+
+    const MAIL = process.env.SUPABASE_USER;
+    const PASS = process.env.SUPABASE_USER_PASS;
 
     await supabase.auth.signInWithPassword({
       email: MAIL,
