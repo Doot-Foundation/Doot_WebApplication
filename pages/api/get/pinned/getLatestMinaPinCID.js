@@ -1,4 +1,4 @@
-const { redis } = require("../../../../utils/helper/InitRedis");
+const { redis } = require("../../../../utils/helper/init/InitRedis");
 const { MINA_CID_CACHE } = require("../../../../utils/constants/info");
 
 export default async function handler(req, res) {

@@ -1,4 +1,4 @@
-import { supabase } from "../../../../utils/helper/InitSupabase.js";
+const { supabase } = require("../../../../utils/helper/init/InitSupabase.js");
 
 export default async function handler(req, res) {
   const { address } = req.query;
@@ -20,12 +20,16 @@ export default async function handler(req, res) {
     await supabase.auth.signOut();
 
     if (select_data != null && select_data.length != 0) {
-      return res.status(200).json({ status: 1, message: "Address_Exists" });
+      return res
+        .status(200)
+        .json({ status: true, message: "Public key exists." });
     } else {
       return res
         .status(200)
-        .json({ status: 0, message: "Address_Does_Not_Exist" });
+        .json({ status: false, message: "Public Key does not exists." });
     }
   }
-  res.status(404).json({ message: "Query parameter missing(address)." });
+  return res
+    .status(400)
+    .json({ status: 400, message: "ERR! Query parameter missing(address)." });
 }

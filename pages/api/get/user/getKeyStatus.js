@@ -1,4 +1,4 @@
-import { supabase } from "../../../../utils/helper/InitSupabase";
+const { supabase } = require("../../../../utils/helper/init/InitSupabase.js");
 
 export default async function handler(req, res) {
   const authHeader = req.headers.authorization;
@@ -20,11 +20,14 @@ export default async function handler(req, res) {
     await supabase.auth.signOut();
 
     if (select_data[0].length == 0)
-      return res.status(200).json({ valid: true });
-    else return res.status(200).json({ valid: false });
+      return res.status(200).json({ status: true, message: "Valid API Key." });
+    else
+      return res
+        .status(200)
+        .json({ status: false, message: "Invalid API Key." });
   }
-  res.status(404).json({
+  return res.status(400).json({
     message:
-      "ERR! Missing API Key. Header should include 'Authorization=[API_KEY]'",
+      "ERR! API Key not found in header. Header should include 'Authorization:[API_KEY]'. For more information visit : https://doot.foundation/dashboard.",
   });
 }

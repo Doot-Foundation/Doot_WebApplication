@@ -1,8 +1,8 @@
+const { supabase } = require("../../../../utils/helper/init/InitSupabase.js");
 const {
   testnetSignatureClient,
   mainnetSignatureClient,
 } = require("../../../../utils/helper/SignatureClient.js");
-const { supabase } = require("../../../../utils/helper/InitSupabase.js");
 
 const KEY = process.env.NEXT_PUBLIC_API_INTERFACE_KEY;
 
@@ -13,15 +13,15 @@ const KEY = process.env.NEXT_PUBLIC_API_INTERFACE_KEY;
 // https://docs.aurowallet.com/general/reference/api-reference/methods/mina_signmessage
 
 export default async function handler(req, res) {
-  if (req.method == "GET") {
-    const signHeader = JSON.parse(req.headers.signed);
-    const authHeader = req.headers.authorization;
+  const signHeader = JSON.parse(req.headers.signed);
+  const authHeader = req.headers.authorization;
 
-    if ("Bearer " + KEY != authHeader) {
-      res.status(401).json({ status: "Unauthorized." });
-      return;
-    }
+  if ("Bearer " + KEY != authHeader) {
+    res.status(401).json({ status: "Unauthorized." });
+    return;
+  }
 
+  if (!signHeader) {
     const timestamp = signHeader.timestamp;
     const currentTimestamp = Date.now();
 
@@ -66,9 +66,19 @@ export default async function handler(req, res) {
     await supabase.auth.signOut();
 
     if (select_data.length == 1) {
-      return res.status(200).json(JSON.stringify(select_data[0]));
+      return res.status(200).json({
+        status: true,
+        data: select_data[0],
+        message: "User data found.",
+      });
     } else {
-      return res.status(200).json({ data: null });
+      return res
+        .status(200)
+        .json({ status: false, data: null, message: "User data not found." });
     }
   }
+  res.status(400).json({
+    message:
+      "ERR! Signature not found in header. Header should include 'Signed:[...]'.",
+  });
 }

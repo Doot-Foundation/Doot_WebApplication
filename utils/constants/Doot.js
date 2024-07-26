@@ -53,12 +53,12 @@ export class Doot extends SmartContract {
     this.commitment = State();
     this.secret = State();
     this.ipfsCID = State();
-    this.oraclePublicKey = State();
+    this.deployerPublicKey = State();
     this.offchainState = offchainState.commitments();
   }
   init() {
     super.init();
-    this.oraclePublicKey.set(this.sender.getUnconstrained());
+    this.deployerPublicKey.set(this.sender.getUnconstrained());
   }
   async initBase(
     updatedCommitment,
@@ -66,7 +66,7 @@ export class Doot extends SmartContract {
     pricesArray,
     updatedSecret
   ) {
-    this.oraclePublicKey.getAndRequireEquals();
+    this.deployerPublicKey.getAndRequireEquals();
     this.secret.getAndRequireEquals();
     this.commitment.getAndRequireEquals();
     this.ipfsCID.getAndRequireEquals();
@@ -177,7 +177,7 @@ export class Doot extends SmartContract {
     this.secret.set(Poseidon.hash([updatedSecret]));
   }
   async update(updatedCommitment, updatedIpfsCID, pricesArray, secret) {
-    this.oraclePublicKey.getAndRequireEquals();
+    this.deployerPublicKey.getAndRequireEquals();
     this.secret.getAndRequireEquals();
     this.commitment.getAndRequireEquals();
     this.ipfsCID.getAndRequireEquals();
@@ -293,8 +293,8 @@ export class Doot extends SmartContract {
     await offchainState.settle(proof);
   }
   async verify(signature, Price) {
-    this.oraclePublicKey.getAndRequireEquals();
-    const validSignature = signature.verify(this.oraclePublicKey.get(), [
+    this.deployerPublicKey.getAndRequireEquals();
+    const validSignature = signature.verify(this.deployerPublicKey.get(), [
       Price,
     ]);
     validSignature.assertTrue();
@@ -321,7 +321,7 @@ __decorate(
 __decorate(
   [state(PublicKey), __metadata("design:type", Object)],
   Doot.prototype,
-  "oraclePublicKey",
+  "deployerPublicKey",
   void 0
 );
 __decorate(

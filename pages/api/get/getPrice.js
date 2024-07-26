@@ -1,21 +1,29 @@
-const MAIL = process.env.SUPABASE_USER;
-const PASS = process.env.SUPABASE_USER_PASS;
+const { supabase } = require("../../../utils/helper/init/InitSupabase.js");
+const { redis } = require("../../../utils/helper/init/InitRedis.js");
+const incrementCallCounter = require("../../../utils/helper/IncrementCallCounter.js");
 
-import { supabase } from "../../../utils/helper/InitSupabase.js";
-import { redis } from "../../../utils/helper/InitRedis.js";
-import incrementCallCounter from "../../../utils/helper/IncrementCallCounter.js";
+const {
+  TOKEN_TO_CACHE,
+  TOKEN_TO_SYMBOL,
+} = require("../../../utils/constants/info.js");
 
-import { TOKEN_TO_CACHE } from "../../../utils/constants/info.js";
-
-import { validate as uuidValidate } from "uuid";
+const uuid = require("uuid");
+const uuidValidate = uuid.validate;
 
 export default async function handler(req, res) {
   const authHeader = req.headers.authorization;
-
   let { token } = req.query;
   token = token.toLowerCase();
 
+  if (!TOKEN_TO_SYMBOL[token])
+    return res
+      .status(400)
+      .json({ status: 400, message: "ERR! Invalid token." });
+
   if (authHeader) {
+    const MAIL = process.env.SUPABASE_USER;
+    const PASS = process.env.SUPABASE_USER_PASS;
+
     await supabase.auth.signInWithPassword({
       email: MAIL,
       password: PASS,
@@ -43,23 +51,29 @@ export default async function handler(req, res) {
 
     await supabase.auth.signOut();
 
-    const cachedData = await redis.get(TOKEN_TO_CACHE[token]);
+    if (token) {
+      const cachedData = await redis.get(TOKEN_TO_CACHE[token]);
 
-    if (cachedData) {
-      return res.status(200).json({
-        status: true,
-        data: cachedData,
-        asset: token,
-        message: "Price information found.",
+      if (cachedData) {
+        return res.status(200).json({
+          status: true,
+          message: "Price information found.",
+          data: cachedData,
+          asset: token,
+        });
+      } else {
+        return res.status(404).json({
+          status: false,
+          message: "Price information not found.",
+          data: {},
+          asset: token,
+        });
+      }
+    } else
+      return res.status(400).json({
+        status: 400,
+        message: "ERR! Query parameter missing(token).",
       });
-    } else {
-      return res.status(404).json({
-        status: false,
-        data: {},
-        asset: token,
-        message: "Price information not found.",
-      });
-    }
   }
   return res.status(401).json("Authentication Failed.");
 }
