@@ -2,7 +2,6 @@ const {
   TOKEN_TO_CACHE,
   TOKEN_TO_SIGNED_SLOT,
   TOKEN_TO_GRAPH_DATA,
-  ORACLE_PUBLIC_KEY,
   HISTORICAL_CID_CACHE,
 } = require("../../../utils/constants/info.js");
 

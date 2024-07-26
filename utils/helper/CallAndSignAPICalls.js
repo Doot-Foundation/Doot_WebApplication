@@ -1,9 +1,12 @@
 const axios = require("axios");
 const _ = require("lodash");
 
-const ORACLE_KEY = process.env.ORACLE_KEY;
+const DEPLOYER_KEY = process.env.DEPLOYER_KEY;
 
-const { signatureClient } = require("./SignatureClient");
+const {
+  signatureClient,
+  testnetSignatureClient,
+} = require("./SignatureClient");
 const { CircuitString } = require("o1js");
 
 const { MULTIPLICATION_FACTOR } = require("../constants/info");
@@ -62,11 +65,12 @@ async function callSignAPICall(url, resultPath, headerName) {
   const fieldDecimals = BigInt(MULTIPLICATION_FACTOR);
   const fieldTimestamp = BigInt(Timestamp);
 
-  const signature = signatureClient.signFields(
+  const signature = testnetSignatureClient.signFields(
     [fieldURL, fieldPrice, fieldDecimals, fieldTimestamp],
-    ORACLE_KEY
+    DEPLOYER_KEY
   );
 
+  // USED SINCE UNABLE TO TRANSFER BIGINT OVER REST API CALLS.
   var JsonCompatibleSignature = {};
   JsonCompatibleSignature["signature"] = signature.signature;
   JsonCompatibleSignature["publicKey"] = signature.publicKey;
