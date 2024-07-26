@@ -9,7 +9,7 @@ const KEY = process.env.NEXT_PUBLIC_API_INTERFACE_KEY;
 export default async function handler(req, res) {
   const authHeader = req.headers.authorization;
   let { token } = req.query;
-  token.toLowerCase();
+  token = token.toLowerCase();
 
   if (!TOKEN_TO_SYMBOL[token])
     return res

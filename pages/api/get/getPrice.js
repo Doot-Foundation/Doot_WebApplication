@@ -74,6 +74,10 @@ export default async function handler(req, res) {
         status: 400,
         message: "ERR! Query parameter missing(token).",
       });
-  }
-  return res.status(401).json("Authentication Failed.");
+  } else
+    return res
+      .status(401)
+      .json(
+        "ERR! Authentication Failed. Missing header `Authorization:Bearer [API_KEY]'."
+      );
 }
