@@ -1,6 +1,6 @@
 const { supabase } = require("../../../../utils/helper/init/InitSupabase");
 const { redis } = require("../../../../utils/helper/init/InitRedis");
-const incrementCallCounter = require("../../../utils/helper/IncrementCallCounter.js");
+const incrementCallCounter = require("../../../../utils/helper/IncrementCallCounter.js");
 
 const {
   TOKEN_TO_CACHE,

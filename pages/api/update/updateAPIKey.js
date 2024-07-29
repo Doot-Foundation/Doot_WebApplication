@@ -1,8 +1,8 @@
-const MAIL = process.env.SUPABASE_USER;
-const PASS = process.env.SUPABASE_USER_PASS;
+const { supabase } = require("../../../utils/helper/init/InitSupabase.js");
 
-import { supabase } from "../../../utils/helper/InitSupabase.js";
-import { validate as uuidValidate, v4 as uuidv4 } from "uuid";
+const uuid = require("uuid");
+const uuidv4 = uuid.v4;
+const uuidValidate = uuid.validate;
 
 const KEY = process.env.NEXT_PUBLIC_API_INTERFACE_KEY;
 
@@ -14,15 +14,18 @@ export default async function handler(req, res) {
     return res.status(401).json("Unauthorized.");
   }
 
-  await supabase.auth.signInWithPassword({
-    email: MAIL,
-    password: PASS,
-  });
-
   if (userInformation) {
     const publicKey = userInformation.address;
     const key = userInformation.key;
     console.log(publicKey, "called reset with original key :", key);
+
+    const MAIL = process.env.SUPABASE_USER;
+    const PASS = process.env.SUPABASE_USER_PASS;
+
+    await supabase.auth.signInWithPassword({
+      email: MAIL,
+      password: PASS,
+    });
 
     const { data: select_data, error: select_error } = await supabase
       .from("Auro_Login")

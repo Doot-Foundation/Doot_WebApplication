@@ -6,9 +6,8 @@ const ENDPOINT: string | undefined = process.env.NEXT_PUBLIC_MINA_ENDPOINT;
 import { Doot, IpfsCID, PricesArray } from "../constants/Doot";
 import { Mina, PrivateKey, Field, fetchAccount, UInt64 } from "o1js";
 import { DootFileSystem, fetchFiles } from "./LoadCache";
-import axios from "axios";
 
-export default async function sendMinaTxn(array: string[], prices: bigint[]) {
+async function sendMinaTxn(array: string[], prices: bigint[]) {
   // console.log(array);
   if (ORACLE_KEY && DOOT_KEY && MINA_SECRET && ENDPOINT) {
     const COMMITMENT = Field.from(array[1]);
@@ -52,3 +51,5 @@ export default async function sendMinaTxn(array: string[], prices: bigint[]) {
     return true;
   }
 }
+
+module.exports = sendMinaTxn;

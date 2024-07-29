@@ -1,3 +1,5 @@
+const { redis } = require("../../../utils/helper/init/InitRedis.js");
+
 const {
   TOKEN_TO_CACHE,
   TOKEN_TO_SIGNED_SLOT,
@@ -5,14 +7,11 @@ const {
   HISTORICAL_CID_CACHE,
 } = require("../../../utils/constants/info.js");
 
-const { redis } = require("../../../utils/helper/init/InitRedis.js");
-const axios = require("axios");
-
 const getPriceOf = require("../../../utils/helper/GetPriceOf.js");
 const appendSignatureToSlot = require("../../../utils/helper/AppendSignatureToSlot.js");
 const generateGraphData = require("../../../utils/helper/GenerateGraphData.js");
 
-const GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
+const axios = require("axios");
 
 function produceHistoricalArray(token, historicalObj) {
   const tokenHistoricalArray = [];
@@ -45,6 +44,7 @@ async function PriceOf(token) {
 
 async function startFetchAndUpdates(tokens) {
   const cid = await redis.get(HISTORICAL_CID_CACHE);
+  const GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
   const pinnedData = await axios.get(`https://${GATEWAY}/ipfs/${cid}`);
   const ipfs = pinnedData.data;
 

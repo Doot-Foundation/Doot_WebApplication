@@ -1,5 +1,6 @@
+const { redis } = require("../../../utils/helper/init/InitRedis");
+
 const { TOKEN_TO_CACHE } = require("../../../utils/constants/info");
-const { redis } = require("../../../utils/helper/InitRedis");
 const {
   testnetSignatureClient,
   mainnetSignatureClient,
