@@ -28,20 +28,21 @@ export default function TokenDescriptionBox({ token }) {
       const headers = {
         Authorization: "Bearer " + key,
       };
+
       const priceResponse = await axios.get(
         `/api/get/interface/getPrice?token=${token}`,
         {
           headers: headers,
         }
       );
+
       const graphResponse = await axios.get(
-        `/api/get/getGraphData?token=${token}`,
+        `/api/get/interface/getGraphData?token=${token}`,
         {
           headers: headers,
         }
       );
 
-      console.log(graphResponse.data);
       setGraphData(graphResponse.data.data.graph_data);
       setGraphMin(graphResponse.data.data.min_price);
       setGraphMax(graphResponse.data.data.max_price);
@@ -55,7 +56,11 @@ export default function TokenDescriptionBox({ token }) {
   }
 
   useEffect(() => {
-    getInformation();
+    async function execute() {
+      await getInformation();
+    }
+
+    execute();
   }, []);
 
   const linkSource = `/feeds/${TOKEN_TO_SYMBOL[token]}`;

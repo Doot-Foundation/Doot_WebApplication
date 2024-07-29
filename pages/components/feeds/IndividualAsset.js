@@ -407,14 +407,16 @@ export default function IndividualAsset({ token }) {
               (The prices are precise upto the 10th decimal)
             </Text>
           </Flex>
-          {ipfsHistorical && ipfsLatest ? (
-            <HistoricalTable
-              ipfsLatest={ipfsLatest}
-              ipfsHistorical={ipfsHistorical}
-            />
-          ) : (
-            <Heading fontFamily={"Montserrat Variable"}> Loading... </Heading>
-          )}
+          <Flex maxH={"700"} overflowY="scroll" borderRadius={20}>
+            {ipfsHistorical && ipfsLatest ? (
+              <HistoricalTable
+                ipfsLatest={ipfsLatest}
+                ipfsHistorical={ipfsHistorical}
+              />
+            ) : (
+              <Heading fontFamily={"Montserrat Variable"}> Loading... </Heading>
+            )}
+          </Flex>
         </Flex>
       </Flex>
     </>
