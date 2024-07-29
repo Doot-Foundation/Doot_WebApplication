@@ -1,19 +1,19 @@
 const { redis } = require("../../../../utils/helper/init/InitRedis");
 const {
-  MINA_SIGNED_MAX_CACHE,
+  MINA_MAX_SIGNED_SLOT_CACHE,
   TOKEN_TO_SYMBOL,
 } = require("../../../../utils/constants/info");
 
 export default async function handler(req, res) {
   let { token } = req.query;
-  token = token.toLowerCase();
+  if (token) token = token.toLowerCase();
 
-  if (token != "" && !TOKEN_TO_SYMBOL[token])
+  if (token != undefined && !TOKEN_TO_SYMBOL[token])
     return res
       .status(400)
       .json({ status: 400, message: "ERR! Invalid token." });
 
-  const cachedData = await redis.get(MINA_SIGNED_MAX_CACHE);
+  const cachedData = await redis.get(MINA_MAX_SIGNED_SLOT_CACHE);
 
   if (cachedData) {
     if (token)

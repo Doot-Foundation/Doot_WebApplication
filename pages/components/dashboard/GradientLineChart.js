@@ -19,20 +19,18 @@ export default function GradientLineChart({ calls = {} }) {
         "DEC",
       ];
       let result = [];
+      let maxCalls = -Infinity;
 
       for (let i = 0; i <= currentMonth; i++) {
         const month = months[i];
-        // if (json[month]) {
-        result.push({ month, count: json[month] });
-        // }
+        if (json[month] > maxCalls) maxCalls = json[month];
+        result.push({ month: month, Count: json[month] });
       }
-      return result;
-    }
-    return [];
+      return [maxCalls, result];
+    } else return [];
   }
 
-  console.log(calls);
-  const data = transformJsonToArray(calls);
+  const [maxCalls, data] = transformJsonToArray(calls);
 
   return (
     <>
@@ -61,16 +59,17 @@ export default function GradientLineChart({ calls = {} }) {
           tickLine={false}
         />
         <YAxis
-          // tickFormatter={(value) => (value === 0 ? "" : Math.round(value))}
-          tickFormatter={(value) => Math.round(value)}
-          dataKey="count"
-          tick={{ fontWeight: "500", dx: -10 }}
-          tickLine={false}
+          label={{ value: "Calls", angle: -90, position: "insideLeft" }}
+          tickFormatter={(value) => (value == maxCalls ? value : "")}
+          // tickFormatter={(value) => Math.round(value)}
+          dataKey="Count"
+          tick={{ fontWeight: "500", dx: -5, dy: -4 }}
+          // tickLine={false}
           axisLine={false}
         />
         <Area
           type="monotone"
-          dataKey="count"
+          dataKey="Count"
           stroke="#6B1BFF"
           fillOpacity={1}
           fill="url(#gradient)"

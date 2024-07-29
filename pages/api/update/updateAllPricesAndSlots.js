@@ -5,13 +5,13 @@ const {
   HISTORICAL_CID_CACHE,
 } = require("../../../utils/constants/info.js");
 
-const { redis } = require("../../../utils/helper/InitRedis.js");
+const { redis } = require("../../../utils/helper/init/InitRedis.js");
+const axios = require("axios");
 
 const getPriceOf = require("../../../utils/helper/GetPriceOf.js");
-const appendSignatureToSlot = require("../../../utils/helper/AppendSignatureToSlot");
+const appendSignatureToSlot = require("../../../utils/helper/AppendSignatureToSlot.js");
 const generateGraphData = require("../../../utils/helper/GenerateGraphData.js");
 
-const axios = require("axios");
 const GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
 
 function produceHistoricalArray(token, historicalObj) {
@@ -33,7 +33,6 @@ function produceLatestArray(latestObj) {
   const tokenLatestArray = new Array();
   tokenLatestArray.push(latestObj);
 
-  console.log(tokenLatestArray);
   return tokenLatestArray;
 }
 
@@ -57,19 +56,22 @@ async function startFetchAndUpdates(tokens) {
       await redis.set(TOKEN_TO_CACHE[token], results[1]);
       await redis.set(TOKEN_TO_SIGNED_SLOT[token], "NULL");
 
+      const DEPLOYER_PUBLIC_KEY = process.env.NEXT_PUBLIC_DEPLOYER_PUBLIC_KEY;
+
       await appendSignatureToSlot(
         token,
         results[1],
         results[1].signature,
-        ORACLE_PUBLIC_KEY
+        DEPLOYER_PUBLIC_KEY
       );
 
-      const immediate = new Array();
-      immediate.push(results[1]);
-      const subone = immediate[0].prices_returned[0] < 1 ? true : false;
+      const latest = new Array();
+      latest.push(results[1]);
+
+      // Check if the price is under 1.
+      const subone = results[0] < 1 ? true : false;
 
       const historical_latest = produceLatestArray(ipfs.latest.prices[token]);
-
       const historical_historical = produceHistoricalArray(
         token,
         ipfs.historical
@@ -78,7 +80,7 @@ async function startFetchAndUpdates(tokens) {
       // (IMMEDIATE, HISTORICAL_LATEST, HISTORICAL_HISTORICAL)
       const graphResult = await generateGraphData(
         subone,
-        immediate,
+        latest,
         historical_latest,
         historical_historical
       );

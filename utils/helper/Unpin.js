@@ -1,7 +1,7 @@
 const JWT = process.env.PINATA_JWT;
 
-export default async function unpin(cid, functionName) {
-  console.log("Called by :", functionName);
+async function unpin(cid, functionName) {
+  console.log("Unpin called by :", functionName);
   if (cid != "NULL") {
     try {
       const options = {
@@ -18,5 +18,7 @@ export default async function unpin(cid, functionName) {
       console.log(`ERROR DELETE PIN : ${cid}`);
       console.log(error);
     }
-  }
+  } else console.log("Nothing to unpin.");
 }
+
+module.exports = unpin;

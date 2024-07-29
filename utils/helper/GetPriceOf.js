@@ -6,7 +6,7 @@ const {
 const DEPLOYER_KEY = process.env.DEPLOYER_KEY;
 const { testnetSignatureClient } = require("./SignatureClient");
 
-import {
+const {
   CoinGekoSymbols,
   BinanceSymbols,
   CMCSymbols,
@@ -23,7 +23,7 @@ import {
   ByBitSymbols,
   CexIOSymbols,
   SwapZoneSymbols,
-} from "../constants/symbols";
+} = require("../constants/symbols");
 
 async function getPriceCoinGecko(token) {
   const id = CoinGekoSymbols[token.toLowerCase()];
@@ -289,7 +289,7 @@ async function removeOutliers(prices, timestamps, signatures, urls, threshold) {
     }
   }
 
-  console.log("\nData Points Considered :", nonOutlierPrices.length);
+  console.log("Data Points Considered :", nonOutlierPrices.length);
 
   return [
     nonOutlierPrices,
@@ -366,7 +366,7 @@ async function getPriceOf(token) {
   const meanPrice = parseFloat(sum / count);
   const aggregatedAt = Date.now();
 
-  //MULTIPLY BY 10 AND DROP THE DECIMALS
+  // MULTIPLY BY 10 AND DROP THE DECIMALS
   const processedMeanPrice = processFloatString(meanPrice);
 
   const signedPrice = testnetSignatureClient.signFields(
@@ -374,7 +374,7 @@ async function getPriceOf(token) {
     DEPLOYER_KEY
   );
 
-  console.log("\nSigned :", signedPrice);
+  console.log("Signed :", signedPrice);
 
   let jsonCompatibleSignature = {};
   jsonCompatibleSignature["signature"] = signedPrice.signature;
@@ -383,13 +383,14 @@ async function getPriceOf(token) {
 
   const assetCacheObject = {
     price: processedMeanPrice,
+    floatingPrice: meanPrice,
     decimals: 10,
-    signature: jsonCompatibleSignature,
     aggregationTimestamp: aggregatedAt,
-    urls: cleanedData[3],
+    signature: jsonCompatibleSignature,
     prices_returned: cleanedData[0],
-    timestamps: cleanedData[2],
     signatures: cleanedData[1],
+    timestamps: cleanedData[2],
+    urls: cleanedData[3],
   };
 
   console.log("Mean :", meanPrice);

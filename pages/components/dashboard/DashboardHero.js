@@ -31,7 +31,9 @@ export default function DashboardHero() {
 
   async function checkUserStatus() {
     try {
-      const res = await axios.get(`/api/get/getUserStatus?address=${signer}`);
+      const res = await axios.get(
+        `/api/get/user/getUserStatus?address=${signer}`
+      );
       setUserStatus(res.data.status);
       if (res.data.status == 0) onOpen();
     } catch (error) {
@@ -59,7 +61,7 @@ export default function DashboardHero() {
     };
 
     await axios
-      .get(`/api/addUser?address=${signer}`, {
+      .get(`/api/user/initUser?address=${signer}`, {
         headers: headers,
       })
       .then((res) => {
@@ -84,14 +86,15 @@ export default function DashboardHero() {
 
       try {
         const res = await axios.get(
-          `/api/get/getUserInformation?address=${signer}&timestamp=${timestamp}`,
+          `/api/get/user/getUserInformation?address=${signer}&timestamp=${timestamp}`,
           {
             headers: headers,
           }
         );
+        console.log(res.data);
 
-        const data = JSON.parse(res.data);
-        setUserDetails(data);
+        // const data = JSON.parse(res.data.data);
+        setUserDetails(res.data.data);
       } catch (err) {
         console.log("Something went wrong!");
       }

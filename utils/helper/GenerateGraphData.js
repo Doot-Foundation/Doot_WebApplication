@@ -9,8 +9,6 @@ async function generateGraphData(subone, immediate, latest, historical) {
   let minPrice = Infinity;
   let maxPrice = -Infinity;
 
-  console.log(historical, latest, immediate);
-
   const combinedArray = [...historical, ...latest, ...immediate];
 
   combinedArray.forEach((item) => {

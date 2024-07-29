@@ -29,6 +29,7 @@ export default async function handler(req, res) {
         .json({ status: false, message: "Invalid API Key." });
   }
   return res.status(400).json({
+    status: 400,
     message:
       "ERR! API Key not found in header. Header should include 'Authorization:Bearer [API_KEY]'. For more information visit : https://doot.foundation/dashboard.",
   });

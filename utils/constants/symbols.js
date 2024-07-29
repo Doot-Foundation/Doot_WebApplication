@@ -69,7 +69,7 @@ const PricePaprikeSymbols = {
   chainlink: "link-chainlink",
   mina: "mina-mina-protocol",
   solana: "sol-solana",
-  ripple: "xrpchain-ripple-chain",
+  ripple: "xrp-xrp",
   dogecoin: "doge-dogecoin",
   polygon: "matic-polygon",
   avalanche: "avax-avalanche",

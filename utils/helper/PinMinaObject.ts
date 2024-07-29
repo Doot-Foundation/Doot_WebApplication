@@ -6,10 +6,7 @@ async function frameKey(key: CircuitString) {
   return key.hash();
 }
 
-export default async function pinMinaObject(
-  obj: { [key: string]: any },
-  previousCID: string
-) {
+async function pinMinaObject(obj: { [key: string]: any }, previousCID: string) {
   const Map = new MerkleMap();
 
   const minaKey = await frameKey(CircuitString.fromString("Mina"));
@@ -122,9 +119,12 @@ export default async function pinMinaObject(
   );
   const data = await response.json();
   const IPFS = data.IpfsHash;
-  console.log("PINNED MINA OBJECT", IPFS);
+  console.log("Pinned Mina Object.");
+  console.log(data);
 
   if (previousCID) await unpin(previousCID, "Mina");
 
   return [IPFS, COMMITMENT.toString()];
 }
+
+module.exports = pinMinaObject;

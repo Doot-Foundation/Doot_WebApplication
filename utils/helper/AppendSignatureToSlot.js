@@ -16,13 +16,15 @@ async function appendSignatureToSlot(
 
   // Bootstrap a new slot.
   if (finalState == "NULL") {
-    console.log("Running fresh slot.");
+    console.log(`Running fresh slot for ${token}.`);
     finalState = tokenDetails;
     finalState["community"] = {
       [publicKey]: signature,
     };
   } else {
     // Endorse an existing slot.
+    console.log(`Updaing existing slot for ${token}.`);
+
     const updatedState = finalState.community;
     updatedState[publicKey] = signature;
     finalState.community = updatedState;
@@ -38,7 +40,7 @@ async function appendSignatureToSlot(
   ) {
     currentMaxHistoricalSlot[token] = finalState;
     await redis.set(HISTORICAL_MAX_SIGNED_SLOT_CACHE, currentMaxHistoricalSlot);
-    console.log("UPDATED HISTORICAL MAX SIGNED SLOT INFO.\n");
+    console.log("UPDATED HISTORICAL MAX SIGNED SLOT INFO.");
   }
 
   //IF THE CURRENT SLOT HAS MORE ENDORSEMENT THAN ANY OTHER SLOTS IN THE PAST 2HRS IT REPLACES THE LEAD.
@@ -49,12 +51,12 @@ async function appendSignatureToSlot(
   ) {
     currentMaxMinaSlot[token] = finalState;
     await redis.set(MINA_MAX_SIGNED_SLOT_CACHE, currentMaxMinaSlot);
-    console.log("UPDATED MINA MAX SIGNED SLOT INFO.\n");
+    console.log("UPDATED MINA MAX SIGNED SLOT INFO.");
   }
 
   await redis.set(TOKEN_TO_SIGNED_SLOT[token], finalState);
 
-  console.log(token, "slot signed.");
+  console.log(token, "slot signed by the protocol.\n");
   return;
 }
 

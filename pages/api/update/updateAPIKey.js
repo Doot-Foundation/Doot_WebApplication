@@ -19,34 +19,41 @@ export default async function handler(req, res) {
     password: PASS,
   });
 
-  const publicKey = userInformation.address;
-  const key = userInformation.api;
-  console.log(publicKey, "called reset with original key :", key);
+  if (userInformation) {
+    const publicKey = userInformation.address;
+    const key = userInformation.key;
+    console.log(publicKey, "called reset with original key :", key);
 
-  const { data: select_data, error: select_error } = await supabase
-    .from("Auro_Login")
-    .select("generated_key, address")
-    .eq("generated_key", key);
+    const { data: select_data, error: select_error } = await supabase
+      .from("Auro_Login")
+      .select("generated_key, address")
+      .eq("generated_key", key);
 
-  if (
-    select_data.length == 0 ||
-    !uuidValidate(key) ||
-    select_data[0]?.address != publicKey
-  ) {
-    return res.status(401).json("Unauthorized.");
-  }
+    if (
+      select_data.length == 0 ||
+      !uuidValidate(key) ||
+      select_data[0]?.address != publicKey
+    ) {
+      return res.status(401).json("Unauthorized.");
+    }
 
-  const updatedKey = uuidv4();
-  const { data, error } = await supabase
-    .from("Auro_Login")
-    .update({ generated_key: updatedKey })
-    .eq("generated_key", key);
+    const updatedKey = uuidv4();
+    const { data, error } = await supabase
+      .from("Auro_Login")
+      .update({ generated_key: updatedKey })
+      .eq("generated_key", key);
 
-  await supabase.auth.signOut();
+    await supabase.auth.signOut();
 
-  if (error) {
-    return res.status(500).json({ status: "Failed" });
-  }
-
-  return res.status(200).json({ key: updatedKey });
+    return res.status(200).json({
+      status: true,
+      data: updatedKey,
+      message: "Updated API key successfully.",
+    });
+  } else
+    return res.status(400).json({
+      status: 400,
+      message:
+        "ERR! User information not found in header. Header should include 'User:[...]'.",
+    });
 }

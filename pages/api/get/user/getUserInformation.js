@@ -6,12 +6,6 @@ const {
 
 const KEY = process.env.NEXT_PUBLIC_API_INTERFACE_KEY;
 
-// MESSAGE
-// Sign this message to prove you have access to this wallet in order to sign in to doot.foundation/dashboard.
-// This won't cost you any Mina.
-// Timestamp: Date.now()
-// https://docs.aurowallet.com/general/reference/api-reference/methods/mina_signmessage
-
 export default async function handler(req, res) {
   const signHeader = JSON.parse(req.headers.signed);
   const authHeader = req.headers.authorization;
@@ -21,7 +15,7 @@ export default async function handler(req, res) {
     return;
   }
 
-  if (!signHeader) {
+  if (signHeader) {
     const timestamp = signHeader.timestamp;
     const currentTimestamp = Date.now();
 
@@ -34,6 +28,11 @@ export default async function handler(req, res) {
         .json({ status: "Timestamp out of the accepted range." });
     }
 
+    // MESSAGE
+    // Sign this message to prove you have access to this wallet in order to sign in to doot.foundation/dashboard.
+    // This won't cost you any Mina.
+    // Timestamp: Date.now()
+    // https://docs.aurowallet.com/general/reference/api-reference/methods/mina_signmessage
     const toVerifyMessage = `Sign this message to prove you have access to this wallet in order to sign in to doot.foundation/dashboard. This won't cost you any Mina. Timestamp:${timestamp}`;
     const verifyBody = {
       data: toVerifyMessage,
@@ -78,6 +77,8 @@ export default async function handler(req, res) {
     }
   }
   res.status(400).json({
+    stats: 400,
+    data: null,
     message:
       "ERR! Signature not found in header. Header should include 'Signed:[...]'.",
   });
