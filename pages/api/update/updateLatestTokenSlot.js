@@ -36,7 +36,12 @@ export default async function handler(req, res) {
     const mainnetOriginsVerified =
       mainnetSignatureClient.verifyMessage(verifyBody);
     if (!mainnetOriginsVerified) {
-      res.status(201).json({ status: 0 });
+      res
+        .status(201)
+        .json({
+          status: false,
+          message: "ERR! Unable to verify signature origins.",
+        });
       return;
     }
   }
@@ -49,5 +54,7 @@ export default async function handler(req, res) {
   );
 
   console.log(publicKey, "joined", token, "consensus.", "\n");
-  res.status(201).json({ status: 1 });
+  res
+    .status(201)
+    .json({ status: true, message: "Successfully joined consensus." });
 }

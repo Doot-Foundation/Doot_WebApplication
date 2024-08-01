@@ -34,5 +34,9 @@ export default async function handler(req, res) {
   // RESET THE MAX SLOT AFTER THE HISTORICAL HAS BEEN UPDATED.
   await redis.set(MINA_MAX_SIGNED_SLOT_CACHE, finalSlotState);
 
-  return res.status(200).json({ latest: results });
+  return res.status(200).json({
+    status: true,
+    data: results,
+    message: "Successfully pinned Mina L1 state corresponding data to IPFS.",
+  });
 }

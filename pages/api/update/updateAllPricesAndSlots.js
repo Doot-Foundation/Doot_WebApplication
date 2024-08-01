@@ -110,7 +110,7 @@ export default async function handler(req, res) {
   await startFetchAndUpdates(keys);
 
   res.status(200).json({
-    status: `Updated Prices Successfully!`,
-    timestamp: Date.now(),
+    status: true,
+    message: `Updated Prices Successfully!`,
   });
 }

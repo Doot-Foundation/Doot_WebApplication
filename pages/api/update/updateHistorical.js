@@ -34,5 +34,11 @@ export default async function handler(req, res) {
   // RESET THE MAX SLOT AFTER THE HISTORICAL HAS BEEN UPDATED.
   await redis.set(HISTORICAL_MAX_SIGNED_SLOT_CACHE, finalSlotState);
 
-  return res.status(200).json({ latest: updatedCID });
+  return res.status(200).json({
+    status: true,
+    message: "Updated historical data successfully.",
+    data: {
+      cid: updatedCID,
+    },
+  });
 }
