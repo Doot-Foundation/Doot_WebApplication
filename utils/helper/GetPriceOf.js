@@ -4,6 +4,8 @@ const {
 } = require("./CallAndSignAPICalls");
 
 const DEPLOYER_KEY = process.env.DEPLOYER_KEY;
+
+const { MULTIPLICATION_FACTOR } = require("../constants/info");
 const { testnetSignatureClient } = require("./SignatureClient");
 
 const {
@@ -272,10 +274,10 @@ async function removeOutliers(prices, timestamps, signatures, urls, threshold) {
   const median = getMedian(prices);
   const mad = getMAD(prices);
 
-  let nonOutlierPrices = [];
-  let nonOutlierTimestamps = [];
-  let nonOutlierSignatures = [];
-  let nonOutlierUrls = [];
+  const nonOutlierPrices = [];
+  const nonOutlierTimestamps = [];
+  const nonOutlierSignatures = [];
+  const nonOutlierUrls = [];
 
   for (let i = 0; i < prices.length; i++) {
     if (isNaN(Number(prices[i]))) continue;
@@ -366,7 +368,7 @@ async function getPriceOf(token) {
   const meanPrice = parseFloat(sum / count);
   const aggregatedAt = Date.now();
 
-  // MULTIPLY BY 10 AND DROP THE DECIMALS
+  /// MULTIPLY BY 10 AND DROP THE DECIMALS
   const processedMeanPrice = processFloatString(meanPrice);
 
   const signedPrice = testnetSignatureClient.signFields(
@@ -374,9 +376,12 @@ async function getPriceOf(token) {
     DEPLOYER_KEY
   );
 
-  console.log("Signed :", signedPrice);
+  console.log("Mean :", meanPrice);
+  console.log("Processed Mean :", processedMeanPrice);
+  console.log("Signature over processed mean :", signedPrice.signature);
 
-  let jsonCompatibleSignature = {};
+  /// PURPOSE - CONVERT A BIGINT DATA TO STRING DATA SINCE BIGINT IS NOT PERMITTED OVER API CALLS.
+  const jsonCompatibleSignature = {};
   jsonCompatibleSignature["signature"] = signedPrice.signature;
   jsonCompatibleSignature["publicKey"] = signedPrice.publicKey;
   jsonCompatibleSignature["data"] = signedPrice.data[0].toString();
@@ -384,7 +389,7 @@ async function getPriceOf(token) {
   const assetCacheObject = {
     price: processedMeanPrice,
     floatingPrice: meanPrice,
-    decimals: 10,
+    decimals: MULTIPLICATION_FACTOR,
     aggregationTimestamp: aggregatedAt,
     signature: jsonCompatibleSignature,
     prices_returned: cleanedData[0],
@@ -393,8 +398,6 @@ async function getPriceOf(token) {
     urls: cleanedData[3],
   };
 
-  console.log("Mean :", meanPrice);
-  console.log("Processed :", processedMeanPrice, "\n");
   return [meanPrice, assetCacheObject];
 }
 

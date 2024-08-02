@@ -28,7 +28,7 @@ function produceHistoricalArray(token, historicalObj) {
   return tokenHistoricalArray;
 }
 
-function produceLatestArray(latestObj) {
+function produceHistoricalLatestArray(latestObj) {
   const tokenLatestArray = new Array();
   tokenLatestArray.push(latestObj);
 
@@ -48,9 +48,10 @@ async function startFetchAndUpdates(tokens) {
   const pinnedData = await axios.get(`https://${GATEWAY}/ipfs/${cid}`);
   const ipfs = pinnedData.data;
 
+  const failedTokens = [];
   for (const token of tokens) {
     try {
-      console.log("=======================\n", token);
+      console.log("\n=======================\n", token);
       const results = await PriceOf(token);
 
       await redis.set(TOKEN_TO_CACHE[token], results[1]);
@@ -71,13 +72,17 @@ async function startFetchAndUpdates(tokens) {
       // Check if the price is under 1.
       const subone = results[0] < 1 ? true : false;
 
-      const historical_latest = produceLatestArray(ipfs.latest.prices[token]);
+      const historical_latest = produceHistoricalLatestArray(
+        ipfs.latest.prices[token]
+      );
       const historical_historical = produceHistoricalArray(
         token,
         ipfs.historical
       );
 
       // (IMMEDIATE, HISTORICAL_LATEST, HISTORICAL_HISTORICAL)
+      // IN THIS CASE, THE MOST FREQUENTLY CHANGED INFO IS THE LATEST - 10 MINUTES.
+      // THE HISTORICAL VALUES ARE UPDATED EVERY 30 MINUTES.
       const graphResult = await generateGraphData(
         subone,
         latest,
@@ -95,8 +100,10 @@ async function startFetchAndUpdates(tokens) {
       await redis.set(TOKEN_TO_GRAPH_DATA[token], graphResultCacheObj);
     } catch (err) {
       console.log("Failed For", token);
+      failedTokens.push(token);
     }
   }
+  return failedTokens;
 }
 
 export default async function handler(req, res) {
@@ -107,10 +114,19 @@ export default async function handler(req, res) {
   }
 
   const keys = Object.keys(TOKEN_TO_CACHE);
-  await startFetchAndUpdates(keys);
+  const failed = await startFetchAndUpdates(keys);
 
+  if (failed.length() > 0) {
+    res.status(200).json({
+      status: true,
+      message: "Updated prices partially.",
+      data: {
+        failed: failed,
+      },
+    });
+  }
   res.status(200).json({
     status: true,
-    message: `Updated Prices Successfully!`,
+    message: `Updated prices successfully.`,
   });
 }
