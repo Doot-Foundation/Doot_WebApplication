@@ -5,6 +5,7 @@ const incrementCallCounter = require("../../../utils/helper/IncrementCallCounter
 const {
   TOKEN_TO_CACHE,
   TOKEN_TO_SYMBOL,
+  TOKEN_TO_AGGREGATION_PROOF_CACHE,
 } = require("../../../utils/constants/info.js");
 
 const uuid = require("uuid");
@@ -53,12 +54,15 @@ export default async function handler(req, res) {
 
       await supabase.auth.signOut();
 
-      const cachedData = await redis.get(TOKEN_TO_CACHE[token]);
-      if (cachedData) {
+      const cachedPriceData = await redis.get(TOKEN_TO_CACHE[token]);
+      const cachedProofData = await redis.get(
+        TOKEN_TO_AGGREGATION_PROOF_CACHE[token]
+      );
+      if (cachedPriceData && cachedProofData) {
         return res.status(200).json({
           status: true,
           message: "Price information found.",
-          data: cachedData,
+          data: { price_data: cachedPriceData, proof_data: cachedProofData },
           asset: token,
         });
       } else {

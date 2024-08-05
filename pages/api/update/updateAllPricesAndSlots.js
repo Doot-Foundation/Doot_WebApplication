@@ -129,7 +129,7 @@ async function startFetchAndUpdates(tokens) {
       failedTokens.push(token);
     }
   }
-  console.log("+++++++++++ FINISHED JOB +++++++++++");
+  console.log("\n+++++++++++ FINISHED JOB +++++++++++\n");
   return failedTokens;
 }
 
