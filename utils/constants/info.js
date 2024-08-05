@@ -22,6 +22,19 @@ const HISTORICAL_MAX_SIGNED_SLOT_CACHE = "historical_signed_max";
 const MINA_CID_CACHE = "mina_cid";
 const MINA_MAX_SIGNED_SLOT_CACHE = "mina_signed_max";
 
+const TOKEN_TO_AGGREGATION_PROOF_CACHE = {
+  mina: "mina_aggregation_cache",
+  bitcoin: "btc_aggregation_cache",
+  ethereum: "eth_aggregation_cache",
+  solana: "sol_aggregation_cache",
+  ripple: "xrp_aggregation_cache",
+  cardano: "ada_aggregation_cache",
+  avalanche: "avax_aggregation_cache",
+  polygon: "matic_aggregation_cache",
+  chainlink: "link_aggregation_cache",
+  dogecoin: "doge_aggregation_cache",
+};
+
 const TOKEN_TO_CACHE = {
   mina: "mina_cache",
   bitcoin: "btc_cache",
@@ -164,6 +177,7 @@ const SYMBOL_TO_TOKEN = {
 module.exports = {
   TOKEN_TO_CACHE,
   TOKEN_TO_SYMBOL,
+  TOKEN_TO_AGGREGATION_PROOF_CACHE,
   TOKEN_TO_SIGNED_SLOT,
   TOKEN_TO_GRAPH_DATA,
   HISTORICAL_CID_CACHE,

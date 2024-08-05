@@ -56,7 +56,7 @@ async function appendSignatureToSlot(
 
   await redis.set(TOKEN_TO_SIGNED_SLOT[token], finalState);
 
-  console.log(token, "slot signed by the protocol.\n");
+  console.log(token, "slot signed by the protocol.");
   return;
 }
 

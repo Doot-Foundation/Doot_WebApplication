@@ -11,6 +11,7 @@ const { CircuitString } = require("o1js");
 
 const { MULTIPLICATION_FACTOR } = require("../constants/info");
 
+/// MULTIPLY BY 10 AND DROP THE DECIMALS
 function processFloatString(input) {
   const floatValue = parseFloat(input);
 

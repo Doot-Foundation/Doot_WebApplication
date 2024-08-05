@@ -4,6 +4,7 @@ const {
   TOKEN_TO_CACHE,
   TOKEN_TO_SIGNED_SLOT,
   TOKEN_TO_GRAPH_DATA,
+  TOKEN_TO_AGGREGATION_PROOF_CACHE,
   HISTORICAL_CID_CACHE,
 } = require("../../../utils/constants/info.js");
 
@@ -35,9 +36,9 @@ function produceHistoricalLatestArray(latestObj) {
   return tokenLatestArray;
 }
 
-async function PriceOf(token) {
+async function PriceOf(token, lastProof, isBase) {
   return new Promise((resolve) => {
-    const results = getPriceOf(token);
+    const results = getPriceOf(token, lastProof, isBase);
     resolve(results);
   });
 }
@@ -49,12 +50,37 @@ async function startFetchAndUpdates(tokens) {
   const ipfs = pinnedData.data;
 
   const failedTokens = [];
+  let lastProofDefault = JSON.stringify({
+    publicInput: [],
+    publicOutput: [],
+    maxProofsVerified: 0,
+    proof: "",
+  });
+  let isBase = true;
+
+  console.log("\n+++++++++++ STARTING JOB +++++++++++");
+
   for (const token of tokens) {
     try {
-      console.log("\n=======================\n", token);
-      const results = await PriceOf(token);
+      console.log("\n=======================\n");
+      console.log("++" + token, "\n");
+      const proofCache = JSON.stringify(
+        await redis.get(TOKEN_TO_AGGREGATION_PROOF_CACHE[token])
+      );
+      if (proofCache != "NULL") isBase = false;
+
+      const results = await PriceOf(
+        token,
+        isBase ? lastProofDefault : proofCache,
+        isBase
+      );
 
       await redis.set(TOKEN_TO_CACHE[token], results[1]);
+      await redis.set(
+        TOKEN_TO_AGGREGATION_PROOF_CACHE[token],
+        JSON.stringify(results[2])
+      );
+
       await redis.set(TOKEN_TO_SIGNED_SLOT[token], "NULL");
 
       const DEPLOYER_PUBLIC_KEY = process.env.NEXT_PUBLIC_DEPLOYER_PUBLIC_KEY;
@@ -103,6 +129,7 @@ async function startFetchAndUpdates(tokens) {
       failedTokens.push(token);
     }
   }
+  console.log("+++++++++++ FINISHED JOB +++++++++++");
   return failedTokens;
 }
 
@@ -116,7 +143,7 @@ export default async function handler(req, res) {
   const keys = Object.keys(TOKEN_TO_CACHE);
   const failed = await startFetchAndUpdates(keys);
 
-  if (failed.length() > 0) {
+  if (failed.length > 0) {
     res.status(200).json({
       status: true,
       message: "Updated prices partially.",

@@ -46,6 +46,7 @@ async function generateGraphData(
     price: normalizePrice(subone, item.price),
   }));
 
+  console.log("Generated graph data.");
   return [finalArray, minPrice, maxPrice, formattedPercentageChange];
 }
 

@@ -7,6 +7,7 @@ const DEPLOYER_KEY = process.env.DEPLOYER_KEY;
 
 const { MULTIPLICATION_FACTOR } = require("../constants/info");
 const { testnetSignatureClient } = require("./SignatureClient");
+const { AggregationModule } = require("./AggregationModule");
 
 const {
   CoinGekoSymbols,
@@ -291,7 +292,10 @@ async function removeOutliers(prices, timestamps, signatures, urls, threshold) {
     }
   }
 
-  console.log("Data Points Considered :", nonOutlierPrices.length);
+  console.log(
+    "Data Points Considered :",
+    nonOutlierPrices.length + "/" + prices.length
+  );
 
   return [
     nonOutlierPrices,
@@ -350,12 +354,24 @@ async function createAssetInfoArray(token) {
   return arrays;
 }
 
-async function getPriceOf(token) {
-  const cleanedData = await createAssetInfoArray(token);
+async function generateProofCompatiblePrices(prices) {
+  return prices.map((price) => BigInt(processFloatString(price.toString())));
+}
 
+async function getPriceOf(token, lastProof, isBase) {
+  const cleanedData = await createAssetInfoArray(token);
   const prices = cleanedData[0];
+  const proofCompatiblePrices = await generateProofCompatiblePrices(prices);
+
+  const aggregationResults = await AggregationModule(
+    proofCompatiblePrices,
+    lastProof,
+    isBase
+  );
+
   let sum = 0;
   let count = 0;
+
   await new Promise((resolve, reject) => {
     for (const price of prices) {
       sum += price;
@@ -367,8 +383,6 @@ async function getPriceOf(token) {
 
   const meanPrice = parseFloat(sum / count);
   const aggregatedAt = Date.now();
-
-  /// MULTIPLY BY 10 AND DROP THE DECIMALS
   const processedMeanPrice = processFloatString(meanPrice);
 
   const signedPrice = testnetSignatureClient.signFields(
@@ -378,6 +392,7 @@ async function getPriceOf(token) {
 
   console.log("Mean :", meanPrice);
   console.log("Processed Mean :", processedMeanPrice);
+  console.log("Aggregation Proof Public Output :", aggregationResults[1]);
   console.log("Signature over processed mean :", signedPrice.signature);
 
   /// PURPOSE - CONVERT A BIGINT DATA TO STRING DATA SINCE BIGINT IS NOT PERMITTED OVER API CALLS.
@@ -398,7 +413,12 @@ async function getPriceOf(token) {
     urls: cleanedData[3],
   };
 
-  return [meanPrice, assetCacheObject];
+  return [
+    meanPrice,
+    assetCacheObject,
+    aggregationResults[0],
+    aggregationResults[1],
+  ];
 }
 
 module.exports = getPriceOf;
