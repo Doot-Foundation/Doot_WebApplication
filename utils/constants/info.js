@@ -16,6 +16,25 @@ import {
 
 const MULTIPLICATION_FACTOR = 10;
 
+const HISTORICAL_CID_CACHE = "historical_cid";
+const HISTORICAL_MAX_SIGNED_SLOT_CACHE = "historical_signed_max";
+
+const MINA_CID_CACHE = "mina_cid";
+const MINA_MAX_SIGNED_SLOT_CACHE = "mina_signed_max";
+
+const TOKEN_TO_AGGREGATION_PROOF_CACHE = {
+  mina: "mina_aggregation_cache",
+  bitcoin: "btc_aggregation_cache",
+  ethereum: "eth_aggregation_cache",
+  solana: "sol_aggregation_cache",
+  ripple: "xrp_aggregation_cache",
+  cardano: "ada_aggregation_cache",
+  avalanche: "avax_aggregation_cache",
+  polygon: "matic_aggregation_cache",
+  chainlink: "link_aggregation_cache",
+  dogecoin: "doge_aggregation_cache",
+};
+
 const TOKEN_TO_CACHE = {
   mina: "mina_cache",
   bitcoin: "btc_cache",
@@ -28,23 +47,7 @@ const TOKEN_TO_CACHE = {
   chainlink: "link_cache",
   dogecoin: "doge_cache",
 };
-const TOKEN_TO_SIGNED_SLOT = {
-  mina: "mina_latest_slot_cache",
-  bitcoin: "btc_latest_slot_cache",
-  ethereum: "eth_latest_slot_cache",
-  solana: "sol_latest_slot_cache",
-  ripple: "xrp_latest_slot_cache",
-  cardano: "ada_latest_slot_cache",
-  avalanche: "avax_latest_slot_cache",
-  polygon: "matic_latest_slot_cache",
-  chainlink: "link_latest_slot_cache",
-  dogecoin: "doge_latest_slot_cache",
-};
 
-// {
-//    mina_graph_cache -> {graph_data, max_price, min_price, percentage_change }
-//    ...
-// }
 const TOKEN_TO_GRAPH_DATA = {
   mina: "mina_graph_cache",
   bitcoin: "btc_graph_cache",
@@ -58,16 +61,18 @@ const TOKEN_TO_GRAPH_DATA = {
   dogecoin: "doge_graph_cache",
 };
 
-const HISTORICAL_CACHE = "historical_cid";
-const HISTORICAL_SIGNED_MAX_CACHE = "historical_signed_max";
-
-const MINA_CACHE = "mina_cid";
-const MINA_SIGNED_MAX_CACHE = "mina_signed_max";
-
-const ORACLE_PUBLIC_KEY =
-  "B62qjm48BJuzaZmu2wA5YaZeKknkovbx9kDmu8E83jcYsg4sPgTDgPF";
-const DOOT_PUBLIC_KEY =
-  "B62qjaQEw1PcdETvJyLMtKxYgz8GAXv3cGeJ575Cgf3Hpw5qybr1jFE";
+const TOKEN_TO_SIGNED_SLOT = {
+  mina: "mina_latest_slot_cache",
+  bitcoin: "btc_latest_slot_cache",
+  ethereum: "eth_latest_slot_cache",
+  solana: "sol_latest_slot_cache",
+  ripple: "xrp_latest_slot_cache",
+  cardano: "ada_latest_slot_cache",
+  avalanche: "avax_latest_slot_cache",
+  polygon: "matic_latest_slot_cache",
+  chainlink: "link_latest_slot_cache",
+  dogecoin: "doge_latest_slot_cache",
+};
 
 const PROVIDERS = [
   "Binance",
@@ -170,16 +175,15 @@ const SYMBOL_TO_TOKEN = {
 };
 
 module.exports = {
-  DOOT_PUBLIC_KEY,
-  ORACLE_PUBLIC_KEY,
   TOKEN_TO_CACHE,
   TOKEN_TO_SYMBOL,
+  TOKEN_TO_AGGREGATION_PROOF_CACHE,
   TOKEN_TO_SIGNED_SLOT,
   TOKEN_TO_GRAPH_DATA,
-  HISTORICAL_CACHE,
-  HISTORICAL_SIGNED_MAX_CACHE,
-  MINA_CACHE,
-  MINA_SIGNED_MAX_CACHE,
+  HISTORICAL_CID_CACHE,
+  HISTORICAL_MAX_SIGNED_SLOT_CACHE,
+  MINA_CID_CACHE,
+  MINA_MAX_SIGNED_SLOT_CACHE,
   MULTIPLICATION_FACTOR,
   SYMBOL_TO_TOKEN,
   SUPPORTED_TOKENS,

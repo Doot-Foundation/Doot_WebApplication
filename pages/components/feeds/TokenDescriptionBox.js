@@ -28,33 +28,39 @@ export default function TokenDescriptionBox({ token }) {
       const headers = {
         Authorization: "Bearer " + key,
       };
+
       const priceResponse = await axios.get(
-        `/api/get/getPriceInterface?token=${token}`,
+        `/api/get/interface/getPrice?token=${token}`,
         {
           headers: headers,
         }
       );
+
       const graphResponse = await axios.get(
-        `/api/get/getGraphDataInterface?token=${token}`,
+        `/api/get/interface/getGraphData?token=${token}`,
         {
           headers: headers,
         }
       );
 
-      setGraphData(graphResponse.data.information.graph_data);
-      setGraphMin(graphResponse.data.information.min_price);
-      setGraphMax(graphResponse.data.information.max_price);
-      setPercentage(graphResponse.data.information.percentage_change);
-      setDirection(graphResponse.data.information.percentage_change[0]);
+      setGraphData(graphResponse.data.data.graph_data);
+      setGraphMin(graphResponse.data.data.min_price);
+      setGraphMax(graphResponse.data.data.max_price);
+      setPercentage(graphResponse.data.data.percentage_change);
+      setDirection(graphResponse.data.data.percentage_change[0]);
 
-      setNormalizedPrice(normalizePrice(priceResponse.data.information.price));
+      setNormalizedPrice(normalizePrice(priceResponse.data.data.price));
     } catch (error) {
       console.error("Error fetching price:", error);
     }
   }
 
   useEffect(() => {
-    getInformation();
+    async function execute() {
+      await getInformation();
+    }
+
+    execute();
   }, []);
 
   const linkSource = `/feeds/${TOKEN_TO_SYMBOL[token]}`;

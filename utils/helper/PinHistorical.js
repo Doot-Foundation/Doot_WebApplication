@@ -2,7 +2,7 @@ const axios = require("axios");
 const JWT = process.env.PINATA_JWT;
 const GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
 
-import unpin from "./Unpin";
+const unpin = require("./Unpin");
 
 function removeOldTimestamps(obj) {
   const currentTime = new Date();
@@ -18,7 +18,7 @@ function removeOldTimestamps(obj) {
   });
 }
 
-export async function pinHistoricalObject(previousCID, latestPrices) {
+async function pinHistoricalObject(previousCID, latestPrices) {
   let isFirst;
   let toUploadObject;
 
@@ -55,10 +55,10 @@ export async function pinHistoricalObject(previousCID, latestPrices) {
     };
   }
 
-  console.log("IsFirst :", isFirst);
+  console.log("Fresh Historical :", isFirst);
 
   removeOldTimestamps(toUploadObject);
-  console.log("Removed Older Timestamps!");
+  console.log("Removed Historical Data > 24hrs(if any).");
 
   const options = {
     method: "POST",
@@ -78,9 +78,12 @@ export async function pinHistoricalObject(previousCID, latestPrices) {
     options
   );
   const data = await response.json();
+  console.log("Pinned Historical Data.");
   console.log(data);
 
   await unpin(previousCID, "Historical");
 
   return data.IpfsHash;
 }
+
+module.exports = pinHistoricalObject;

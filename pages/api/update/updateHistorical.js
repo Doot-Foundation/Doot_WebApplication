@@ -1,15 +1,14 @@
-const {
-  pinHistoricalObject,
-} = require("../../../utils/helper/PinHistorical.js");
+const { redis } = require("../../../utils/helper/init/InitRedis");
 
 const {
-  HISTORICAL_SIGNED_MAX_CACHE,
-  HISTORICAL_CACHE,
+  HISTORICAL_MAX_SIGNED_SLOT_CACHE,
+  HISTORICAL_CID_CACHE,
 } = require("../../../utils/constants/info");
-const { redis } = require("../../../utils/helper/InitRedis");
+const pinHistoricalObject = require("../../../utils/helper/PinHistorical.js");
 
 export default async function handler(req, res) {
   const authHeader = req.headers.authorization;
+
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     res.status(401).json("Unauthorized");
     return;
@@ -17,25 +16,29 @@ export default async function handler(req, res) {
 
   const obj = {};
   const finalSlotState = {};
-  const CACHED_DATA = await redis.get(HISTORICAL_SIGNED_MAX_CACHE);
+
+  const CACHED_DATA = await redis.get(HISTORICAL_MAX_SIGNED_SLOT_CACHE);
   const keys = Object.keys(CACHED_DATA);
 
-  for (const item of keys) {
-    const data = CACHED_DATA[item];
-    if (Object.keys(data).length === 1) continue;
-    obj[item] = data;
-    finalSlotState[item] = { community: {} };
+  for (const key of keys) {
+    const data = CACHED_DATA[key];
+    obj[key] = data;
+    finalSlotState[key] = { community: {} };
   }
 
-  if (Object.keys(obj).length === 0) {
-    res.status(200).json({ latest: "Not updated." });
-    return;
-  }
-
-  const cid = await redis.get(HISTORICAL_CACHE);
+  const cid = await redis.get(HISTORICAL_CID_CACHE);
   const updatedCID = await pinHistoricalObject(cid, obj);
-  await redis.set(HISTORICAL_CACHE, updatedCID);
-  await redis.set(HISTORICAL_SIGNED_MAX_CACHE, finalSlotState);
 
-  res.status(200).json({ latest: updatedCID });
+  // IPFS PIN UPDATED.
+  await redis.set(HISTORICAL_CID_CACHE, updatedCID);
+  // RESET THE MAX SLOT AFTER THE HISTORICAL HAS BEEN UPDATED.
+  await redis.set(HISTORICAL_MAX_SIGNED_SLOT_CACHE, finalSlotState);
+
+  return res.status(200).json({
+    status: true,
+    message: "Updated historical data successfully.",
+    data: {
+      cid: updatedCID,
+    },
+  });
 }

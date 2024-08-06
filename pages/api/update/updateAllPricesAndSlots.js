@@ -1,19 +1,18 @@
+const { redis } = require("../../../utils/helper/init/InitRedis.js");
+
 const {
   TOKEN_TO_CACHE,
   TOKEN_TO_SIGNED_SLOT,
-  ORACLE_PUBLIC_KEY,
-  HISTORICAL_CACHE,
   TOKEN_TO_GRAPH_DATA,
+  TOKEN_TO_AGGREGATION_PROOF_CACHE,
+  HISTORICAL_CID_CACHE,
 } = require("../../../utils/constants/info.js");
 
-const { redis } = require("../../../utils/helper/InitRedis.js");
-
 const getPriceOf = require("../../../utils/helper/GetPriceOf.js");
-const appendSignatureToSlot = require("../../../utils/helper/AppendSignatureToSlot");
+const appendSignatureToSlot = require("../../../utils/helper/AppendSignatureToSlot.js");
 const generateGraphData = require("../../../utils/helper/GenerateGraphData.js");
 
 const axios = require("axios");
-const GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
 
 function produceHistoricalArray(token, historicalObj) {
   const tokenHistoricalArray = [];
@@ -30,56 +29,89 @@ function produceHistoricalArray(token, historicalObj) {
   return tokenHistoricalArray;
 }
 
-function produceLatestArray(latestObj) {
+function produceHistoricalLatestArray(latestObj) {
   const tokenLatestArray = new Array();
   tokenLatestArray.push(latestObj);
 
-  console.log(tokenLatestArray);
   return tokenLatestArray;
 }
 
-async function PriceOf(token) {
+async function PriceOf(token, lastProof, isBase) {
   return new Promise((resolve) => {
-    const results = getPriceOf(token);
+    const results = getPriceOf(token, lastProof, isBase);
     resolve(results);
   });
 }
 
 async function startFetchAndUpdates(tokens) {
-  const cid = await redis.get(HISTORICAL_CACHE);
+  const cid = await redis.get(HISTORICAL_CID_CACHE);
+  const GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
   const pinnedData = await axios.get(`https://${GATEWAY}/ipfs/${cid}`);
   const ipfs = pinnedData.data;
 
+  const failedTokens = [];
+  let lastProofDefault = JSON.stringify({
+    publicInput: [],
+    publicOutput: [],
+    maxProofsVerified: 0,
+    proof: "",
+  });
+  let isBase = true;
+
+  console.log("\n+++++++++++ STARTING JOB +++++++++++");
+
   for (const token of tokens) {
     try {
-      console.log("=======================\n", token);
-      const results = await PriceOf(token);
+      console.log("\n=======================\n");
+      console.log("++" + token, "\n");
+      const proofCache = JSON.stringify(
+        await redis.get(TOKEN_TO_AGGREGATION_PROOF_CACHE[token])
+      );
+      if (proofCache != "NULL") isBase = false;
+
+      const results = await PriceOf(
+        token,
+        isBase ? lastProofDefault : proofCache,
+        isBase
+      );
 
       await redis.set(TOKEN_TO_CACHE[token], results[1]);
+      await redis.set(
+        TOKEN_TO_AGGREGATION_PROOF_CACHE[token],
+        JSON.stringify(results[2])
+      );
+
       await redis.set(TOKEN_TO_SIGNED_SLOT[token], "NULL");
+
+      const DEPLOYER_PUBLIC_KEY = process.env.NEXT_PUBLIC_DEPLOYER_PUBLIC_KEY;
 
       await appendSignatureToSlot(
         token,
         results[1],
         results[1].signature,
-        ORACLE_PUBLIC_KEY
+        DEPLOYER_PUBLIC_KEY
       );
 
-      const immediate = new Array();
-      immediate.push(results[1]);
-      const subone = immediate[0].prices_returned[0] < 1 ? true : false;
+      const latest = new Array();
+      latest.push(results[1]);
 
-      const historical_latest = produceLatestArray(ipfs.latest.prices[token]);
+      // Check if the price is under 1.
+      const subone = results[0] < 1 ? true : false;
 
+      const historical_latest = produceHistoricalLatestArray(
+        ipfs.latest.prices[token]
+      );
       const historical_historical = produceHistoricalArray(
         token,
         ipfs.historical
       );
 
       // (IMMEDIATE, HISTORICAL_LATEST, HISTORICAL_HISTORICAL)
+      // IN THIS CASE, THE MOST FREQUENTLY CHANGED INFO IS THE LATEST - 10 MINUTES.
+      // THE HISTORICAL VALUES ARE UPDATED EVERY 30 MINUTES.
       const graphResult = await generateGraphData(
         subone,
-        immediate,
+        latest,
         historical_latest,
         historical_historical
       );
@@ -94,8 +126,11 @@ async function startFetchAndUpdates(tokens) {
       await redis.set(TOKEN_TO_GRAPH_DATA[token], graphResultCacheObj);
     } catch (err) {
       console.log("Failed For", token);
+      failedTokens.push(token);
     }
   }
+  console.log("\n+++++++++++ FINISHED JOB +++++++++++\n");
+  return failedTokens;
 }
 
 export default async function handler(req, res) {
@@ -106,10 +141,19 @@ export default async function handler(req, res) {
   }
 
   const keys = Object.keys(TOKEN_TO_CACHE);
-  await startFetchAndUpdates(keys);
+  const failed = await startFetchAndUpdates(keys);
 
+  if (failed.length > 0) {
+    res.status(200).json({
+      status: true,
+      message: "Updated prices partially.",
+      data: {
+        failed: failed,
+      },
+    });
+  }
   res.status(200).json({
-    status: `Updated Prices Successfully!`,
-    timestamp: Date.now(),
+    status: true,
+    message: `Updated prices successfully.`,
   });
 }

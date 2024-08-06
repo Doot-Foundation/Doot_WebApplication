@@ -1,15 +1,12 @@
 const JWT = process.env.PINATA_JWT;
 import unpin from "./Unpin";
-import { Poseidon, CircuitString, MerkleMap, Field } from "o1js";
+import { CircuitString, MerkleMap, Field } from "o1js";
 
 async function frameKey(key: CircuitString) {
-  return Poseidon.hash(key.toFields());
+  return key.hash();
 }
 
-export default async function pinMinaObject(
-  obj: { [key: string]: any },
-  previousCID: string
-) {
+async function pinMinaObject(obj: { [key: string]: any }, previousCID: string) {
   const Map = new MerkleMap();
 
   const minaKey = await frameKey(CircuitString.fromString("Mina"));
@@ -60,8 +57,9 @@ export default async function pinMinaObject(
 
   const timestamp = Date.now();
   const toUploadObject = {
+    assets: obj,
     merkle_map: {
-      last_updated: timestamp,
+      pinnedAt: timestamp,
       commitment: COMMITMENT,
       keys: [
         ethereumKey,
@@ -100,7 +98,6 @@ export default async function pinMinaObject(
         cardanoWitness,
       ],
     },
-    assets: obj,
   };
 
   const options = {
@@ -122,9 +119,12 @@ export default async function pinMinaObject(
   );
   const data = await response.json();
   const IPFS = data.IpfsHash;
-  console.log("PINNED MINA OBJECT", IPFS);
+  console.log("Pinned Mina Object.");
+  console.log(data);
 
-  await unpin(previousCID, "Mina");
+  if (previousCID) await unpin(previousCID, "Mina");
 
   return [IPFS, COMMITMENT.toString()];
 }
+
+module.exports = pinMinaObject;

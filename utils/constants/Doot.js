@@ -38,7 +38,7 @@ import {
   Provable,
 } from "o1js";
 import { MultiPackedStringFactory } from "o1js-pack";
-const { OffchainState } = Experimental;
+const { OffchainState, OffchainStateCommitments } = Experimental;
 export const offchainState = OffchainState({
   prices: OffchainState.Map(Field, Field),
 });
@@ -46,7 +46,6 @@ export class PriceProof extends offchainState.Proof {}
 export class IpfsCID extends MultiPackedStringFactory(2) {}
 export class PricesArray extends Struct({
   prices: Provable.Array(Field, 10),
-  // aggregationProofs: Provable.Array(SelfProof<Prices, Field>, 10),
 }) {}
 export class Doot extends SmartContract {
   constructor() {
@@ -54,12 +53,12 @@ export class Doot extends SmartContract {
     this.commitment = State();
     this.secret = State();
     this.ipfsCID = State();
-    this.oraclePublicKey = State();
-    this.offchainState = offchainState.commitments();
+    this.deployerPublicKey = State();
+    this.offchainState = State(OffchainStateCommitments.empty());
   }
   init() {
     super.init();
-    this.oraclePublicKey.set(this.sender.getUnconstrained());
+    this.deployerPublicKey.set(this.sender.getUnconstrained());
   }
   async initBase(
     updatedCommitment,
@@ -67,7 +66,7 @@ export class Doot extends SmartContract {
     pricesArray,
     updatedSecret
   ) {
-    this.oraclePublicKey.getAndRequireEquals();
+    this.deployerPublicKey.getAndRequireEquals();
     this.secret.getAndRequireEquals();
     this.commitment.getAndRequireEquals();
     this.ipfsCID.getAndRequireEquals();
@@ -178,7 +177,7 @@ export class Doot extends SmartContract {
     this.secret.set(Poseidon.hash([updatedSecret]));
   }
   async update(updatedCommitment, updatedIpfsCID, pricesArray, secret) {
-    this.oraclePublicKey.getAndRequireEquals();
+    this.deployerPublicKey.getAndRequireEquals();
     this.secret.getAndRequireEquals();
     this.commitment.getAndRequireEquals();
     this.ipfsCID.getAndRequireEquals();
@@ -294,8 +293,8 @@ export class Doot extends SmartContract {
     await offchainState.settle(proof);
   }
   async verify(signature, Price) {
-    this.oraclePublicKey.getAndRequireEquals();
-    const validSignature = signature.verify(this.oraclePublicKey.get(), [
+    this.deployerPublicKey.getAndRequireEquals();
+    const validSignature = signature.verify(this.deployerPublicKey.get(), [
       Price,
     ]);
     validSignature.assertTrue();
@@ -322,11 +321,11 @@ __decorate(
 __decorate(
   [state(PublicKey), __metadata("design:type", Object)],
   Doot.prototype,
-  "oraclePublicKey",
+  "deployerPublicKey",
   void 0
 );
 __decorate(
-  [state(OffchainState.Commitments), __metadata("design:type", Object)],
+  [state(OffchainStateCommitments), __metadata("design:type", Object)],
   Doot.prototype,
   "offchainState",
   void 0

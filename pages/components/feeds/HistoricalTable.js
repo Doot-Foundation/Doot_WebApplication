@@ -64,25 +64,33 @@ export default function HistoricalTable({ ipfsHistorical, ipfsLatest }) {
         bgcolor={"white"}
         color={"black"}
         borderRadius={10}
-        overflow="hidden"
+        overflowY="hidden"
         border="none"
       >
         <Thead>
-          <Tr>
-            <Th>SNo</Th>
+          <Tr bgcolor="#5218bd">
+            <Th color="white">SNo</Th>
             <Tooltip label="Signature over the aggregated price.">
-              <Th>Agg. Signature</Th>
+              <Th color="white">Agg. Signature</Th>
             </Tooltip>
             <Tooltip label="The aggregated price after removing outliers.">
-              <Th>Agg. Price</Th>
+              <Th color="white">Agg. Price</Th>
             </Tooltip>
             <Tooltip label="Timestamp when the aggregated price was calculated.">
-              <Th>Agg. Timestamp</Th>
+              <Th color="white">Agg. Timestamp</Th>
             </Tooltip>
-            <Th>Provider</Th>
-            <Th>Price</Th>
-            <Th>Signature</Th>
-            <Th>Timestamp</Th>
+            <Tooltip label="Data provider called.">
+              <Th color="white">Provider</Th>
+            </Tooltip>
+            <Tooltip label="Returned price from the data provider.">
+              <Th color="white">Price</Th>
+            </Tooltip>
+            <Tooltip label="Signature over the response price from the data provider.">
+              <Th color="white">Signature</Th>
+            </Tooltip>
+            <Tooltip label="Timestamp when the response was received.">
+              <Th color="white"> Timestamp</Th>
+            </Tooltip>
           </Tr>
         </Thead>
         <Tbody border={"none"} borderRadius={20} overflow="hidden">
@@ -128,7 +136,7 @@ export default function HistoricalTable({ ipfsHistorical, ipfsLatest }) {
                           signatures[x].signature.slice(-4)
                         : null}
                     </Td>
-                    <Td>{timestamps[x]}</Td>
+                    <Td border="none">{timestamps[x]}</Td>
                   </Tr>
                 ));
               } catch (err) {

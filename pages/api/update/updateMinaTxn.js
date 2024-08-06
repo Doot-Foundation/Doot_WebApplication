@@ -1,7 +1,7 @@
-import sendMinaTxn from "../../../utils/helper/SendMinaTxn.ts";
+const { redis } = require("../../../utils/helper/init/InitRedis.js");
 
-const { MINA_CACHE } = require("../../../utils/constants/info.js");
-const { redis } = require("../../../utils/helper/InitRedis.js");
+const { MINA_CID_CACHE } = require("../../../utils/constants/info.js");
+const sendMinaTxn = require("../../../utils/helper/SendMinaTxn.ts");
 
 export default async function handler(req, res) {
   const authHeader = req.headers.authorization;
@@ -10,7 +10,7 @@ export default async function handler(req, res) {
     return;
   }
 
-  const array = await redis.get(MINA_CACHE);
+  const array = await redis.get(MINA_CID_CACHE);
   //RESULTS : [IPFSHASH,COMMITMENT]
   const success = await sendMinaTxn(array);
 

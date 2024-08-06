@@ -1,4 +1,4 @@
-export default async function incrementCallCounter(obj) {
+async function incrementCallCounter(obj) {
   const now = new Date();
   const currentMonth = now.getMonth();
 
@@ -9,3 +9,5 @@ export default async function incrementCallCounter(obj) {
 
   return obj;
 }
+
+module.exports = incrementCallCounter;

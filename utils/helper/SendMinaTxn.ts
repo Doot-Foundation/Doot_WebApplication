@@ -1,55 +1,54 @@
-const ORACLE_KEY: string | undefined = process.env.ORACLE_KEY;
+const DEPLOYER_KEY: string | undefined = process.env.DEPLOYER_KEY;
 const DOOT_KEY: string | undefined = process.env.DOOT_KEY;
 const MINA_SECRET: string | undefined = process.env.MINA_SECRET;
 const ENDPOINT: string | undefined = process.env.NEXT_PUBLIC_MINA_ENDPOINT;
 
-import { Doot, IpfsCID, PricesArray } from "./Doot";
+import { Doot, IpfsCID, PricesArray } from "../constants/Doot.js";
 import { Mina, PrivateKey, Field, fetchAccount } from "o1js";
 import { DootFileSystem, fetchFiles } from "./LoadCache";
 
-export default async function sendMinaTxn(array: string[]) {
-  console.log(array);
-  if (ORACLE_KEY && DOOT_KEY && MINA_SECRET && ENDPOINT) {
+async function sendMinaTxn(array: string[], prices: bigint[]) {
+  if (DEPLOYER_KEY && DOOT_KEY && MINA_SECRET && ENDPOINT) {
     const COMMITMENT = Field.from(array[1]);
     const IPFS_HASH: IpfsCID = IpfsCID.fromString(array[0]);
     const SECRET: Field = Field.from(MINA_SECRET);
+    const PRICES: PricesArray = new PricesArray({
+      prices: prices.map((e) => Field.from(e)),
+    });
 
     const doot = PrivateKey.fromBase58(DOOT_KEY);
     const dootPub = doot.toPublicKey();
-    const oracle = PrivateKey.fromBase58(ORACLE_KEY);
-    const oraclePub = oracle.toPublicKey();
+    const deployer = PrivateKey.fromBase58(DEPLOYER_KEY);
+    const deployerPub = deployer.toPublicKey();
 
-    const Berkeley = Mina.Network(ENDPOINT);
-    Mina.setActiveInstance(Berkeley);
+    const Devnet = Mina.Network(ENDPOINT);
+    Mina.setActiveInstance(Devnet);
 
     let accountInfo = {
       publicKey: dootPub,
     };
     await fetchAccount(accountInfo);
     accountInfo = {
-      publicKey: oraclePub,
+      publicKey: deployerPub,
     };
     await fetchAccount(accountInfo);
 
     const cacheFiles = await fetchFiles();
     await Doot.compile({ cache: DootFileSystem(cacheFiles) });
-    const zkapp = new Doot(dootPub);
-
-    const transactionFee = 100_000_000;
-    const PRICES = new PricesArray({ prices: [Field.from(0)] });
+    const dootZkApp = new Doot(dootPub);
 
     console.log("Proving and sending txn...");
-    const txn = await Mina.transaction(
-      { sender: oraclePub, fee: transactionFee },
-      () => {
-        zkapp.update(COMMITMENT, IPFS_HASH, PRICES, SECRET);
-      }
-    );
-    await txn.prove();
+
+    const txn = await Mina.transaction(deployerPub, async () => {
+      await dootZkApp.update(COMMITMENT, IPFS_HASH, PRICES, SECRET);
+    }).prove();
     console.log("Proved.");
 
-    const res = await txn.sign([oracle]).send();
-    console.log("Sent txn:", res.hash());
+    const res = await txn.sign([deployer]).send();
+
+    console.log("Sent txn:", res.hash);
     return true;
   }
 }
+
+module.exports = sendMinaTxn;

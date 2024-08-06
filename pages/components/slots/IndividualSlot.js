@@ -26,6 +26,7 @@ export default function IndividualSlot({ token }) {
   const [timePassed, setTimePassed] = useState(null);
 
   const [timeLagError, setTimeLagError] = useState(false);
+
   const src = `/static/slot_token/${token}.png`;
 
   async function fetchInitDetails() {
@@ -34,19 +35,19 @@ export default function IndividualSlot({ token }) {
         Authorization: "Bearer " + key,
       };
       const response = await axios.get(
-        `/api/get/getLatestTokenSlot?token=${token}`,
+        `/api/get/interface/getTokenSlot?token=${token}`,
         {
           headers: headers,
         }
       );
-      setResult(response.data.information);
-      if (Date.now() - response.data.information.aggregationTimestamp > 600000)
+
+      const data = response.data.data[0][token];
+      setResult(data);
+      if (Date.now() - data.aggregationTimestamp > 600000)
         setTimeLagError(true);
       else {
         setTimePassed(
-          Math.floor(
-            (Date.now() - response.data.information.aggregationTimestamp) / 1000
-          )
+          Math.floor((Date.now() - data.aggregationTimestamp) / 1000)
         );
       }
     } catch (error) {
@@ -133,6 +134,8 @@ export default function IndividualSlot({ token }) {
   }
 
   useEffect(() => {}, [timePassed]);
+
+  console.log(timePassed);
 
   return (
     <>

@@ -1,21 +1,18 @@
-const { redis } = require("../../../utils/helper/InitRedis.js");
+const { redis } = require("../../../utils/helper/init/InitRedis.js");
 
 const {
   TOKEN_TO_CACHE,
   TOKEN_TO_SIGNED_SLOT,
   TOKEN_TO_GRAPH_DATA,
-  HISTORICAL_CACHE,
-  HISTORICAL_SIGNED_MAX_CACHE,
-  MINA_CACHE,
-  MINA_SIGNED_MAX_CACHE,
-  ORACLE_PUBLIC_KEY,
+  HISTORICAL_CID_CACHE,
+  HISTORICAL_MAX_SIGNED_SLOT_CACHE,
+  MINA_CID_CACHE,
+  MINA_MAX_SIGNED_SLOT_CACHE,
 } = require("../../../utils/constants/info.js");
 
-const {
-  pinHistoricalObject,
-} = require("../../../utils/helper/PinHistorical.js");
+const pinHistoricalObject = require("../../../utils/helper/PinHistorical.js");
 
-import pinMinaObject from "../../../utils/helper/PinMinaObject.ts";
+const pinMinaObject = require("../../../utils/helper/PinMinaObject.ts");
 
 const getPriceOf = require("../../../utils/helper/GetPriceOf.js");
 
@@ -47,7 +44,7 @@ async function resetHistoricalCache(keys) {
   }
 
   const updatedCID = await pinHistoricalObject("NULL", finalObject);
-  await redis.set(HISTORICAL_CACHE, updatedCID);
+  await redis.set(HISTORICAL_CID_CACHE, updatedCID);
 }
 
 async function resetHistoricalSignedCache(keys) {
@@ -56,7 +53,7 @@ async function resetHistoricalSignedCache(keys) {
   for (const key of keys) {
     finalObj[key] = { community: {} };
   }
-  await redis.set(HISTORICAL_SIGNED_MAX_CACHE, finalObj);
+  await redis.set(HISTORICAL_MAX_SIGNED_SLOT_CACHE, finalObj);
 }
 
 async function resetMinaCache(keys) {
@@ -68,8 +65,7 @@ async function resetMinaCache(keys) {
   }
 
   const updatedCID = await pinMinaObject(finalObj, "NULL");
-  console.log(updatedCID);
-  await redis.set(MINA_CACHE, updatedCID);
+  await redis.set(MINA_CID_CACHE, updatedCID);
 }
 
 async function resetMinaSignedCache(keys) {
@@ -79,10 +75,12 @@ async function resetMinaSignedCache(keys) {
     finalObj[key] = { community: {} };
   }
 
-  await redis.set(MINA_SIGNED_MAX_CACHE, finalObj);
+  await redis.set(MINA_MAX_SIGNED_SLOT_CACHE, finalObj);
 }
 
 async function resetSlots(keys) {
+  const DEPLOYER_PUBLIC_KEY = process.env.NEXT_PUBLIC_DEPLOYER_PUBLIC_KEY;
+
   for (const key of keys) {
     const CACHED_DATA = await redis.get(TOKEN_TO_CACHE[key]);
 
@@ -90,7 +88,7 @@ async function resetSlots(keys) {
       key,
       CACHED_DATA,
       CACHED_DATA.signature,
-      ORACLE_PUBLIC_KEY
+      DEPLOYER_PUBLIC_KEY
     );
   }
 }
@@ -117,6 +115,7 @@ export default async function handler(req, res) {
   }
 
   const keys = Object.keys(TOKEN_TO_CACHE);
+  console.log("\n=============== INIT RESET JOB!! ===============\n");
 
   await resetTokenCache(keys);
   await resetHistoricalCache(keys);
@@ -126,9 +125,8 @@ export default async function handler(req, res) {
   await resetSlots(keys);
   await resetGraphCache(keys);
 
-  // AFTER ALL IS DONE YOU NEED TO CALL UPDATEHISTORICAL TO POPULATE THE HISTORICAL.HISTORICAL
-
-  console.log("FINISHED JOB!!");
+  // AFTER ALL IS DONE YOU NEED TO CALL UPDATE HISTORICAL TO POPULATE THE HISTORICAL.HISTORICAL
+  console.log("\n=============== FINISHED JOB!! ===============\n");
 
   res.status(200).json("Init Cache!");
 }

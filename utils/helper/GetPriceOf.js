@@ -3,10 +3,13 @@ const {
   processFloatString,
 } = require("./CallAndSignAPICalls");
 
-const ORACLE_KEY = process.env.ORACLE_KEY;
-const { signatureClient } = require("./SignatureClient");
+const DEPLOYER_KEY = process.env.DEPLOYER_KEY;
 
-import {
+const { MULTIPLICATION_FACTOR } = require("../constants/info");
+const { testnetSignatureClient } = require("./SignatureClient");
+const { AggregationModule } = require("./AggregationModule");
+
+const {
   CoinGekoSymbols,
   BinanceSymbols,
   CMCSymbols,
@@ -23,7 +26,7 @@ import {
   ByBitSymbols,
   CexIOSymbols,
   SwapZoneSymbols,
-} from "../constants/symbols";
+} = require("../constants/symbols");
 
 async function getPriceCoinGecko(token) {
   const id = CoinGekoSymbols[token.toLowerCase()];
@@ -35,7 +38,7 @@ async function getPriceCoinGecko(token) {
     return results;
   } catch (error) {
     console.error("Error coin gecko");
-    return [0, 0, ""];
+    return ["0"];
   }
 }
 
@@ -49,7 +52,7 @@ async function getPriceBinance(token) {
     return results;
   } catch (error) {
     console.error("Error binance");
-    return [0, 0, ""];
+    return ["0"];
   }
 }
 
@@ -64,7 +67,7 @@ async function getPriceCMC(token) {
     return results;
   } catch (error) {
     console.error("Error coin market cap");
-    return [0, 0, ""];
+    return ["0"];
   }
 }
 
@@ -78,7 +81,7 @@ async function getPriceCryptoCompare(token) {
     return results;
   } catch (error) {
     console.error("Error crypto compare");
-    return [0, 0, ""];
+    return ["0"];
   }
 }
 
@@ -93,7 +96,7 @@ async function getPriceCoinAPI(token) {
     return results;
   } catch (error) {
     console.error("Error coin api");
-    return [0, 0, ""];
+    return ["0"];
   }
 }
 
@@ -107,7 +110,7 @@ async function getPricePaprika(token) {
     return results;
   } catch (error) {
     console.error("Error price paprika");
-    return [0, 0, ""];
+    return ["0"];
   }
 }
 
@@ -121,7 +124,7 @@ async function getPriceMessari(token) {
     return results;
   } catch (error) {
     console.error("Error messari");
-    return [0, 0, ""];
+    return ["0"];
   }
 }
 
@@ -135,7 +138,7 @@ async function getPriceCoinCap(token) {
     return results;
   } catch (error) {
     console.error("Error coin cap");
-    return [0, 0, ""];
+    return ["0"];
   }
 }
 
@@ -149,7 +152,7 @@ async function getPriceCoinlore(token) {
     return results;
   } catch (error) {
     console.error("Error coin lore");
-    return [0, 0, ""];
+    return ["0"];
   }
 }
 
@@ -166,7 +169,7 @@ async function getPriceCoinRanking(token) {
     return results;
   } catch (error) {
     console.error("Error coin ranking");
-    return [0, 0, ""];
+    return ["0"];
   }
 }
 
@@ -180,7 +183,7 @@ async function getPriceCoinCodex(token) {
     return results;
   } catch (error) {
     console.error("Error coin codex");
-    return [0, 0, ""];
+    return ["0"];
   }
 }
 async function getPriceKuCoin(token) {
@@ -193,7 +196,7 @@ async function getPriceKuCoin(token) {
     return results;
   } catch (error) {
     console.error("Error kucoin");
-    return [0, 0, ""];
+    return ["0"];
   }
 }
 async function getPriceHuobi(token) {
@@ -206,7 +209,7 @@ async function getPriceHuobi(token) {
     return results;
   } catch (error) {
     console.error("Error huobi");
-    return [0, 0, ""];
+    return ["0"];
   }
 }
 async function getPriceByBit(token) {
@@ -219,24 +222,9 @@ async function getPriceByBit(token) {
     return results;
   } catch (error) {
     console.error("Error bybit");
-    return [0, 0, ""];
+    return ["0"];
   }
 }
-
-//THEY RETURN PRICES IN KOREAN WON
-// async function getPriceUpBit(token) {
-//   const id = UpBitSymbols[token.toLowerCase()];
-//   const apiToCall = `https://api.upbit.com/v1/ticker?markets=${id}`;
-//   const resultPath = `data[0].trade_price`;
-
-//   try {
-//     const results = await callSignAPICall(apiToCall, resultPath, "");
-//     return results;
-//   } catch (error) {
-//     console.error("Error upbit");
-//     return [0, 0, ""];
-//   }
-// }
 
 async function getPriceCexIO(token) {
   const id = CexIOSymbols[token.toLowerCase()];
@@ -248,7 +236,7 @@ async function getPriceCexIO(token) {
     return results;
   } catch (error) {
     console.error("Error cexio");
-    return [0, 0, ""];
+    return ["0"];
   }
 }
 
@@ -264,7 +252,7 @@ async function getPriceSwapZone(token) {
     return results;
   } catch (error) {
     console.error("Error swapzone");
-    return [0, 0, ""];
+    return ["0"];
   }
 }
 
@@ -276,34 +264,38 @@ function getMedian(array) {
     : sorted[middle];
 }
 
+// Mean Absolute Deviation
 function getMAD(array) {
   const median = getMedian(array);
   const deviations = array.map((value) => Math.abs(value - median));
   return getMedian(deviations);
 }
 
-async function removeOutliers(array, timestamps, signatures, urls, threshold) {
-  const median = getMedian(array);
-  const mad = getMAD(array);
+async function removeOutliers(prices, timestamps, signatures, urls, threshold) {
+  const median = getMedian(prices);
+  const mad = getMAD(prices);
 
-  var nonOutlierPrices = [];
-  var nonOutlierTimestamps = [];
-  var nonOutlierSignatures = [];
-  var nonOutlierUrls = [];
+  const nonOutlierPrices = [];
+  const nonOutlierTimestamps = [];
+  const nonOutlierSignatures = [];
+  const nonOutlierUrls = [];
 
-  for (let i = 0; i < array.length; i++) {
-    if (isNaN(Number(array[i]))) continue;
+  for (let i = 0; i < prices.length; i++) {
+    if (isNaN(Number(prices[i]))) continue;
 
-    const deviation = Math.abs(array[i] - median);
+    const deviation = Math.abs(prices[i] - median);
     if (deviation <= threshold * mad) {
-      nonOutlierPrices.push(array[i]);
+      nonOutlierPrices.push(prices[i]);
       nonOutlierTimestamps.push(timestamps[i]);
       nonOutlierSignatures.push(signatures[i]);
       nonOutlierUrls.push(urls[i]);
     }
   }
 
-  console.log("\nData Points Considered :", nonOutlierPrices.length);
+  console.log(
+    "Data Points Considered :",
+    nonOutlierPrices.length + "/" + prices.length
+  );
 
   return [
     nonOutlierPrices,
@@ -316,11 +308,8 @@ async function removeOutliers(array, timestamps, signatures, urls, threshold) {
 async function createAssetInfoArray(token) {
   const functions = [
     getPriceBinance,
-    // getPriceCMC,
-    // getPriceCoinAPI,
     getPriceCoinCap,
     getPriceCoinGecko,
-    // getPriceCoinRanking,
     getPriceCoinCodex,
     getPriceCoinlore,
     getPriceCryptoCompare,
@@ -329,21 +318,24 @@ async function createAssetInfoArray(token) {
     getPriceKuCoin,
     getPriceHuobi,
     getPriceByBit,
-    // getPriceUpBit,
     getPriceCexIO,
     getPriceSwapZone,
+    // getPriceCMC,
+    // getPriceCoinAPI,
+    // getPriceCoinRanking,
   ];
 
-  var priceArray = [];
-  var timestampArray = [];
-  var signatureArray = [];
-  var urlArray = [];
+  let priceArray = [];
+  let timestampArray = [];
+  let signatureArray = [];
+  let urlArray = [];
 
   for (const func of functions) {
     const results = await func(token);
     const floatValue = parseFloat(results[0]);
 
-    if (results[0] != "0") {
+    // Check if the function call was successful.
+    if (results[0] !== 0) {
       priceArray.push(floatValue);
       timestampArray.push(results[1]);
       signatureArray.push(results[2]);
@@ -351,6 +343,7 @@ async function createAssetInfoArray(token) {
     }
   }
 
+  // REMOVE OUTLIERS(PRICES) USING MAD AT 2.5 THRESHOLD.
   const arrays = await removeOutliers(
     priceArray,
     timestampArray,
@@ -361,12 +354,24 @@ async function createAssetInfoArray(token) {
   return arrays;
 }
 
-async function getPriceOf(token) {
-  const results = await createAssetInfoArray(token);
+async function generateProofCompatiblePrices(prices) {
+  return prices.map((price) => BigInt(processFloatString(price.toString())));
+}
 
-  const prices = results[0];
+async function getPriceOf(token, lastProof, isBase) {
+  const cleanedData = await createAssetInfoArray(token);
+  const prices = cleanedData[0];
+  const proofCompatiblePrices = await generateProofCompatiblePrices(prices);
+
+  const aggregationResults = await AggregationModule(
+    proofCompatiblePrices,
+    lastProof,
+    isBase
+  );
+
   let sum = 0;
   let count = 0;
+
   await new Promise((resolve, reject) => {
     for (const price of prices) {
       sum += price;
@@ -377,34 +382,43 @@ async function getPriceOf(token) {
   });
 
   const meanPrice = parseFloat(sum / count);
-  const processedPrice = processFloatString(meanPrice);
   const aggregatedAt = Date.now();
-  const signedPrice = signatureClient.signFields(
-    [BigInt(processedPrice)],
-    ORACLE_KEY
+  const processedMeanPrice = processFloatString(meanPrice);
+
+  const signedPrice = testnetSignatureClient.signFields(
+    [BigInt(processedMeanPrice)],
+    DEPLOYER_KEY
   );
 
-  console.log("\nSigned :", signedPrice);
+  console.log("Mean :", meanPrice);
+  console.log("Processed Mean :", processedMeanPrice);
+  console.log("Aggregation Proof Public Output :", aggregationResults[1]);
+  console.log("Signature over processed mean :", signedPrice.signature);
 
-  var jsonCompatibleSignature = {};
+  /// PURPOSE - CONVERT A BIGINT DATA TO STRING DATA SINCE BIGINT IS NOT PERMITTED OVER API CALLS.
+  const jsonCompatibleSignature = {};
   jsonCompatibleSignature["signature"] = signedPrice.signature;
   jsonCompatibleSignature["publicKey"] = signedPrice.publicKey;
   jsonCompatibleSignature["data"] = signedPrice.data[0].toString();
 
   const assetCacheObject = {
-    price: processedPrice,
-    decimals: 10,
-    signature: jsonCompatibleSignature,
+    price: processedMeanPrice,
+    floatingPrice: meanPrice,
+    decimals: MULTIPLICATION_FACTOR,
     aggregationTimestamp: aggregatedAt,
-    urls: results[3],
-    prices_returned: results[0],
-    timestamps: results[2],
-    signatures: results[1],
+    signature: jsonCompatibleSignature,
+    prices_returned: cleanedData[0],
+    signatures: cleanedData[1],
+    timestamps: cleanedData[2],
+    urls: cleanedData[3],
   };
 
-  console.log("Mean :", meanPrice);
-  console.log("Processed :", processedPrice, "\n");
-  return [meanPrice, assetCacheObject];
+  return [
+    meanPrice,
+    assetCacheObject,
+    aggregationResults[0],
+    aggregationResults[1],
+  ];
 }
 
 module.exports = getPriceOf;

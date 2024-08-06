@@ -74,6 +74,8 @@ export default function IndividualAsset({ token }) {
     setIPFSHistorical(tokenHistoricalArray);
   }
 
+  console.log(ipfsData);
+
   useEffect(() => {
     if (ipfsData) {
       const toPush = ipfsData.latest.prices[SYMBOL_TO_TOKEN[token]];
@@ -86,8 +88,10 @@ export default function IndividualAsset({ token }) {
   }, [ipfsData]);
 
   async function getCID() {
-    const response = await axios.get("/api/get/getLatestCID");
-    const cid = response.data.cid;
+    const response = await axios.get(
+      "/api/get/pinned/getLatestHistoricalPinCID"
+    );
+    const cid = response.data.data.cid;
 
     try {
       const ipfsData = await axios.get(`https://${GATEWAY}/ipfs/${cid}`);
@@ -105,25 +109,25 @@ export default function IndividualAsset({ token }) {
         Authorization: "Bearer " + key,
       };
       const priceResponse = await axios.get(
-        `/api/get/getPriceInterface?token=${SYMBOL_TO_TOKEN[token]}`,
+        `/api/get/interface/getPrice?token=${SYMBOL_TO_TOKEN[token]}`,
         {
           headers: headers,
         }
       );
       const graphResponse = await axios.get(
-        `/api/get/getGraphDataInterface?token=${SYMBOL_TO_TOKEN[token]}`,
+        `/api/get/interface/getGraphData?token=${SYMBOL_TO_TOKEN[token]}`,
         {
           headers: headers,
         }
       );
 
-      setGraphData(graphResponse.data.information.graph_data);
-      setGraphMin(graphResponse.data.information.min_price);
-      setGraphMax(graphResponse.data.information.max_price);
-      setPercentage(graphResponse.data.information.percentage_change);
-      setDirection(graphResponse.data.information.percentage_change[0]);
+      setGraphData(graphResponse.data.data.graph_data);
+      setGraphMin(graphResponse.data.data.min_price);
+      setGraphMax(graphResponse.data.data.max_price);
+      setPercentage(graphResponse.data.data.percentage_change);
+      setDirection(graphResponse.data.data.percentage_change[0]);
 
-      setLatest(priceResponse.data.information);
+      setLatest(priceResponse.data.data);
     } catch (error) {
       console.error("Error fetching price:", error);
     }
@@ -403,14 +407,16 @@ export default function IndividualAsset({ token }) {
               (The prices are precise upto the 10th decimal)
             </Text>
           </Flex>
-          {ipfsHistorical && ipfsLatest ? (
-            <HistoricalTable
-              ipfsLatest={ipfsLatest}
-              ipfsHistorical={ipfsHistorical}
-            />
-          ) : (
-            <Heading fontFamily={"Montserrat Variable"}> Loading... </Heading>
-          )}
+          <Flex maxH={"700"} overflowY="scroll" borderRadius={20}>
+            {ipfsHistorical && ipfsLatest ? (
+              <HistoricalTable
+                ipfsLatest={ipfsLatest}
+                ipfsHistorical={ipfsHistorical}
+              />
+            ) : (
+              <Heading fontFamily={"Montserrat Variable"}> Loading... </Heading>
+            )}
+          </Flex>
         </Flex>
       </Flex>
     </>

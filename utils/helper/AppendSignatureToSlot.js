@@ -1,9 +1,9 @@
 const {
   TOKEN_TO_SIGNED_SLOT,
-  MINA_SIGNED_MAX_CACHE,
-  HISTORICAL_SIGNED_MAX_CACHE,
+  MINA_MAX_SIGNED_SLOT_CACHE,
+  HISTORICAL_MAX_SIGNED_SLOT_CACHE,
 } = require("../constants/info");
-const { redis } = require("./InitRedis");
+const { redis } = require("./init/InitRedis");
 
 async function appendSignatureToSlot(
   token,
@@ -12,47 +12,51 @@ async function appendSignatureToSlot(
   publicKey
 ) {
   const lastUpdatedSlotInfo = await redis.get(TOKEN_TO_SIGNED_SLOT[token]);
-  var finalState = lastUpdatedSlotInfo;
+  let finalState = lastUpdatedSlotInfo;
 
+  // Bootstrap a new slot.
   if (finalState == "NULL") {
-    console.log("Running fresh slot.");
+    console.log(`Running fresh slot for ${token}.`);
     finalState = tokenDetails;
     finalState["community"] = {
       [publicKey]: signature,
     };
   } else {
+    // Endorse an existing slot.
+    console.log(`Updaing existing slot for ${token}.`);
+
     const updatedState = finalState.community;
     updatedState[publicKey] = signature;
     finalState.community = updatedState;
   }
 
-  const currentMaxHistoricalCache = await redis.get(
-    HISTORICAL_SIGNED_MAX_CACHE
+  //IF THE CURRENT SLOT HAS MORE ENDORSEMENT THAN ANY OTHER SLOTS IN THE PAST 30 MINUTES IT REPLACES THE LEAD.
+  const currentMaxHistoricalSlot = await redis.get(
+    HISTORICAL_MAX_SIGNED_SLOT_CACHE
   );
-
   if (
     Object.keys(finalState.community).length >
-    Object.keys(currentMaxHistoricalCache[token].community).length
+    Object.keys(currentMaxHistoricalSlot[token].community).length
   ) {
-    currentMaxHistoricalCache[token] = finalState;
-    await redis.set(HISTORICAL_SIGNED_MAX_CACHE, currentMaxHistoricalCache);
-    console.log("UPDATED HISTORICAL MAX SIGNED SLOT INFO.\n");
+    currentMaxHistoricalSlot[token] = finalState;
+    await redis.set(HISTORICAL_MAX_SIGNED_SLOT_CACHE, currentMaxHistoricalSlot);
+    console.log("UPDATED HISTORICAL MAX SIGNED SLOT INFO.");
   }
 
-  const currentMaxMinaCache = await redis.get(MINA_SIGNED_MAX_CACHE);
-
+  //IF THE CURRENT SLOT HAS MORE ENDORSEMENT THAN ANY OTHER SLOTS IN THE PAST 2HRS IT REPLACES THE LEAD.
+  const currentMaxMinaSlot = await redis.get(MINA_MAX_SIGNED_SLOT_CACHE);
   if (
     Object.keys(finalState.community).length >
-    Object.keys(currentMaxMinaCache[token].community).length
+    Object.keys(currentMaxMinaSlot[token].community).length
   ) {
-    currentMaxMinaCache[token] = finalState;
-    await redis.set(MINA_SIGNED_MAX_CACHE, currentMaxMinaCache);
-    console.log("UPDATED MINA MAX SIGNED SLOT INFO.\n");
+    currentMaxMinaSlot[token] = finalState;
+    await redis.set(MINA_MAX_SIGNED_SLOT_CACHE, currentMaxMinaSlot);
+    console.log("UPDATED MINA MAX SIGNED SLOT INFO.");
   }
 
   await redis.set(TOKEN_TO_SIGNED_SLOT[token], finalState);
 
-  console.log(token, "slot signed.");
+  console.log(token, "slot signed by the protocol.");
   return;
 }
 
