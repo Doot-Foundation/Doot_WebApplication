@@ -159,10 +159,12 @@ async function AggregationModule(
     console.log("Step Proof20 Sanity Check.");
 
     const valid20 = await verify(proof20.toJSON(), vk20);
+
     if (!valid20) {
       console.log("\nERR! VALID 20 FAILED.\n");
       return [null, BigInt(0)];
     } else {
+      console.log("Proof verified against VK.");
       return [proof20.toJSON(), proof20.publicOutput.toBigInt()];
     }
   } else {
@@ -173,10 +175,12 @@ async function AggregationModule(
     console.log("Base Proof20 Sanity Check.");
 
     const valid20 = await verify(proof20.toJSON(), vk20);
+
     if (!valid20) {
       console.log("\nERR! VALID 20 FAILED.\n");
       return [null, BigInt(0)];
     } else {
+      console.log("Proof verified against VK.");
       return [proof20.toJSON(), proof20.publicOutput.toBigInt()];
     }
   }
