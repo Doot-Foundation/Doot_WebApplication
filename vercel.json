@@ -7,7 +7,43 @@
   },
   "crons": [
     {
-      "path": "/api/update/updateAllPricesAndSlots",
+      "path": "/api/update/updatePriceAndSlot?token=mina",
+      "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/update/updatePriceAndSlot?token=ethereum",
+      "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/update/updatePriceAndSlot?token=bitcoin",
+      "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/update/updatePriceAndSlot?token=solana",
+      "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/update/updatePriceAndSlot?token=avalanche",
+      "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/update/updatePriceAndSlot?token=ripple",
+      "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/update/updatePriceAndSlot?token=dogecoin",
+      "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/update/updatePriceAndSlot?token=chainlink",
+      "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/update/updatePriceAndSlot?token=polygon",
+      "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/update/updatePriceAndSlot?token=cardano",
       "schedule": "*/10 * * * *"
     },
     {
