@@ -11,14 +11,6 @@
       "schedule": "*/10 * * * *"
     },
     {
-      "path": "/api/update/updateMinaPin",
-      "schedule": "0 */2 * * *"
-    },
-    {
-      "path": "/api/update/updateMinaTxn",
-      "schedule": "1 */2 * * *"
-    },
-    {
       "path": "/api/update/updateHistorical",
       "schedule": "*/33 * * * *"
     }

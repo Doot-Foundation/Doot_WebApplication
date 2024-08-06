@@ -29,7 +29,14 @@ async function generateGraphData(
   });
 
   /// THIS IS THE LAST VALUE IN THE HISTORICAL INFORMATION. IE THAT IS CLOSEST TO 24 HOURS IN THE PAST.
-  const firstHistoricalPrice = parseFloat(historical_historical[0].price);
+  /// IF NOT AVAILABLE, USE THE LATEST PRICE.
+  let firstHistoricalPrice;
+  if (historical_historical[0])
+    firstHistoricalPrice = parseFloat(historical_historical[0].price);
+  else if (historical_latest[0])
+    firstHistoricalPrice = parseFloat(historical_latest[0].price);
+  else firstHistoricalPrice = parseFloat(latest[0].price);
+
   const immediatePrice = parseFloat(latest[0].price);
 
   /// % OF CHANGE IN THE PAST 24 HOURS = DIFF IN THE LATEST VALUE AND THE OLDEST VALUE IN TERMS OF TIMESTAMP.
