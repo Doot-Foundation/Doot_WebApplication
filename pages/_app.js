@@ -1,4 +1,5 @@
 import Head from "next/head";
+import { Analytics } from "@vercel/analytics/react";
 
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import "@fontsource-variable/source-code-pro";
@@ -37,6 +38,7 @@ export default function App({ Component, pageProps }) {
         <ChakraProvider theme={theme}>
           <Header />
           <Component {...pageProps} />
+          <Analytics />
         </ChakraProvider>
       </Provider>
     </>

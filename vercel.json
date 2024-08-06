@@ -1,7 +1,7 @@
 {
   "functions": {
     "pages/api/update/*": {
-      "memory": 3008,
+      "memory": 5000,
       "maxDuration": 300
     }
   },
