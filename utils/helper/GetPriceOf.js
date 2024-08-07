@@ -1,3 +1,5 @@
+const { redis } = require("../helper/init/InitRedis");
+
 const {
   callSignAPICall,
   processFloatString,
@@ -7,7 +9,6 @@ const DEPLOYER_KEY = process.env.DEPLOYER_KEY;
 
 const { MULTIPLICATION_FACTOR } = require("../constants/info");
 const { testnetSignatureClient } = require("./SignatureClient");
-const { AggregationModule } = require("./AggregationModule");
 
 const {
   CoinGekoSymbols,
@@ -354,20 +355,10 @@ async function createAssetInfoArray(token) {
   return arrays;
 }
 
-async function generateProofCompatiblePrices(prices) {
-  return prices.map((price) => BigInt(processFloatString(price.toString())));
-}
-
-async function getPriceOf(token, lastProof, isBase) {
+async function getPriceOf(token) {
   const cleanedData = await createAssetInfoArray(token);
   const prices = cleanedData[0];
-  const proofCompatiblePrices = await generateProofCompatiblePrices(prices);
-
-  const aggregationResults = await AggregationModule(
-    proofCompatiblePrices,
-    lastProof,
-    isBase
-  );
+  console.log(prices);
 
   let sum = 0;
   let count = 0;
@@ -392,7 +383,6 @@ async function getPriceOf(token, lastProof, isBase) {
 
   console.log("Mean :", meanPrice);
   console.log("Processed Mean :", processedMeanPrice);
-  console.log("Aggregation Proof Public Output :", aggregationResults[1]);
   console.log("Signature over processed mean :", signedPrice.signature);
 
   /// PURPOSE - CONVERT A BIGINT DATA TO STRING DATA SINCE BIGINT IS NOT PERMITTED OVER API CALLS.
@@ -413,12 +403,7 @@ async function getPriceOf(token, lastProof, isBase) {
     urls: cleanedData[3],
   };
 
-  return [
-    meanPrice,
-    assetCacheObject,
-    aggregationResults[0],
-    aggregationResults[1],
-  ];
+  return [meanPrice, assetCacheObject];
 }
 
 module.exports = getPriceOf;
