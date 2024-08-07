@@ -112,27 +112,40 @@ async function startFetchAndUpdates(tokens) {
 }
 
 export default async function handler(req, res) {
-  const authHeader = req.headers.authorization;
+  let responseAlreadySent = false;
+  try {
+    const authHeader = req.headers.authorization;
 
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    res.status(401).json("Unauthorized");
-    return;
+    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+      return res.status(401).json("Unauthorized");
+    }
+
+    const tokens = Object.keys(TOKEN_TO_SYMBOL);
+    const failed = await startFetchAndUpdates(tokens);
+    if (!responseAlreadySent) {
+      responseAlreadySent = true;
+      if (failed.length > 0) {
+        return res.status(200).json({
+          status: true,
+          message: `Updated prices partially.`,
+          data: {
+            failed: failed,
+          },
+        });
+      } else {
+        responseAlreadySent = true;
+        return res.status(200).json({
+          status: true,
+          message: `Updated prices successfully.`,
+        });
+      }
+    }
+  } catch (err) {
+    if (!responseAlreadySent) {
+      responseAlreadySent = true;
+      return res
+        .status(500)
+        .json({ status: false, message: "Internal Server Error" });
+    }
   }
-
-  const tokens = Object.keys(TOKEN_TO_SYMBOL);
-  const failed = await startFetchAndUpdates(tokens);
-
-  if (failed.length > 0) {
-    res.status(200).json({
-      status: true,
-      message: `Updated prices partially.`,
-      data: {
-        failed: failed,
-      },
-    });
-  } else
-    res.status(200).json({
-      status: true,
-      message: `Updated prices successfully.`,
-    });
 }
