@@ -11,8 +11,7 @@ export default async function handler(req, res) {
   const authHeader = req.headers.authorization;
 
   if ("Bearer " + KEY != authHeader) {
-    res.status(401).json({ status: "Unauthorized." });
-    return;
+    return res.status(401).json({ status: "Unauthorized." });
   }
 
   if (signHeader) {
@@ -76,7 +75,7 @@ export default async function handler(req, res) {
         .json({ status: false, data: null, message: "User data not found." });
     }
   }
-  res.status(400).json({
+  return res.status(400).json({
     stats: 400,
     data: null,
     message:

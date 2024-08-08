@@ -10,8 +10,6 @@ const appendSignatureToSlot = require("../../../utils/helper/AppendSignatureToSl
 export default async function handler(req, res) {
   const { signature, token } = req.query;
 
-  // console.log(signature, publicKey, token);
-
   const cachedData = await redis.get(TOKEN_TO_CACHE[token.toLowerCase()]);
   const toCheck = cachedData.signature;
   var originsVerified = false;
@@ -33,16 +31,12 @@ export default async function handler(req, res) {
 
   originsVerified = testnetSignatureClient.verifyMessage(verifyBody);
   if (!originsVerified) {
-    const mainnetOriginsVerified =
-      mainnetSignatureClient.verifyMessage(verifyBody);
-    if (!mainnetOriginsVerified) {
-      res
-        .status(201)
-        .json({
-          status: false,
-          message: "ERR! Unable to verify signature origins.",
-        });
-      return;
+    originsVerified = mainnetSignatureClient.verifyMessage(verifyBody);
+    if (!originsVerified) {
+      return res.status(201).json({
+        status: false,
+        message: "ERR! Unable to verify signature origins.",
+      });
     }
   }
 
@@ -53,8 +47,7 @@ export default async function handler(req, res) {
     compatibleReceivedSignatureObj.publicKey
   );
 
-  console.log(publicKey, "joined", token, "consensus.", "\n");
-  res
+  return res
     .status(201)
     .json({ status: true, message: "Successfully joined consensus." });
 }

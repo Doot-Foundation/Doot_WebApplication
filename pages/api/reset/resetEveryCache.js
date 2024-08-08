@@ -128,5 +128,5 @@ export default async function handler(req, res) {
   // AFTER ALL IS DONE YOU NEED TO CALL UPDATE HISTORICAL TO POPULATE THE HISTORICAL.HISTORICAL
   console.log("\n=============== FINISHED JOB!! ===============\n");
 
-  res.status(200).json("Init Cache!");
+  return res.status(200).json("Init Cache!");
 }

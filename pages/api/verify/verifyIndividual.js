@@ -20,9 +20,9 @@ export default function handler(req, res) {
     console.log(verifyBody);
 
     const originsVerified = signatureClient.verifyFields(verifyBody);
-    if (!originsVerified) res.status(201).json({ status: 0 });
-    else res.status(200).json({ status: 1 });
+    if (!originsVerified) return res.status(201).json({ status: 0 });
+    else return res.status(200).json({ status: 1 });
   } catch (err) {
-    res.status(200).json({ status: 0 });
+    return res.status(200).json({ status: 0 });
   }
 }
