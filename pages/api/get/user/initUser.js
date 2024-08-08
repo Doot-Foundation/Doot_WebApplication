@@ -28,10 +28,9 @@ export default async function handler(req, res) {
 
     if (select_data != null && select_data.length != 0) {
       await supabase.auth.signOut();
-      res
+      return res
         .status(200)
         .json({ status: true, message: "Already Exists.", key: "" });
-      return;
     }
 
     const assignedKey = uuidv4();
@@ -41,13 +40,12 @@ export default async function handler(req, res) {
 
     await supabase.auth.signOut();
 
-    res.status(201).json({
+    return res.status(201).json({
       status: true,
       message: "Generated API key successfully.",
       publicKey: address,
       data: assignedKey,
     });
-    return;
   } else
     return res.status(400).json({
       status: 400,
