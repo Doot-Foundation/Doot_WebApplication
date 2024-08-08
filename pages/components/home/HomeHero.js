@@ -74,7 +74,7 @@ export default function HomeHero() {
         Authorization: "Bearer " + key,
       };
       const response = await axios.get(
-        `/api/get/getPriceInterface?token=${asset}`,
+        `/api/get/interface/getPrice?token=${asset}`,
         {
           headers: headers,
         }
@@ -82,10 +82,10 @@ export default function HomeHero() {
       console.log(response.data);
       const finalObj = {
         asset: response.data.asset,
-        price: response.data.information.price,
+        price: response.data.data.price,
         decimals: 10,
-        timestamp: response.data.information.aggregationTimestamp,
-        signature: formatSign(response.data.information.signature.signature),
+        timestamp: response.data.data.aggregationTimestamp,
+        signature: formatSign(response.data.data.signature.signature),
       };
 
       const finalString = await formatString(finalObj);
