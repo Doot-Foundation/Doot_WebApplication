@@ -9,8 +9,8 @@ export default function HeroAnimatedText() {
           1500,
           "Transparent",
           1500,
-          "Trustless",
-          1500,
+          // "Trustless",
+          // 1500,
           "Provable",
           1500,
         ]}
