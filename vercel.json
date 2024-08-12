@@ -7,52 +7,24 @@
   },
   "crons": [
     {
-      "path": "/api/update/updateAggregationProof?token=mina",
-      "schedule": "3-53/10 * * * *"
-    },
-    {
-      "path": "/api/update/updateAggregationProof?token=ethereum",
-      "schedule": "3-53/10 * * * *"
-    },
-    {
-      "path": "/api/update/updateAggregationProof?token=bitcoin",
-      "schedule": "3-53/10 * * * *"
-    },
-    {
-      "path": "/api/update/updateAggregationProof?token=solana",
-      "schedule": "3-53/10 * * * *"
-    },
-    {
-      "path": "/api/update/updateAggregationProof?token=avalanche",
-      "schedule": "3-53/10 * * * *"
-    },
-    {
-      "path": "/api/update/updateAggregationProof?token=ripple",
-      "schedule": "3-53/10 * * * *"
-    },
-    {
-      "path": "/api/update/updateAggregationProof?token=dogecoin",
-      "schedule": "3-53/10 * * * *"
-    },
-    {
-      "path": "/api/update/updateAggregationProof?token=chainlink",
-      "schedule": "3-53/10 * * * *"
-    },
-    {
-      "path": "/api/update/updateAggregationProof?token=polygon",
-      "schedule": "3-53/10 * * * *"
-    },
-    {
-      "path": "/api/update/updateAggregationProof?token=cardano",
-      "schedule": "3-53/10 * * * *"
-    },
-    {
-      "path": "/api/update/updateAllPricesAndSlots",
+      "path": "/api/update/core/updateAllPricesAndSlots",
       "schedule": "*/10 * * * *"
     },
     {
-      "path": "/api/update/updateHistorical",
+      "path": "/api/update/ipfs/updateHistorical",
       "schedule": "*/33 * * * *"
+    },
+    {
+      "path": "/api/update/ipfs/updateMina",
+      "schedule": "* 2 * * *"
+    },
+    {
+      "path": "/api/update/mina/sendMinaTxn",
+      "schedule": "2 2 * * *"
+    },
+    {
+      "path": "/api/update/mina/sendMinaStateTxn",
+      "schedule": "5 2 * * *"
     }
   ],
   "headers": [

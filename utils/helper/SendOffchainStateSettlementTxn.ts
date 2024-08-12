@@ -6,7 +6,7 @@ const ENDPOINT: string | undefined = process.env.NEXT_PUBLIC_MINA_ENDPOINT;
 import { Doot, offchainState } from "../constants/Doot.js";
 import { PrivateKey, Mina, fetchAccount } from "o1js";
 
-async function settleOffchainStateTxn() {
+export default async function sendOffchainStateTxn() {
   if (DEPLOYER_KEY && DOOT_KEY && MINA_SECRET && ENDPOINT) {
     const doot = PrivateKey.fromBase58(DOOT_KEY);
     const dootPub = doot.toPublicKey();
@@ -39,5 +39,3 @@ async function settleOffchainStateTxn() {
   }
   return false;
 }
-
-module.exports = settleOffchainStateTxn;

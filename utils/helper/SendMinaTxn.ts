@@ -7,11 +7,12 @@ import { Doot, IpfsCID, PricesArray } from "../constants/Doot.js";
 import { Mina, PrivateKey, Field, fetchAccount } from "o1js";
 import { DootFileSystem, fetchFiles } from "./LoadCache";
 
-async function sendMinaTxn(array: string[], prices: bigint[]) {
+async function sendMinaTxn(commitment: string, ipfs: string, prices: bigint[]) {
   if (DEPLOYER_KEY && DOOT_KEY && MINA_SECRET && ENDPOINT) {
-    const COMMITMENT = Field.from(array[1]);
-    const IPFS_HASH: IpfsCID = IpfsCID.fromString(array[0]);
+    const COMMITMENT = Field.from(commitment);
+    const IPFS_HASH: IpfsCID = IpfsCID.fromString(ipfs);
     const SECRET: Field = Field.from(MINA_SECRET);
+
     const PRICES: PricesArray = new PricesArray({
       prices: prices.map((e) => Field.from(e)),
     });
