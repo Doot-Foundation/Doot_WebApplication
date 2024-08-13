@@ -15,16 +15,8 @@
       "schedule": "*/33 * * * *"
     },
     {
-      "path": "/api/update/updateMinaPin",
+      "path": "/api/update/ipfs/updateMina",
       "schedule": "* 2 * * *"
-    },
-    {
-      "path": "/api/update/mina/sendMinaTxn",
-      "schedule": "2 2 * * *"
-    },
-    {
-      "path": "/api/update/mina/sendMinaStateTxn",
-      "schedule": "5 2 * * *"
     }
   ],
   "headers": [
