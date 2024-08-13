@@ -1,0 +1,78 @@
+{
+  "functions": {
+    "pages/api/update/*": {
+      "memory": 3009,
+      "maxDuration": 300
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/update/updateAggregationProof?token=mina",
+      "schedule": "3-53/10 * * * *"
+    },
+    {
+      "path": "/api/update/updateAggregationProof?token=ethereum",
+      "schedule": "3-53/10 * * * *"
+    },
+    {
+      "path": "/api/update/updateAggregationProof?token=bitcoin",
+      "schedule": "3-53/10 * * * *"
+    },
+    {
+      "path": "/api/update/updateAggregationProof?token=solana",
+      "schedule": "3-53/10 * * * *"
+    },
+    {
+      "path": "/api/update/updateAggregationProof?token=avalanche",
+      "schedule": "3-53/10 * * * *"
+    },
+    {
+      "path": "/api/update/updateAggregationProof?token=ripple",
+      "schedule": "3-53/10 * * * *"
+    },
+    {
+      "path": "/api/update/updateAggregationProof?token=dogecoin",
+      "schedule": "3-53/10 * * * *"
+    },
+    {
+      "path": "/api/update/updateAggregationProof?token=chainlink",
+      "schedule": "3-53/10 * * * *"
+    },
+    {
+      "path": "/api/update/updateAggregationProof?token=polygon",
+      "schedule": "3-53/10 * * * *"
+    },
+    {
+      "path": "/api/update/updateAggregationProof?token=cardano",
+      "schedule": "3-53/10 * * * *"
+    },
+    {
+      "path": "/api/update/updateAllPricesAndSlots",
+      "schedule": "*/10 * * * *"
+    },
+    {
+      "path": "/api/update/updateHistorical",
+      "schedule": "*/33 * * * *"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Credentials", "value": "true" },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "https://azure-bitter-tortoise-311.mypinata.cloud/ipfs/"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET,DELETE,PATCH,POST,PUT"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
+        }
+      ]
+    }
+  ]
+}

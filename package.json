@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
     "@chakra-ui/react": "^2.8.2",
@@ -44,6 +45,7 @@
   },
   "devDependencies": {
     "@types/react": "18.2.45",
+    "turbo": "^2.0.12",
     "typescript": "^5.5.4"
   },
   "packageManager": "yarn@1.22.21+sha1.1959a18351b811cdeedbd484a8f86c3cc3bbaf72"
