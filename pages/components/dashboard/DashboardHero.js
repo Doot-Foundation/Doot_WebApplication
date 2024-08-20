@@ -35,7 +35,7 @@ export default function DashboardHero() {
         `/api/get/user/getUserStatus?address=${signer}`
       );
       setUserStatus(res.data.status);
-      if (res.data.status == 0) onOpen();
+      if (res.data.status == false) onOpen();
     } catch (error) {
       console.log("Failed Fetching The Status.");
     }
@@ -55,13 +55,12 @@ export default function DashboardHero() {
     onClose();
 
     const key = process.env.NEXT_PUBLIC_API_INTERFACE_KEY;
-
     const headers = {
       Authorization: `Bearer ${key}`,
     };
 
     await axios
-      .get(`/api/user/initUser?address=${signer}`, {
+      .get(`/api/update/user/initUser?address=${signer}`, {
         headers: headers,
       })
       .then((res) => {
