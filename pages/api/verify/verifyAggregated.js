@@ -14,8 +14,6 @@ export default function handler(req, res) {
       data: [BigInt(price)],
     };
 
-    console.log(verifyBody);
-
     const originsVerified = signatureClient.verifyFields(verifyBody);
 
     if (!originsVerified) return res.status(201).json({ status: 0 });

@@ -22,6 +22,7 @@ export default async function handler(req, res) {
       return res.status(401).json("Unauthorized.");
     }
 
+    /// Instead of this, return data from historical.
     const cachedData = await redis.get(TOKEN_TO_CACHE[token]);
 
     if (cachedData) {

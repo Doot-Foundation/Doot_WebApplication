@@ -43,73 +43,71 @@ async function PriceOf(token) {
   });
 }
 
-async function startFetchAndUpdates(tokens) {
+async function startFetchAndUpdates() {
   const cid = await redis.get(HISTORICAL_CID_CACHE);
   const GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
   const pinnedData = await axios.get(`https://${GATEWAY}/ipfs/${cid}`);
   const ipfs = pinnedData.data;
 
-  const failed = [];
+  //   const failed = [];
 
-  for (const token of tokens) {
-    if (token == "mina") continue;
-    console.log("\n+++++++++++ STARTING JOB +++++++++++");
+  const token = "mina";
+  console.log("\n+++++++++++ STARTING JOB +++++++++++");
 
-    try {
-      console.log("++ " + token, "\n");
+  try {
+    console.log("++ " + token, "\n");
 
-      const results = await PriceOf(token);
+    const results = await PriceOf(token);
 
-      await redis.set(TOKEN_TO_CACHE[token], results[1]);
-      await redis.set(TOKEN_TO_SIGNED_SLOT[token], "NULL");
+    await redis.set(TOKEN_TO_CACHE[token], results[1]);
+    await redis.set(TOKEN_TO_SIGNED_SLOT[token], "NULL");
 
-      const DEPLOYER_PUBLIC_KEY = process.env.NEXT_PUBLIC_DEPLOYER_PUBLIC_KEY;
+    const DEPLOYER_PUBLIC_KEY = process.env.NEXT_PUBLIC_DEPLOYER_PUBLIC_KEY;
 
-      await appendSignatureToSlot(
-        token,
-        results[1],
-        results[1].signature,
-        DEPLOYER_PUBLIC_KEY
-      );
+    await appendSignatureToSlot(
+      token,
+      results[1],
+      results[1].signature,
+      DEPLOYER_PUBLIC_KEY
+    );
 
-      const latest = new Array();
-      latest.push(results[1]);
+    const latest = new Array();
+    latest.push(results[1]);
 
-      // Check if the price is under 1.
-      const subone = results[0] < 1 ? true : false;
+    // Check if the price is under 1.
+    const subone = results[0] < 1 ? true : false;
 
-      const historical_latest = produceHistoricalLatestArray(
-        ipfs.latest.prices[token]
-      );
-      const historical_historical = produceHistoricalArray(
-        token,
-        ipfs.historical
-      );
+    const historical_latest = produceHistoricalLatestArray(
+      ipfs.latest.prices[token]
+    );
+    const historical_historical = produceHistoricalArray(
+      token,
+      ipfs.historical
+    );
 
-      // (IMMEDIATE, HISTORICAL_LATEST, HISTORICAL_HISTORICAL)
-      // IN THIS CASE, THE MOST FREQUENTLY CHANGED INFO IS THE LATEST - 10 MINUTES.
-      // THE HISTORICAL VALUES ARE UPDATED EVERY 30 MINUTES.
-      const graphResult = await generateGraphData(
-        subone,
-        latest,
-        historical_latest,
-        historical_historical
-      );
+    // (IMMEDIATE, HISTORICAL_LATEST, HISTORICAL_HISTORICAL)
+    // IN THIS CASE, THE MOST FREQUENTLY CHANGED INFO IS THE LATEST - 10 MINUTES.
+    // THE HISTORICAL VALUES ARE UPDATED EVERY 30 MINUTES.
+    const graphResult = await generateGraphData(
+      subone,
+      latest,
+      historical_latest,
+      historical_historical
+    );
 
-      const graphResultCacheObj = {
-        graph_data: graphResult[0],
-        min_price: graphResult[1],
-        max_price: graphResult[2],
-        percentage_change: graphResult[3],
-      };
+    const graphResultCacheObj = {
+      graph_data: graphResult[0],
+      min_price: graphResult[1],
+      max_price: graphResult[2],
+      percentage_change: graphResult[3],
+    };
 
-      await redis.set(TOKEN_TO_GRAPH_DATA[token], graphResultCacheObj);
-    } catch (err) {
-      failed.push(token);
-    }
+    await redis.set(TOKEN_TO_GRAPH_DATA[token], graphResultCacheObj);
+  } catch (err) {
+    return false;
   }
   console.log("+++++++++++ FINISHED JOB +++++++++++\n");
-  return failed;
+  return true;
 }
 
 export default async function handler(req, res) {
@@ -125,19 +123,16 @@ export default async function handler(req, res) {
     const failed = await startFetchAndUpdates(tokens);
     if (!responseAlreadySent) {
       responseAlreadySent = true;
-      if (failed.length > 0) {
+      if (failed) {
         return res.status(200).json({
-          status: true,
-          message: `Updated prices partially.`,
-          data: {
-            failed: failed,
-          },
+          status: false,
+          message: `Not updated mina price.`,
         });
       } else {
         responseAlreadySent = true;
         return res.status(200).json({
           status: true,
-          message: `Updated prices successfully.`,
+          message: `Updated mina price.`,
         });
       }
     }

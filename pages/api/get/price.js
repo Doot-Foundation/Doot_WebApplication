@@ -1,5 +1,5 @@
 const { supabase } = require("../../../utils/helper/init/InitSupabase.js");
-const { redis } = require("../../../utils/helper/init/InitRedis.js");
+const { redis, ratelimit } = require("../../../utils/helper/init/InitRedis.js");
 const incrementCallCounter = require("../../../utils/helper/IncrementCallCounter.js");
 
 const {
@@ -12,6 +12,15 @@ const uuid = require("uuid");
 const uuidValidate = uuid.validate;
 
 export default async function handler(req, res) {
+  const ip = req.ip ?? "ip";
+  const { success } = await ratelimit.limit(ip);
+  if (!success) {
+    res.status(429).json({
+      message: "Too Many Requests.",
+    });
+    return;
+  }
+
   const authHeader = req.headers.authorization;
   let { token } = req.query;
 

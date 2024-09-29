@@ -1,10 +1,9 @@
 const { signatureClient } = require("../../../utils/helper/SignatureClient");
-const { ORACLE_PUBLIC_KEY } = require("../../../utils/constants/info");
-
 const { CircuitString } = require("o1js");
 
 export default function handler(req, res) {
   const { price, signature, url, decimals, timestamp } = req.query;
+  const KEY = process.env.NEXT_PUBLIC_DEPLOYER_PUBLIC_KEY;
   try {
     const fieldURL = BigInt(CircuitString.fromString(url).hash());
     const fieldPrice = BigInt(price);
@@ -13,11 +12,11 @@ export default function handler(req, res) {
 
     const verifyBody = {
       signature: signature,
-      publicKey: ORACLE_PUBLIC_KEY,
+      publicKey: KEY,
       data: [fieldURL, fieldPrice, fieldDecimals, fieldTimestamp],
     };
 
-    console.log(verifyBody);
+    // console.log(verifyBody);
 
     const originsVerified = signatureClient.verifyFields(verifyBody);
     if (!originsVerified) return res.status(201).json({ status: 0 });

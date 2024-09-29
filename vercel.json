@@ -11,6 +11,10 @@
       "schedule": "*/10 * * * *"
     },
     {
+      "path": "/api/update/core/updateMina",
+      "schedule": "* * * * *"
+    },
+    {
       "path": "/api/update/ipfs/updateHistorical",
       "schedule": "*/33 * * * *"
     },
