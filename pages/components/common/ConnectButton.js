@@ -19,7 +19,6 @@ export default function ConnectButton() {
   } else {
     window.mina?.on("accountsChanged", (accounts) => {
       sessionStorage.clear();
-
       sessionStorage.setItem("signer", accounts[0]);
 
       dispatch(setSigner(accounts[0]));
@@ -35,31 +34,63 @@ export default function ConnectButton() {
     });
   }
 
-  async function handleConnection() {
+  async function handleConnection(sessionSigner) {
+    if (typeof window.mina == "undefined") {
+      setShowWalletPopup(true);
+    } else {
+      const walletCode = sessionStorage.getItem("errorCode");
+      if (sessionSigner != undefined && walletCode != "1002") {
+        try {
+          const accounts = await window.mina.requestAccounts();
+          const network = await window.mina.requestNetwork();
+
+          let chName = network.networkID;
+          chName = chName.split(":");
+          chName = chName[1];
+          chName = chName[0].toUpperCase() + chName.slice(1);
+
+          sessionStorage.setItem("signer", accounts[0]);
+
+          dispatch(setSigner(accounts[0]));
+          dispatch(setChainName(chName));
+        } catch (err) {
+          sessionStorage.setItem("errorCode", 1002);
+          console.log(err.code);
+        }
+      }
+    }
+  }
+
+  async function handleConnectionManual() {
     if (typeof window.mina == "undefined") {
       setShowWalletPopup(true);
     } else {
       if (!signer) {
-        const accounts = await window.mina.requestAccounts();
-        const network = await window.mina.requestNetwork();
+        try {
+          const accounts = await window.mina.requestAccounts();
+          const network = await window.mina.requestNetwork();
 
-        let chName = network.networkID;
-        chName = chName.split(":");
-        chName = chName[1];
-        chName = chName[0].toUpperCase() + chName.slice(1);
+          let chName = network.networkID;
+          chName = chName.split(":");
+          chName = chName[1];
+          chName = chName[0].toUpperCase() + chName.slice(1);
 
-        sessionStorage.setItem("signer", accounts[0]);
+          sessionStorage.setItem("signer", accounts[0]);
+          sessionStorage.setItem("errorCode", 0);
 
-        dispatch(setSigner(accounts[0]));
-        dispatch(setChainName(chName));
+          dispatch(setSigner(accounts[0]));
+          dispatch(setChainName(chName));
+        } catch (err) {
+          console.log(err.code);
+        }
       }
     }
   }
 
   useEffect(() => {
-    const sign = sessionStorage.getItem("signer");
-
-    if (sign != "undefined") handleConnection();
+    const sessionSigner = sessionStorage.getItem("signer");
+    console.log(sessionSigner);
+    handleConnection(sessionSigner);
   }, []);
 
   const handleCloseWalletPopup = () => {
@@ -119,7 +150,7 @@ export default function ConnectButton() {
                 color="white"
                 _hover={{}}
                 _active={{}}
-                onClick={() => handleConnection()}
+                onClick={() => handleConnectionManual()}
               >
                 Connect
               </Button>

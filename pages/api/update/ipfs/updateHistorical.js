@@ -1,9 +1,6 @@
 const { redis } = require("@/utils/helper/init/InitRedis.js");
 
-const {
-  HISTORICAL_MAX_SIGNED_SLOT_CACHE,
-  HISTORICAL_CID_CACHE,
-} = require("@/utils/constants/info.js");
+const { HISTORICAL_CID_CACHE } = require("@/utils/constants/info.js");
 const pinHistoricalObject = require("@/utils/helper/PinHistorical.js");
 
 export default async function handler(req, res) {
@@ -13,15 +10,13 @@ export default async function handler(req, res) {
   }
 
   const obj = {};
-  const finalSlotState = {};
 
-  const CACHED_DATA = await redis.get(HISTORICAL_MAX_SIGNED_SLOT_CACHE);
+  const CACHED_DATA = await redis.get();
   const keys = Object.keys(CACHED_DATA);
 
   for (const key of keys) {
     const data = CACHED_DATA[key];
     obj[key] = data;
-    finalSlotState[key] = { community: {} };
   }
 
   const cid = await redis.get(HISTORICAL_CID_CACHE);
@@ -30,7 +25,6 @@ export default async function handler(req, res) {
   // IPFS PIN UPDATED.
   await redis.set(HISTORICAL_CID_CACHE, updatedCID);
   // RESET THE MAX SLOT AFTER THE HISTORICAL HAS BEEN UPDATED.
-  await redis.set(HISTORICAL_MAX_SIGNED_SLOT_CACHE, finalSlotState);
 
   return res.status(200).json({
     status: true,

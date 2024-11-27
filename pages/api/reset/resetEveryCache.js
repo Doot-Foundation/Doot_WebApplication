@@ -2,12 +2,9 @@ const { redis } = require("@/utils/helper/init/InitRedis.js");
 
 const {
   TOKEN_TO_CACHE,
-  TOKEN_TO_SIGNED_SLOT,
   TOKEN_TO_GRAPH_DATA,
   HISTORICAL_CID_CACHE,
-  HISTORICAL_MAX_SIGNED_SLOT_CACHE,
   MINA_CID_CACHE,
-  MINA_MAX_SIGNED_SLOT_CACHE,
 } = require("@/utils/constants/info.js");
 
 const pinHistoricalObject = require("@/utils/helper/PinHistorical.js");
@@ -15,8 +12,6 @@ const pinHistoricalObject = require("@/utils/helper/PinHistorical.js");
 const pinMinaObject = require("@/utils/helper/PinMinaObject.ts");
 
 const getPriceOf = require("@/utils/helper/GetPriceOf.js");
-
-const appendSignatureToSlot = require("@/utils/helper/AppendSignatureToSlot.js");
 
 async function PriceOf(key) {
   return new Promise((resolve) => {
@@ -31,7 +26,6 @@ async function resetTokenCache(keys) {
     const results = await PriceOf(key);
 
     await redis.set(TOKEN_TO_CACHE[key], results[1]);
-    await redis.set(TOKEN_TO_SIGNED_SLOT[key], "NULL");
   }
 }
 
@@ -53,7 +47,6 @@ async function resetHistoricalSignedCache(keys) {
   for (const key of keys) {
     finalObj[key] = { community: {} };
   }
-  await redis.set(HISTORICAL_MAX_SIGNED_SLOT_CACHE, finalObj);
 }
 
 async function resetMinaCache(keys) {
@@ -74,23 +67,6 @@ async function resetMinaSignedCache(keys) {
   for (const key of keys) {
     finalObj[key] = { community: {} };
   }
-
-  await redis.set(MINA_MAX_SIGNED_SLOT_CACHE, finalObj);
-}
-
-async function resetSlots(keys) {
-  const DEPLOYER_PUBLIC_KEY = process.env.NEXT_PUBLIC_DEPLOYER_PUBLIC_KEY;
-
-  for (const key of keys) {
-    const CACHED_DATA = await redis.get(TOKEN_TO_CACHE[key]);
-
-    await appendSignatureToSlot(
-      key,
-      CACHED_DATA,
-      CACHED_DATA.signature,
-      DEPLOYER_PUBLIC_KEY
-    );
-  }
 }
 
 async function resetGraphCache(keys) {
@@ -102,7 +78,7 @@ async function resetGraphCache(keys) {
       percentage_change: "0",
     });
 
-    console.log("Added graph slot for", key);
+    console.log("Cleared graph data for", key);
   }
 }
 
@@ -122,7 +98,6 @@ export default async function handler(req, res) {
   await resetHistoricalSignedCache(keys);
   await resetMinaCache(keys);
   await resetMinaSignedCache(keys);
-  await resetSlots(keys);
   await resetGraphCache(keys);
 
   // AFTER ALL IS DONE YOU NEED TO CALL UPDATE HISTORICAL TO POPULATE THE HISTORICAL.HISTORICAL

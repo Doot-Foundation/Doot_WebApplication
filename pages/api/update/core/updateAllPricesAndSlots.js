@@ -3,13 +3,11 @@ const { redis } = require("@/utils/helper/init/InitRedis.js");
 const {
   TOKEN_TO_CACHE,
   TOKEN_TO_SYMBOL,
-  TOKEN_TO_SIGNED_SLOT,
   TOKEN_TO_GRAPH_DATA,
   HISTORICAL_CID_CACHE,
 } = require("@/utils/constants/info.js");
 
 const getPriceOf = require("@/utils/helper/GetPriceOf.js");
-const appendSignatureToSlot = require("@/utils/helper/AppendSignatureToSlot.js");
 const generateGraphData = require("@/utils/helper/GenerateGraphData.js");
 
 const axios = require("axios");
@@ -61,16 +59,6 @@ async function startFetchAndUpdates(tokens) {
       const results = await PriceOf(token);
 
       await redis.set(TOKEN_TO_CACHE[token], results[1]);
-      await redis.set(TOKEN_TO_SIGNED_SLOT[token], "NULL");
-
-      const DEPLOYER_PUBLIC_KEY = process.env.NEXT_PUBLIC_DEPLOYER_PUBLIC_KEY;
-
-      await appendSignatureToSlot(
-        token,
-        results[1],
-        results[1].signature,
-        DEPLOYER_PUBLIC_KEY
-      );
 
       const latest = new Array();
       latest.push(results[1]);

@@ -149,7 +149,7 @@ const KuCoinSymbols = {
   chainlink: "LINK",
   ripple: "XRP",
   dogecoin: "DOGE",
-  polygon: "MATIC",
+  polygon: "POL",
   avalanche: "AVAX",
   cardano: "ADA",
 };
@@ -162,7 +162,7 @@ const HuobiSymbols = {
   solana: "sol",
   ripple: "xrp",
   dogecoin: "doge",
-  polygon: "matic",
+  polygon: "pol",
   avalanche: "avax",
   cardano: "ada",
 };
@@ -188,7 +188,7 @@ const CexIOSymbols = {
   solana: "SOL",
   ripple: "XRP",
   dogecoin: "DOGE",
-  polygon: "MATIC",
+  polygon: "POL",
   avalanche: "AVAX",
   cardano: "ADA",
 };

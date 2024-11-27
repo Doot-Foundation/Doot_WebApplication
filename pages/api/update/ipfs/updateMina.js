@@ -1,9 +1,6 @@
 const { redis } = require("@/utils/helper/init/InitRedis.js");
 
-const {
-  MINA_CID_CACHE,
-  MINA_MAX_SIGNED_SLOT_CACHE,
-} = require("@/utils/constants/info.js");
+const { MINA_CID_CACHE } = require("@/utils/constants/info.js");
 const pinMinaObject = require("@/utils/helper/PinMinaObject.ts");
 
 export default async function handler(req, res) {
@@ -13,15 +10,13 @@ export default async function handler(req, res) {
   }
 
   const obj = {};
-  const finalSlotState = {};
 
-  const CACHED_DATA = await redis.get(MINA_MAX_SIGNED_SLOT_CACHE);
+  const CACHED_DATA = await redis.get();
   const keys = Object.keys(CACHED_DATA);
 
   for (const key of keys) {
     const data = CACHED_DATA[key];
     obj[key] = data;
-    finalSlotState[key] = { community: {} };
   }
   //RESULTS : [IPFSHASH,COMMITMENT]
   const [cid, commitment] = await redis.get(MINA_CID_CACHE);
@@ -29,8 +24,6 @@ export default async function handler(req, res) {
 
   // IPFS PIN UPDATED.
   await redis.set(MINA_CID_CACHE, results);
-  // RESET THE MAX SLOT AFTER THE HISTORICAL HAS BEEN UPDATED.
-  await redis.set(MINA_MAX_SIGNED_SLOT_CACHE, finalSlotState);
 
   return res.status(200).json({
     status: true,

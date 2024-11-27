@@ -173,12 +173,12 @@ export default function Features() {
           position="relative"
           gap={"40px"}
         >
-          <Image
+          {/* <Image
             position="absolute"
             src="/static/images/Background_Lines.svg"
             minW="100vw"
             zIndex={-10}
-          />
+          /> */}
           <Flex
             gap={10}
             mt={32}

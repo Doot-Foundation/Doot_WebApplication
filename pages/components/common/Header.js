@@ -1,11 +1,9 @@
 import { Link, Flex, Image, Spacer } from "@chakra-ui/react";
 import ConnectButton from "./ConnectButton";
 
-import { useMediaQuery } from "@chakra-ui/react";
-
 export default function Header() {
-  const [isLargerThanMd] = useMediaQuery("(min-width: 1280px)");
-  if (!isLargerThanMd) return;
+  // const [isLargerThanMd] = useMediaQuery("(min-width: 1280px)");
+  // if (!isLargerThanMd) return;
 
   return (
     <>
@@ -48,7 +46,7 @@ export default function Header() {
           >
             Feeds
           </Link>
-          <Link
+          {/* <Link
             href="/slots"
             _hover={{
               color: "white",
@@ -56,7 +54,7 @@ export default function Header() {
             }}
           >
             Slots
-          </Link>
+          </Link> */}
           <Link
             href="/verify"
             _hover={{

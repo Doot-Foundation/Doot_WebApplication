@@ -111,7 +111,7 @@ export default function Footer() {
               <Flex direction={"column"} gap={2} textAlign="right">
                 <Link href="/">Home</Link>
                 <Link href="/feeds">Feeds</Link>
-                <Link href="/slots">Slots</Link>
+                {/* <Link href="/slots">Slots</Link> */}
                 <Link href="/verify">Verify</Link>
                 <Link href="/dashboard">Dashboard</Link>
               </Flex>
