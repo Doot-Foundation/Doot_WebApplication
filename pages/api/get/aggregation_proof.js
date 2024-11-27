@@ -1,11 +1,11 @@
-const { supabase } = require("../../../utils/helper/init/InitSupabase.js");
-const { redis } = require("../../../utils/helper/init/InitRedis.js");
-const incrementCallCounter = require("../../../utils/helper/IncrementCallCounter.js");
+const { supabase } = require("@/utils/helper/init/InitSupabase.js");
+const { redis } = require("@/utils/helper/init/InitRedis.js");
+const incrementCallCounter = require("@/utils/helper/IncrementCallCounter.js");
 
 const {
   TOKEN_TO_AGGREGATION_PROOF_CACHE,
   TOKEN_TO_SYMBOL,
-} = require("../../../utils/constants/info.js");
+} = require("@/utils/constants/info.js");
 
 const uuid = require("uuid");
 const uuidValidate = uuid.validate;

@@ -1,12 +1,12 @@
-const { supabase } = require("../../../utils/helper/init/InitSupabase.js");
-const { redis, ratelimit } = require("../../../utils/helper/init/InitRedis.js");
-const incrementCallCounter = require("../../../utils/helper/IncrementCallCounter.js");
+const { supabase } = require("@/utils/helper/init/InitSupabase.js");
+const { redis, ratelimit } = require("@/utils/helper/init/InitRedis.js");
+const incrementCallCounter = require("@/utils/helper/IncrementCallCounter.js");
 
 const {
   TOKEN_TO_CACHE,
   TOKEN_TO_SYMBOL,
   TOKEN_TO_AGGREGATION_PROOF_CACHE,
-} = require("../../../utils/constants/info.js");
+} = require("@/utils/constants/info.js");
 
 const uuid = require("uuid");
 const uuidValidate = uuid.validate;

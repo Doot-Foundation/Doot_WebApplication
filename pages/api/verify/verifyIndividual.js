@@ -1,4 +1,4 @@
-const { signatureClient } = require("../../../utils/helper/SignatureClient");
+const { signatureClient } = require("@/utils/helper/init/InitSignatureClient");
 const { CircuitString } = require("o1js");
 
 export default function handler(req, res) {

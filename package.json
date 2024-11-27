@@ -10,6 +10,7 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
+    "zkon-sdk": "git://github.com/ZKON-Network/provable-data-sdk.git#main",
     "@chakra-ui/react": "^2.8.2",
     "@choc-ui/chakra-autocomplete": "^5.5.1",
     "@emotion/react": "^11.13.0",
@@ -33,7 +34,7 @@
     "lodash": "^4.17.21",
     "mina-signer": "^3.0.7",
     "next": "14.0.1",
-    "o1js": "^1.6.0",
+    "o1js": "^1.9.1",
     "o1js-pack": "^0.7.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",

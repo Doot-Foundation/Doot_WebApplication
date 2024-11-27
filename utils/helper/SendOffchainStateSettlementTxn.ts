@@ -1,13 +1,37 @@
-const DOOT_KEY: string | undefined = process.env.DOOT_KEY;
-const DEPLOYER_KEY: string | undefined = process.env.DEPLOYER_KEY;
-const MINA_SECRET: string | undefined = process.env.MINA_SECRET;
-const ENDPOINT: string | undefined = process.env.NEXT_PUBLIC_MINA_ENDPOINT;
+import { Mina, PrivateKey, PublicKey, fetchAccount } from "o1js";
+import { Doot, offchainState } from "@/utils/constants/Doot.js";
+import { setTimeout } from "timers/promises";
 
-import { Doot, offchainState } from "../constants/Doot.js";
-import { PrivateKey, Mina, fetchAccount } from "o1js";
+const DOOT_KEY = process.env.DOOT_KEY;
+const DEPLOYER_KEY = process.env.DEPLOYER_KEY;
+const ENDPOINT = process.env.NEXT_PUBLIC_MINA_ENDPOINT;
 
-export default async function sendOffchainStateTxn() {
-  if (DEPLOYER_KEY && DOOT_KEY && MINA_SECRET && ENDPOINT) {
+type AccountInfo = {
+  publicKey: PublicKey;
+};
+
+async function fetchAccountWithRetry(
+  accountInfo: AccountInfo,
+  maxRetries = 3
+): Promise<void> {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      await fetchAccount(accountInfo);
+      return;
+    } catch (error) {
+      if (i === maxRetries - 1) throw error;
+      await setTimeout(1000 * (i + 1));
+    }
+  }
+}
+
+async function sendOffchainStateTxn(): Promise<boolean> {
+  if (!DEPLOYER_KEY || !DOOT_KEY || !ENDPOINT) {
+    console.error("Missing required environment variables");
+    return false;
+  }
+
+  try {
     const doot = PrivateKey.fromBase58(DOOT_KEY);
     const dootPub = doot.toPublicKey();
     const deployer = PrivateKey.fromBase58(DEPLOYER_KEY);
@@ -16,26 +40,39 @@ export default async function sendOffchainStateTxn() {
     const Devnet = Mina.Network(ENDPOINT);
     Mina.setActiveInstance(Devnet);
 
-    let accountInfo = {
-      publicKey: dootPub,
-    };
-    await fetchAccount(accountInfo);
-    accountInfo = {
-      publicKey: deployerPub,
-    };
-    await fetchAccount(accountInfo);
+    const dootAccountInfo = { publicKey: dootPub };
+    const deployerAccountInfo = { publicKey: deployerPub };
 
-    let dootZkApp = new Doot(dootPub);
-    offchainState.setContractInstance(dootZkApp);
+    await Promise.all([
+      fetchAccountWithRetry(dootAccountInfo),
+      fetchAccountWithRetry(deployerAccountInfo),
+    ]);
+
+    const dootZkApp = new Doot(dootPub);
+    dootZkApp.offchainState.setContractInstance(dootZkApp);
+
+    console.log("Compiling offchain state...");
     await offchainState.compile();
 
-    let proof = await offchainState.createSettlementProof();
-    await Mina.transaction(deployerPub, () => dootZkApp.settle(proof))
-      .prove()
-      .sign([deployer])
-      .send();
+    console.log("Creating settlement proof...");
+    const proof = await dootZkApp.offchainState.createSettlementProof();
+
+    console.log("Sending transaction...");
+    const txn = await Mina.transaction(deployerPub, () =>
+      dootZkApp.settle(proof)
+    ).prove();
+
+    const result = await txn.sign([deployer]).send();
+    console.log("Transaction sent:", result.hash);
 
     return true;
+  } catch (error) {
+    console.error(
+      "Offchain state transaction failed:",
+      error instanceof Error ? error.message : "Unknown error"
+    );
+    return false; // We return false instead of throwing since this is an application-level operation
   }
-  return false;
 }
+
+export default sendOffchainStateTxn;

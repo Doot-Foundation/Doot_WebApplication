@@ -1,6 +1,6 @@
-const { redis } = require("../../../../utils/helper/init/InitRedis.js");
-const { HISTORICAL_CID_CACHE } = require("../../../../utils/constants/info.js");
-const getHistoricalInfo = require("../../../../utils/helper/GetHistoricalInfo.js");
+const { redis } = require("@/utils/helper/init/InitRedis.js");
+const { HISTORICAL_CID_CACHE } = require("@/utils/constants/info.js");
+const getHistoricalInfo = require("@/utils/helper/GetHistoricalInfo.js");
 
 export default async function handler(req, res) {
   const cid = await redis.get(HISTORICAL_CID_CACHE);

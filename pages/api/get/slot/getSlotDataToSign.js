@@ -1,11 +1,8 @@
-const { supabase } = require("../../../../utils/helper/init/InitSupabase");
-const { redis } = require("../../../../utils/helper/init/InitRedis");
-const incrementCallCounter = require("../../../../utils/helper/IncrementCallCounter.js");
+const { supabase } = require("@/utils/helper/init/InitSupabase");
+const { redis } = require("@/utils/helper/init/InitRedis");
+const incrementCallCounter = require("@/utils/helper/IncrementCallCounter.js");
 
-const {
-  TOKEN_TO_CACHE,
-  TOKEN_TO_SYMBOL,
-} = require("../../../../utils/constants/info");
+const { TOKEN_TO_CACHE, TOKEN_TO_SYMBOL } = require("@/utils/constants/info");
 
 const uuid = require("uuid");
 const uuidValidate = uuid.validate;

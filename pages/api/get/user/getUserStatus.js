@@ -1,4 +1,4 @@
-const { supabase } = require("../../../../utils/helper/init/InitSupabase.js");
+const { supabase } = require("@/utils/helper/init/InitSupabase.js");
 
 export default async function handler(req, res) {
   const { address } = req.query;

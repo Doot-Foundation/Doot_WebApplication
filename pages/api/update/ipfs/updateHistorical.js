@@ -1,10 +1,10 @@
-const { redis } = require("../../../../utils/helper/init/InitRedis.js");
+const { redis } = require("@/utils/helper/init/InitRedis.js");
 
 const {
   HISTORICAL_MAX_SIGNED_SLOT_CACHE,
   HISTORICAL_CID_CACHE,
-} = require("../../../../utils/constants/info.js");
-const pinHistoricalObject = require("../../../../utils/helper/PinHistorical.js");
+} = require("@/utils/constants/info.js");
+const pinHistoricalObject = require("@/utils/helper/PinHistorical.js");
 
 export default async function handler(req, res) {
   const authHeader = req.headers.authorization;

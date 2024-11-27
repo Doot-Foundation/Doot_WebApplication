@@ -1,8 +1,8 @@
-const { redis } = require("../../../../utils/helper/init/InitRedis");
+const { redis } = require("@/utils/helper/init/InitRedis");
 const {
   TOKEN_TO_GRAPH_DATA,
   TOKEN_TO_SYMBOL,
-} = require("../../../../utils/constants/info");
+} = require("@/utils/constants/info");
 
 const KEY = process.env.NEXT_PUBLIC_API_INTERFACE_KEY;
 

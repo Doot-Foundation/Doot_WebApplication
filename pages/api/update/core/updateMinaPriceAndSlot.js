@@ -1,4 +1,4 @@
-const { redis } = require("../../../../utils/helper/init/InitRedis.js");
+const { redis } = require("@/utils/helper/init/InitRedis.js");
 
 const {
   TOKEN_TO_CACHE,
@@ -6,11 +6,11 @@ const {
   TOKEN_TO_SIGNED_SLOT,
   TOKEN_TO_GRAPH_DATA,
   HISTORICAL_CID_CACHE,
-} = require("../../../../utils/constants/info.js");
+} = require("@/utils/constants/info.js");
 
-const getPriceOf = require("../../../../utils/helper/GetPriceOf.js");
-const appendSignatureToSlot = require("../../../../utils/helper/AppendSignatureToSlot.js");
-const generateGraphData = require("../../../../utils/helper/GenerateGraphData.js");
+const getPriceOf = require("@/utils/helper/GetPriceOf.js");
+const appendSignatureToSlot = require("@/utils/helper/AppendSignatureToSlot.js");
+const generateGraphData = require("@/utils/helper/GenerateGraphData.js");
 
 const axios = require("axios");
 
@@ -120,10 +120,10 @@ export default async function handler(req, res) {
     }
 
     const tokens = Object.keys(TOKEN_TO_SYMBOL);
-    const failed = await startFetchAndUpdates(tokens);
+    const success = await startFetchAndUpdates(tokens);
     if (!responseAlreadySent) {
       responseAlreadySent = true;
-      if (failed) {
+      if (!success) {
         return res.status(200).json({
           status: false,
           message: `Not updated mina price.`,

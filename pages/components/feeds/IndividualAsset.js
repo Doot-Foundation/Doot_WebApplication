@@ -12,7 +12,7 @@ import { useState, useEffect } from "react";
 import {
   SYMBOL_TO_TOKEN,
   ENDPOINT_TO_DATA_PROVIDER,
-} from "../../../utils/constants/info";
+} from "@/utils/constants/info";
 
 import { SlArrowDown, SlArrowLeft } from "react-icons/sl";
 

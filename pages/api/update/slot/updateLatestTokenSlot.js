@@ -1,11 +1,11 @@
-const { redis } = require("../../../../utils/helper/init/InitRedis");
+const { redis } = require("@/utils/helper/init/InitRedis");
 
-const { TOKEN_TO_CACHE } = require("../../../../utils/constants/info");
+const { TOKEN_TO_CACHE } = require("@/utils/constants/info");
 const {
   testnetSignatureClient,
   mainnetSignatureClient,
-} = require("../../../../utils/helper/SignatureClient");
-const appendSignatureToSlot = require("../../../../utils/helper/AppendSignatureToSlot");
+} = require("@/utils/helper/init/InitSignatureClient");
+const appendSignatureToSlot = require("@/utils/helper/AppendSignatureToSlot");
 
 export default async function handler(req, res) {
   const { signature, token } = req.query;

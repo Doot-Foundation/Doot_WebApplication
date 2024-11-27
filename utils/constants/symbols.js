@@ -206,6 +206,45 @@ const SwapZoneSymbols = {
   cardano: "ada",
 };
 
+const MEXCSymbols = {
+  ethereum: "ETH",
+  bitcoin: "BTC",
+  mina: "MINA",
+  chainlink: "LINK",
+  solana: "SOL",
+  ripple: "XRP",
+  dogecoin: "DOGE",
+  polygon: "POL",
+  avalanche: "AVAX",
+  cardano: "ADA",
+};
+
+const GateIOSymbols = {
+  ethereum: "ETH",
+  bitcoin: "BTC",
+  mina: "MINA",
+  chainlink: "LINK",
+  solana: "SOL",
+  ripple: "XRP",
+  dogecoin: "DOGE",
+  polygon: "POL",
+  avalanche: "AVAX",
+  cardano: "ADA",
+};
+
+const OKXSymbols = {
+  ethereum: "ETH",
+  bitcoin: "BTC",
+  mina: "MINA",
+  chainlink: "LINK",
+  solana: "SOL",
+  ripple: "XRP",
+  dogecoin: "DOGE",
+  polygon: "POL",
+  avalanche: "AVAX",
+  cardano: "ADA",
+};
+
 module.exports = {
   CoinGekoSymbols,
   BinanceSymbols,
@@ -223,4 +262,7 @@ module.exports = {
   ByBitSymbols,
   CexIOSymbols,
   SwapZoneSymbols,
+  MEXCSymbols,
+  GateIOSymbols,
+  OKXSymbols,
 };

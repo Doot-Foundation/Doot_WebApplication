@@ -1,8 +1,8 @@
-const { supabase } = require("../../../../utils/helper/init/InitSupabase.js");
+const { supabase } = require("@/utils/helper/init/InitSupabase.js");
 const {
   testnetSignatureClient,
   mainnetSignatureClient,
-} = require("../../../../utils/helper/SignatureClient.js");
+} = require("@/utils/helper/init/InitSignatureClient.js");
 
 const KEY = process.env.NEXT_PUBLIC_API_INTERFACE_KEY;
 

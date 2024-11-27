@@ -1,11 +1,11 @@
-const generateAggregationProof = require("../../../../utils/helper/GenerateAggregationProof");
+const generateAggregationProof = require("@/utils/helper/GenerateAggregationProof");
 
-const { redis } = require("../../../../utils/helper/init/InitRedis");
+const { redis } = require("@/utils/helper/init/InitRedis");
 const {
   TOKEN_TO_CACHE,
   TOKEN_TO_AGGREGATION_PROOF_CACHE,
   TOKEN_TO_SYMBOL,
-} = require("../../../../utils/constants/info");
+} = require("@/utils/constants/info");
 
 export default async function handler(req, res) {
   try {

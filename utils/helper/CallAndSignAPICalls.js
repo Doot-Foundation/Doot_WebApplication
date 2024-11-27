@@ -1,15 +1,10 @@
-const axios = require("axios");
-const _ = require("lodash");
-
 const DEPLOYER_KEY = process.env.DEPLOYER_KEY;
 
-const {
-  signatureClient,
-  testnetSignatureClient,
-} = require("./SignatureClient");
+const axios = require("axios");
+const _ = require("lodash");
 const { CircuitString } = require("o1js");
-
-const { MULTIPLICATION_FACTOR } = require("../constants/info");
+const { testnetSignatureClient } = require("./init/InitSignatureClient");
+const { MULTIPLICATION_FACTOR } = require("@/utils/constants/info");
 
 /// MULTIPLY BY 10 AND DROP THE DECIMALS
 function processFloatString(input) {

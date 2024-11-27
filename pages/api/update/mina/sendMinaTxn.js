@@ -1,10 +1,8 @@
-const { redis } = require("../../../../utils/helper/init/InitRedis.js");
+const { redis } = require("@/utils/helper/init/InitRedis.js");
 
-const { MINA_CID_CACHE } = require("../../../../utils/constants/info.js");
-const {
-  getToPinIPFSInformation,
-} = require("../../../../utils/helper/GetMinaInfo.ts");
-const sendMinaTxn = require("../../../../utils/helper/SendMinaTxn.ts");
+const { MINA_CID_CACHE } = require("@/utils/constants/info.js");
+const { getToPinIPFSInformation } = require("@/utils/helper/GetMinaInfo.ts");
+const sendMinaTxn = require("@/utils/helper/SendMinaTxn");
 
 /// TO CALL THE UPDATE() ON-CHAIN WITH PINNED MINA INFORMATION.
 export default async function handler(req, res) {

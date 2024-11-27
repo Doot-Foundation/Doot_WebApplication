@@ -1,4 +1,4 @@
-const { supabase } = require("../../../../utils/helper/init/InitSupabase.js");
+const { supabase } = require("@/utils/helper/init/InitSupabase.js");
 
 const uuid = require("uuid");
 const uuidv4 = uuid.v4;

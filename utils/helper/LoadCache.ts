@@ -1,7 +1,33 @@
 import { Cache } from "o1js";
+import fs from "fs";
+import path from "path";
 
-const cacheFiles = [
-  { name: "step-vk-doot-getprice", type: "string" },
+// Type definitions
+interface CacheFile {
+  name: string;
+  type: string;
+}
+
+interface CacheMap {
+  [key: string]: {
+    file: CacheFile;
+    header: string;
+    data: string;
+  };
+}
+
+// Cache file configurations
+const aggregationCacheFiles: CacheFile[] = [
+  { name: "step-vk-doot-prices-aggregation-program20-base", type: "string" },
+  {
+    name: "step-vk-doot-prices-aggregation-program20-generateaggregationproof",
+    type: "string",
+  },
+  { name: "wrap-vk-doot-prices-aggregation-program20", type: "string" },
+];
+
+const cacheFiles: CacheFile[] = [
+  { name: "step-vk-doot-getprices", type: "string" },
   { name: "step-vk-doot-initbase", type: "string" },
   { name: "step-vk-doot-settle", type: "string" },
   { name: "step-vk-doot-update", type: "string" },
@@ -9,66 +35,103 @@ const cacheFiles = [
   { name: "wrap-vk-doot", type: "string" },
 ];
 
-import fs from "fs";
-import path from "path";
+// Cache paths
+const DOOT_CACHE_PATH = path.join(
+  process.cwd(),
+  "utils",
+  "constants",
+  "doot_cache"
+);
+const AGGREGATION_CACHE_PATH = path.join(
+  process.cwd(),
+  "utils",
+  "constants",
+  "aggregation_cache"
+);
 
-function getHeaderData(filename: string) {
-  const filePath = path.join(
-    process.cwd(),
-    "utils",
-    "constants",
-    "cache",
-    `${filename}.header`
-  );
-  return fs.readFileSync(filePath, "utf8");
+// File reading functions with proper error handling
+function readCacheFile(
+  basePath: string,
+  filename: string,
+  isHeader: boolean = false
+): string {
+  try {
+    const filePath = path.join(
+      basePath,
+      `${filename}${isHeader ? ".header" : ""}`
+    );
+    return fs.readFileSync(filePath, "utf8");
+  } catch (error) {
+    console.error(
+      `Error reading cache file ${filename}:`,
+      error instanceof Error ? error.message : "Unknown error"
+    );
+    throw error;
+  }
 }
 
-function getFileData(filename: string) {
-  const filePath = path.join(
-    process.cwd(),
-    "utils",
-    "constants",
-    "cache",
-    filename
-  );
-  return fs.readFileSync(filePath, "utf8");
-}
+async function processCacheFiles(
+  files: CacheFile[],
+  basePath: string
+): Promise<CacheMap> {
+  try {
+    const cacheList = await Promise.all(
+      files.map(async (file) => ({
+        file,
+        header: readCacheFile(basePath, file.name, true),
+        data: readCacheFile(basePath, file.name),
+      }))
+    );
 
-export async function fetchFiles(): Promise<any> {
-  return Promise.all(
-    cacheFiles.map(async (file: any) => {
-      const header = getHeaderData(file.name);
-      const data = getFileData(file.name);
-
-      return { file, header, data };
-    })
-  ).then((cacheList) =>
-    cacheList.reduce((acc: any, { file, header, data }) => {
-      acc[file.name] = { file, header, data };
-
+    return cacheList.reduce((acc: CacheMap, cache) => {
+      acc[cache.file.name] = cache;
       return acc;
-    }, {})
-  );
+    }, {});
+  } catch (error) {
+    console.error(
+      "Error processing cache files:",
+      error instanceof Error ? error.message : "Unknown error"
+    );
+    throw error;
+  }
 }
 
-export const DootFileSystem = (files: any): Cache => ({
-  read({ persistentId, uniqueId, dataType }: any) {
-    // read current uniqueId, return data if it matches
-    if (!files[persistentId]) {
+export async function fetchDootFiles(): Promise<CacheMap> {
+  return processCacheFiles(cacheFiles, DOOT_CACHE_PATH);
+}
+
+export async function fetchAggregationFiles(): Promise<CacheMap> {
+  return processCacheFiles(aggregationCacheFiles, AGGREGATION_CACHE_PATH);
+}
+
+interface FileSystemParams {
+  persistentId: string;
+  uniqueId: string;
+  dataType: string;
+}
+
+export const FileSystem = (files: CacheMap): Cache => ({
+  read({ persistentId, uniqueId, dataType }: FileSystemParams) {
+    try {
+      const file = files[persistentId];
+      if (!file || file.header !== uniqueId) {
+        return undefined;
+      }
+
+      return dataType === "string"
+        ? new TextEncoder().encode(file.data)
+        : undefined;
+    } catch (error) {
+      console.error(
+        "Error reading from FileSystem:",
+        error instanceof Error ? error.message : "Unknown error"
+      );
       return undefined;
     }
-
-    const currentId = files[persistentId].header;
-    if (currentId !== uniqueId) {
-      return undefined;
-    }
-
-    if (dataType === "string") {
-      return new TextEncoder().encode(files[persistentId].data);
-    }
-
-    return undefined;
   },
-  write({ persistentId, uniqueId, dataType }: any, data: any) {},
+  write: (
+    { persistentId, uniqueId, dataType }: FileSystemParams,
+    data: any
+  ) => {},
   canWrite: true,
 });

@@ -1,10 +1,10 @@
-const { redis } = require("../../../../utils/helper/init/InitRedis.js");
+const { redis } = require("@/utils/helper/init/InitRedis.js");
 
 const {
   MINA_CID_CACHE,
   MINA_MAX_SIGNED_SLOT_CACHE,
-} = require("../../../../utils/constants/info.js");
-const pinMinaObject = require("../../../../utils/helper/PinMinaObject.ts");
+} = require("@/utils/constants/info.js");
+const pinMinaObject = require("@/utils/helper/PinMinaObject.ts");
 
 export default async function handler(req, res) {
   const authHeader = req.headers.authorization;

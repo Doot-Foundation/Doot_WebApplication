@@ -1,4 +1,4 @@
-const sendOffchainStateTxn = require("../../../../utils/helper/SendOffchainStateSettlementTxn");
+const sendOffchainStateTxn = require("@/utils/helper/SendOffchainStateSettlementTxn");
 
 /// AFTER NORMAL TXN EXECUTES, CALL THE SETTLE OFFCHAINSTATE PROOF.
 export default async function handler(req, res) {

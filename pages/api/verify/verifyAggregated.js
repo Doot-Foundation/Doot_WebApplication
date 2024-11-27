@@ -1,8 +1,8 @@
 const {
   signatureClient,
   mainnetSignatureClient,
-} = require("../../../utils/helper/SignatureClient");
-const { ORACLE_PUBLIC_KEY } = require("../../../utils/constants/info");
+} = require("@/utils/helper/init/InitSignatureClient");
+const { ORACLE_PUBLIC_KEY } = require("@/utils/constants/info");
 
 export default function handler(req, res) {
   const { price, signature } = req.query;

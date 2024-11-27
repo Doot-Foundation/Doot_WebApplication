@@ -1,4 +1,4 @@
-const { redis } = require("../../../../utils/helper/init/InitRedis.js");
+const { redis } = require("@/utils/helper/init/InitRedis.js");
 
 const {
   TOKEN_TO_CACHE,
@@ -6,11 +6,11 @@ const {
   TOKEN_TO_SIGNED_SLOT,
   TOKEN_TO_GRAPH_DATA,
   HISTORICAL_CID_CACHE,
-} = require("../../../../utils/constants/info.js");
+} = require("@/utils/constants/info.js");
 
-const getPriceOf = require("../../../../utils/helper/GetPriceOf.js");
-const appendSignatureToSlot = require("../../../../utils/helper/AppendSignatureToSlot.js");
-const generateGraphData = require("../../../../utils/helper/GenerateGraphData.js");
+const getPriceOf = require("@/utils/helper/GetPriceOf.js");
+const appendSignatureToSlot = require("@/utils/helper/AppendSignatureToSlot.js");
+const generateGraphData = require("@/utils/helper/GenerateGraphData.js");
 
 const axios = require("axios");
 

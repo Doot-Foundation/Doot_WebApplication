@@ -1,4 +1,4 @@
-const { redis } = require("../../../utils/helper/init/InitRedis.js");
+const { redis } = require("@/utils/helper/init/InitRedis.js");
 
 const {
   TOKEN_TO_CACHE,
@@ -8,15 +8,15 @@ const {
   HISTORICAL_MAX_SIGNED_SLOT_CACHE,
   MINA_CID_CACHE,
   MINA_MAX_SIGNED_SLOT_CACHE,
-} = require("../../../utils/constants/info.js");
+} = require("@/utils/constants/info.js");
 
-const pinHistoricalObject = require("../../../utils/helper/PinHistorical.js");
+const pinHistoricalObject = require("@/utils/helper/PinHistorical.js");
 
-const pinMinaObject = require("../../../utils/helper/PinMinaObject.ts");
+const pinMinaObject = require("@/utils/helper/PinMinaObject.ts");
 
-const getPriceOf = require("../../../utils/helper/GetPriceOf.js");
+const getPriceOf = require("@/utils/helper/GetPriceOf.js");
 
-const appendSignatureToSlot = require("../../../utils/helper/AppendSignatureToSlot.js");
+const appendSignatureToSlot = require("@/utils/helper/AppendSignatureToSlot.js");
 
 async function PriceOf(key) {
   return new Promise((resolve) => {
