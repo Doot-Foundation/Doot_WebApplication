@@ -26,6 +26,7 @@ const {
   MEXCSymbols,
   GateIOSymbols,
   OKXSymbols,
+  PoloniexSymbols,
 } = require("@/utils/constants/symbols");
 
 const DEPLOYER_KEY = process.env.DEPLOYER_KEY;
@@ -264,6 +265,17 @@ async function getPriceOkx(token) {
   );
 }
 
+async function getPricePoloniex(token) {
+  const id = PoloniexSymbols[token.toLowerCase()];
+  return safeApiCall("poloniex", () =>
+    callSignAPICall(
+      `https://api.poloniex.com/markets/${id}_USDT/price`,
+      `data.price`,
+      ""
+    )
+  );
+}
+
 async function removeOutliers(prices, timestamps, signatures, urls, threshold) {
   try {
     const median = getMedian(prices);
@@ -314,6 +326,7 @@ async function createAssetInfoArray(token) {
     getPriceMexc,
     getPriceOkx,
     getPriceGateio,
+    getPricePoloniex,
   ];
 
   console.log("Total Data Providers :", priceFunctions.length);

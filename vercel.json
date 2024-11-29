@@ -7,11 +7,11 @@
   },
   "crons": [
     {
-      "path": "/api/update/core/updateAllPricesAndSlots",
+      "path": "/api/update/core/updateAllPrices",
       "schedule": "*/10 * * * *"
     },
     {
-      "path": "/api/update/core/updateMinaPriceAndSlot",
+      "path": "/api/update/core/updateMinaPrice",
       "schedule": "* * * * *"
     },
     {

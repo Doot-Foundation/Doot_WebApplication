@@ -245,6 +245,19 @@ const OKXSymbols = {
   cardano: "ADA",
 };
 
+const PoloniexSymbols = {
+  ethereum: "ETH",
+  bitcoin: "BTC",
+  mina: "MINA",
+  chainlink: "LINK",
+  solana: "SOL",
+  ripple: "XRP",
+  dogecoin: "DOGE",
+  polygon: "POL",
+  avalanche: "AVAX",
+  cardano: "ADA",
+};
+
 module.exports = {
   CoinGekoSymbols,
   BinanceSymbols,
@@ -265,4 +278,5 @@ module.exports = {
   MEXCSymbols,
   GateIOSymbols,
   OKXSymbols,
+  PoloniexSymbols,
 };
