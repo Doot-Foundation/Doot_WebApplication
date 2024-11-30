@@ -26,7 +26,7 @@ class PriceAggregationArray20 extends Struct({
   }
 }
 
-const AggregationProgram20 = ZkProgram({
+export const AggregationProgram20 = ZkProgram({
   name: "doot-prices-aggregation-program20",
   publicInput: PriceAggregationArray20,
   publicOutput: UInt64,
@@ -36,7 +36,12 @@ const AggregationProgram20 = ZkProgram({
       privateInputs: [],
 
       async method(publicInput: PriceAggregationArray20) {
-        return UInt64.from(0);
+        let currentSum: UInt64 = UInt64.from(0);
+        for (let i = 0; i < 20; i++) {
+          currentSum = currentSum.add(publicInput.pricesArray[i]);
+        }
+
+        return currentSum.div(publicInput.count);
       },
     },
     generateAggregationProof: {
@@ -138,65 +143,6 @@ async function AggregationModule(
     );
     return [null, BigInt(0)];
   }
-
-  // let Local = await Mina.LocalBlockchain({ proofsEnabled: false });
-  // Mina.setActiveInstance(Local);
-
-  // const cacheFiles = await fetchAggregationFiles();
-  // const { verificationKey: vk20 } = await AggregationProgram20.compile({
-  //   cache: FileSystem(cacheFiles),
-  // });
-  // // await Doot.compile({ cache: DootFileSystem(cacheFiles) });
-
-  // const lastAvailableProof: JsonProof = convertToJsonProof(
-  //   JSON.parse(lastAvailableProofStr)
-  // );
-  // const compatibleResults = await generateUInt64Array(prices);
-
-  // const input20 = new PriceAggregationArray20({
-  //   pricesArray: compatibleResults[0],
-  //   count: compatibleResults[1],
-  // });
-
-  // if (!isBase) {
-  //   const compatibleLastAvailableProof = await AggregationProof20.fromJSON(
-  //     lastAvailableProof
-  //   );
-  //   let proof20 = await AggregationProgram20.generateAggregationProof(
-  //     input20,
-  //     compatibleLastAvailableProof
-  //   );
-  //   console.log("Step Proof20 Generated.");
-
-  //   proof20 satisfies AggregationProof20;
-  //   console.log("Step Proof20 Sanity Check.");
-
-  //   const valid20 = await verify(proof20.toJSON(), vk20);
-
-  //   if (!valid20) {
-  //     console.log("\nERR! VALID 20 FAILED.\n");
-  //     return [null, BigInt(0)];
-  //   } else {
-  //     console.log("Proof verified against VK.");
-  //     return [proof20.toJSON(), proof20.publicOutput.toBigInt()];
-  //   }
-  // } else {
-  //   let proof20 = await AggregationProgram20.base(input20);
-  //   console.log("Base Proof20 Generated.");
-
-  //   proof20 satisfies AggregationProof20;
-  //   console.log("Base Proof20 Sanity Check.");
-
-  //   const valid20 = await verify(proof20.toJSON(), vk20);
-
-  //   if (!valid20) {
-  //     console.log("\nERR! VALID 20 FAILED.\n");
-  //     return [null, BigInt(0)];
-  //   } else {
-  //     console.log("Proof verified against VK.");
-  //     return [proof20.toJSON(), proof20.publicOutput.toBigInt()];
-  //   }
-  // }
 }
 
 module.exports = { AggregationModule };

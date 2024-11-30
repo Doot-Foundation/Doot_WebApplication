@@ -24,27 +24,29 @@ export default async function handler(req, res) {
           .status(400)
           .json({ status: 400, message: "ERR! Invalid token." });
 
-      const proofCache = JSON.stringify(
-        await redis.get(TOKEN_TO_AGGREGATION_PROOF_CACHE[token])
-      );
+      // const proofCache = JSON.stringify(
+      //   await redis.get(TOKEN_TO_AGGREGATION_PROOF_CACHE[token])
+      // );
 
       let isBase = true;
-      if (proofCache != "NULL") isBase = false;
+      // if (proofCache != "NULL") isBase = false;
 
-      let lastProofDefault = JSON.stringify({
+      let proofDefault = JSON.stringify({
         publicInput: [],
         publicOutput: [],
         maxProofsVerified: 0,
         proof: "",
       });
 
+      console.log(isBase);
       const cachedData = await redis.get(TOKEN_TO_CACHE[token]);
       const priceInfo = cachedData.prices_returned;
 
       console.log(`\nProof creation for ${token} initialized.`);
       const aggregationResults = await generateAggregationProof(
         priceInfo,
-        isBase ? lastProofDefault : proofCache,
+        // isBase ? lastProofDefault : proofCache,
+        proofDefault,
         isBase
       );
 

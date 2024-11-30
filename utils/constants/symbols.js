@@ -136,7 +136,7 @@ const CoinCodexSymbols = {
   solana: "sol",
   ripple: "xrp",
   dogecoin: "doge",
-  polygon: "matic",
+  polygon: "pol",
   avalanche: "avax",
   cardano: "ada",
 };
@@ -258,6 +258,19 @@ const PoloniexSymbols = {
   cardano: "ADA",
 };
 
+const BTSESymbols = {
+  ethereum: "ETH",
+  bitcoin: "BTC",
+  mina: "MINA",
+  chainlink: "LINK",
+  solana: "SOL",
+  ripple: "XRP",
+  dogecoin: "DOGE",
+  polygon: "POL",
+  avalanche: "AVAX",
+  cardano: "ADA",
+};
+
 module.exports = {
   CoinGekoSymbols,
   BinanceSymbols,
@@ -279,4 +292,5 @@ module.exports = {
   GateIOSymbols,
   OKXSymbols,
   PoloniexSymbols,
+  BTSESymbols,
 };

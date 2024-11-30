@@ -20,10 +20,10 @@ import {
 const MULTIPLICATION_FACTOR = 10;
 
 const HISTORICAL_CID_CACHE = "historical_cid";
-const HISTORICAL_MAX_SIGNED_SLOT_CACHE = "historical_signed_max";
+// const HISTORICAL_MAX_SIGNED_SLOT_CACHE = "historical_signed_max";
 
 const MINA_CID_CACHE = "mina_cid";
-const MINA_MAX_SIGNED_SLOT_CACHE = "mina_signed_max";
+// const MINA_MAX_SIGNED_SLOT_CACHE = "mina_signed_max";
 
 const TOKEN_TO_AGGREGATION_PROOF_CACHE = {
   mina: "mina_aggregation_cache",
@@ -64,18 +64,18 @@ const TOKEN_TO_GRAPH_DATA = {
   dogecoin: "doge_graph_cache",
 };
 
-const TOKEN_TO_SIGNED_SLOT = {
-  mina: "mina_latest_slot_cache",
-  bitcoin: "btc_latest_slot_cache",
-  ethereum: "eth_latest_slot_cache",
-  solana: "sol_latest_slot_cache",
-  ripple: "xrp_latest_slot_cache",
-  cardano: "ada_latest_slot_cache",
-  avalanche: "avax_latest_slot_cache",
-  polygon: "matic_latest_slot_cache",
-  chainlink: "link_latest_slot_cache",
-  dogecoin: "doge_latest_slot_cache",
-};
+// const TOKEN_TO_SIGNED_SLOT = {
+//   mina: "mina_latest_slot_cache",
+//   bitcoin: "btc_latest_slot_cache",
+//   ethereum: "eth_latest_slot_cache",
+//   solana: "sol_latest_slot_cache",
+//   ripple: "xrp_latest_slot_cache",
+//   cardano: "ada_latest_slot_cache",
+//   avalanche: "avax_latest_slot_cache",
+//   polygon: "matic_latest_slot_cache",
+//   chainlink: "link_latest_slot_cache",
+//   dogecoin: "doge_latest_slot_cache",
+// };
 
 const PROVIDERS = [
   "Binance",
@@ -95,6 +95,7 @@ const PROVIDERS = [
   "Gate.io",
   "OKX",
 ];
+
 const ENDPOINT_TO_DATA_PROVIDER = {
   binance: "Binance",
   cryptocompare: "Crypto Compare",
@@ -165,6 +166,7 @@ const SUPPORTED_TOKENS = [
   "LINK",
   "DOGE",
 ];
+
 const TOKEN_TO_SYMBOL = {
   mina: "MINA",
   bitcoin: "BTC",
@@ -177,6 +179,7 @@ const TOKEN_TO_SYMBOL = {
   chainlink: "LINK",
   dogecoin: "DOGE",
 };
+
 const SYMBOL_TO_TOKEN = {
   MINA: "mina",
   BTC: "bitcoin",
@@ -194,12 +197,12 @@ module.exports = {
   TOKEN_TO_CACHE,
   TOKEN_TO_SYMBOL,
   TOKEN_TO_AGGREGATION_PROOF_CACHE,
-  TOKEN_TO_SIGNED_SLOT,
+  // TOKEN_TO_SIGNED_SLOT,
   TOKEN_TO_GRAPH_DATA,
   HISTORICAL_CID_CACHE,
-  HISTORICAL_MAX_SIGNED_SLOT_CACHE,
+  // HISTORICAL_MAX_SIGNED_SLOT_CACHE,
   MINA_CID_CACHE,
-  MINA_MAX_SIGNED_SLOT_CACHE,
+  // MINA_MAX_SIGNED_SLOT_CACHE,
   MULTIPLICATION_FACTOR,
   SYMBOL_TO_TOKEN,
   SUPPORTED_TOKENS,

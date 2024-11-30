@@ -27,6 +27,7 @@ const {
   GateIOSymbols,
   OKXSymbols,
   PoloniexSymbols,
+  BTSESymbols,
 } = require("@/utils/constants/symbols");
 
 const DEPLOYER_KEY = process.env.DEPLOYER_KEY;
@@ -276,6 +277,17 @@ async function getPricePoloniex(token) {
   );
 }
 
+async function getPriceBtse(token) {
+  const id = BTSESymbols[token.toLowerCase()];
+  return safeApiCall("btse", () =>
+    callSignAPICall(
+      `https://api.btse.com/spot/api/v3.2/price?symbol=${id}-USD`,
+      `data[0].lastPrice`,
+      ""
+    )
+  );
+}
+
 async function removeOutliers(prices, timestamps, signatures, urls, threshold) {
   try {
     const median = getMedian(prices);
@@ -327,6 +339,7 @@ async function createAssetInfoArray(token) {
     getPriceOkx,
     getPriceGateio,
     getPricePoloniex,
+    getPriceBtse,
   ];
 
   console.log("Total Data Providers :", priceFunctions.length);
@@ -364,7 +377,6 @@ async function getPriceOf(token) {
     const [prices, signatures, timestamps, urls] = await createAssetInfoArray(
       token
     );
-    console.log("Collected prices:", prices);
 
     // Calculate mean price
     const meanPrice =
@@ -378,8 +390,7 @@ async function getPriceOf(token) {
       DEPLOYER_KEY
     );
 
-    console.log("Mean:", meanPrice);
-    console.log("Processed Mean:", processedMeanPrice);
+    console.log("Mean:", meanPrice, " | Processed Mean:", processedMeanPrice);
     console.log("Signature over processed mean:", signedPrice.signature);
 
     // Format signature for API compatibility

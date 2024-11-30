@@ -55,7 +55,11 @@ export const AggregationProgram20 = ZkProgram({
     base: {
       privateInputs: [],
       async method(publicInput) {
-        return UInt64.from(0);
+        let currentSum = UInt64.from(0);
+        for (let i = 0; i < 20; i++) {
+          currentSum = currentSum.add(publicInput.pricesArray[i]);
+        }
+        return currentSum.div(publicInput.count);
       },
     },
     generateAggregationProof: {

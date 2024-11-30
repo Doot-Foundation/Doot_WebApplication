@@ -3,7 +3,7 @@ const GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
 const axios = require("axios");
 const unpin = require("./Unpin");
 
-const ONE_DAY_MS = 24 * 60 * 60 * 1000; // One day in milliseconds
+const ONE_DAY_MS = 24 * 60 * 60 * 1000 * 365; // One year in milliseconds
 
 /**
  * Removes timestamps older than 24 hours
@@ -57,7 +57,7 @@ async function pinHistoricalObject(previousCID, latestPrices) {
 
     // Remove old data and prepare for upload
     removeOldTimestamps(toUploadObject);
-    console.log("Removed Historical Data > 24hrs(if any).");
+    console.log("Removed Historical Data > 1Y(if any).");
 
     // Prepare upload options
     const options = {

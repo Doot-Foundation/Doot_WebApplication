@@ -40,13 +40,22 @@ async function callSignAPICall(url, resultPath, headerName) {
   API_KEY = API_KEY.replace(/^'(.*)'$/, "$1");
 
   var header = { [headerName]: API_KEY };
+  let response;
 
-  const response =
-    headerName !== ""
-      ? await axios.get(url, {
-          headers: header,
-        })
-      : await axios.get(url);
+  if (url.toLowerCase().includes("coingecko")) {
+    if (url.toLowerCase().includes("mina")) {
+      response = await axios.get(url);
+    } else {
+      throw new Error("Specific for Mina.");
+    }
+  } else {
+    response =
+      headerName !== ""
+        ? await axios.get(url, {
+            headers: header,
+          })
+        : await axios.get(url);
+  }
 
   header = null;
 
