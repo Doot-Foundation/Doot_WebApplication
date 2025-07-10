@@ -13,10 +13,6 @@
     {
       "path": "/api/update/ipfs/updateHistorical",
       "schedule": "*/33 * * * *"
-    },
-    {
-      "path": "/api/update/ipfs/updateMina",
-      "schedule": "* 2 * * *"
     }
   ],
   "headers": [
