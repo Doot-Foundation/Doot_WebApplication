@@ -50,7 +50,7 @@ async function startFetchAndUpdates(tokens) {
   const failed = [];
 
   for (const token of tokens) {
-    if (token == "mina") continue;
+    // if (token == "mina") continue;
     console.log("\n+++++++++++ STARTING JOB +++++++++++");
 
     try {

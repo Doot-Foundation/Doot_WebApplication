@@ -11,10 +11,6 @@
       "schedule": "*/10 * * * *"
     },
     {
-      "path": "/api/update/core/updateMinaPrice",
-      "schedule": "* * * * *"
-    },
-    {
       "path": "/api/update/ipfs/updateHistorical",
       "schedule": "*/33 * * * *"
     },

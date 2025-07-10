@@ -61,6 +61,7 @@ export default async function handler(req, res) {
         data: {
           proof: aggregationResults[0],
           selfAggregationResult: cachedData.price,
+          zkProgramAggregationResult: aggregationResults[1],
         },
         status: true,
         token: token,
