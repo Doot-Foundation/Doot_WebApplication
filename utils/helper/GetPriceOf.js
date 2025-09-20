@@ -30,7 +30,7 @@ const {
   BTSESymbols,
 } = require("@/utils/constants/symbols");
 
-const DEPLOYER_KEY = process.env.DEPLOYER_KEY;
+const DOOT_CALLER_KEY = process.env.DOOT_CALLER_KEY;
 
 // Unified error handler for API calls
 async function safeApiCall(apiName, callFn) {
@@ -387,7 +387,7 @@ async function getPriceOf(token) {
     // Sign the processed mean price
     const signedPrice = testnetSignatureClient.signFields(
       [BigInt(processedMeanPrice)],
-      DEPLOYER_KEY
+      DOOT_CALLER_KEY
     );
 
     console.log("Mean:", meanPrice, " | Processed Mean:", processedMeanPrice);

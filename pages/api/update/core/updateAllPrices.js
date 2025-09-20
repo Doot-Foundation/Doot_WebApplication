@@ -35,16 +35,25 @@ function produceHistoricalLatestArray(latestObj) {
 }
 
 async function PriceOf(token) {
-  return new Promise((resolve) => {
-    const results = getPriceOf(token);
-    resolve(results);
-  });
+  return await getPriceOf(token);
 }
 
 async function startFetchAndUpdates(tokens) {
   const cid = await redis.get(HISTORICAL_CID_CACHE);
+
+  if (!cid) {
+    throw new Error("Historical CID not found in cache");
+  }
+
   const GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
-  const pinnedData = await axios.get(`https://${GATEWAY}/ipfs/${cid}`);
+
+  if (!GATEWAY) {
+    throw new Error("PINATA_GATEWAY environment variable not set");
+  }
+
+  const pinnedData = await axios.get(`https://${GATEWAY}/ipfs/${cid}`, {
+    timeout: 30000 // 30 second timeout
+  });
   const ipfs = pinnedData.data;
 
   const failed = [];

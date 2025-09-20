@@ -2,20 +2,34 @@ const sendOffchainStateTxn = require("@/utils/helper/SendOffchainStateSettlement
 
 /// AFTER NORMAL TXN EXECUTES, CALL THE SETTLE OFFCHAINSTATE PROOF.
 export default async function handler(req, res) {
-  const authHeader = req.headers.authorization;
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return res.status(401).json("Unauthorized");
-  }
+  try {
+    const authHeader = req.headers.authorization;
+    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+      return res.status(401).json("Unauthorized");
+    }
 
-  const success = await sendOffchainStateTxn();
+    console.log("Sending offchain state settlement transaction...");
+    const success = await sendOffchainStateTxn();
 
-  if (success)
-    return res.status(200).json({
-      status: true,
-      message: "Settled stae on Doot smart contract successfully.",
+    if (success) {
+      console.log("Offchain state settlement successful");
+      return res.status(200).json({
+        status: true,
+        message: "Settled state on Doot smart contract successfully.",
+      });
+    } else {
+      console.log("Offchain state settlement failed");
+      return res.status(500).json({
+        status: false,
+        message: "Transaction failed."
+      });
+    }
+  } catch (error) {
+    console.error("Error in sendMinaStateTxn handler:", error.message);
+    return res.status(500).json({
+      status: false,
+      message: "Internal Server Error",
+      error: error.message
     });
-  else
-    return res
-      .status(200)
-      .json({ status: false, message: "Transaction failed." });
+  }
 }

@@ -7,7 +7,7 @@ import {
 import { FileSystem, fetchDootFiles } from "@/utils/helper/LoadCache";
 import { setTimeout } from "timers/promises";
 
-const DEPLOYER_KEY = process.env.DEPLOYER_KEY;
+const DOOT_CALLER_KEY = process.env.DOOT_CALLER_KEY;
 const DOOT_KEY = process.env.DOOT_KEY;
 const ENDPOINT = process.env.NEXT_PUBLIC_MINA_ENDPOINT;
 
@@ -35,7 +35,7 @@ async function sendMinaTxn(
   ipfs: string,
   prices: bigint[]
 ): Promise<boolean | undefined> {
-  if (!DEPLOYER_KEY || !DOOT_KEY || !ENDPOINT) {
+  if (!DOOT_CALLER_KEY || !DOOT_KEY || !ENDPOINT) {
     console.error("Missing required environment variables");
     return undefined;
   }
@@ -49,7 +49,7 @@ async function sendMinaTxn(
 
     const doot = PrivateKey.fromBase58(DOOT_KEY);
     const dootPub = doot.toPublicKey();
-    const deployer = PrivateKey.fromBase58(DEPLOYER_KEY);
+    const deployer = PrivateKey.fromBase58(DOOT_CALLER_KEY);
     const deployerPub = deployer.toPublicKey();
 
     const Devnet = Mina.Network(ENDPOINT);

@@ -1,4 +1,4 @@
-const DEPLOYER_KEY = process.env.DEPLOYER_KEY;
+const DOOT_CALLER_KEY = process.env.DOOT_CALLER_KEY;
 
 const axios = require("axios");
 const _ = require("lodash");
@@ -72,7 +72,7 @@ async function callSignAPICall(url, resultPath, headerName) {
 
   const signature = testnetSignatureClient.signFields(
     [fieldURL, fieldPrice, fieldDecimals, fieldTimestamp],
-    DEPLOYER_KEY
+    DOOT_CALLER_KEY
   );
 
   // USED SINCE UNABLE TO TRANSFER BIGINT OVER REST API CALLS.

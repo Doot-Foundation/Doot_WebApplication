@@ -1,4 +1,4 @@
-const { supabase } = require("@/utils/helper/init/InitSupabase.js");
+const { supabaseService } = require("@/utils/helper/init/InitSupabase.js");
 const uuid = require("uuid");
 const uuidv4 = uuid.v4;
 
@@ -13,33 +13,24 @@ export default async function handler(req, res) {
   }
 
   if (address) {
-    const MAIL = process.env.SUPABASE_USER;
-    const PASS = process.env.SUPABASE_USER_PASS;
 
-    await supabase.auth.signInWithPassword({
-      email: MAIL,
-      password: PASS,
-    });
-
-    const { data: select_data, error: select_error } = await supabase
-      .from("Auro_Login")
+    const { data: select_data, error: select_error } = await supabaseService
+      .from("login")
       .select("address")
       .eq("address", address);
 
     if (select_data != null && select_data.length != 0) {
-      await supabase.auth.signOut();
-      return res
+            return res
         .status(200)
         .json({ status: true, message: "Already Exists.", key: "" });
     }
 
     const assignedKey = uuidv4();
-    await supabase
-      .from("Auro_Login")
+    await supabaseService
+      .from("login")
       .insert([{ address: address, generated_key: assignedKey }]);
 
-    await supabase.auth.signOut();
-
+    
     return res.status(201).json({
       status: true,
       message: "Generated API key successfully.",

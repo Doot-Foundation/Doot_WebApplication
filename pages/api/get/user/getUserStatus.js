@@ -1,23 +1,15 @@
-const { supabase } = require("@/utils/helper/init/InitSupabase.js");
+const { supabaseService } = require("@/utils/helper/init/InitSupabase.js");
 
 export default async function handler(req, res) {
   const { address } = req.query;
 
   if (address) {
-    const MAIL = process.env.SUPABASE_USER;
-    const PASS = process.env.SUPABASE_USER_PASS;
 
-    await supabase.auth.signInWithPassword({
-      email: MAIL,
-      password: PASS,
-    });
-
-    const { data: select_data, error: select_error } = await supabase
-      .from("Auro_Login")
+    const { data: select_data, error: select_error } = await supabaseService
+      .from("login")
       .select("address")
       .eq("address", address);
 
-    await supabase.auth.signOut();
 
     if (select_data != null && select_data.length != 0) {
       return res

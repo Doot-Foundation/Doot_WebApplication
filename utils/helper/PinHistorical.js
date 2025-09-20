@@ -6,7 +6,7 @@ const unpin = require("./Unpin");
 const ONE_DAY_MS = 24 * 60 * 60 * 1000 * 365; // One year in milliseconds
 
 /**
- * Removes timestamps older than 24 hours
+ * Removes timestamps older than 1 year
  */
 function removeOldTimestamps(obj) {
   const currentTime = Date.now();

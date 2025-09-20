@@ -3,7 +3,7 @@ import { Doot, offchainState } from "@/utils/constants/Doot.js";
 import { setTimeout } from "timers/promises";
 
 const DOOT_KEY = process.env.DOOT_KEY;
-const DEPLOYER_KEY = process.env.DEPLOYER_KEY;
+const DOOT_CALLER_KEY = process.env.DOOT_CALLER_KEY;
 const ENDPOINT = process.env.NEXT_PUBLIC_MINA_ENDPOINT;
 
 type AccountInfo = {
@@ -26,7 +26,7 @@ async function fetchAccountWithRetry(
 }
 
 async function sendOffchainStateTxn(): Promise<boolean> {
-  if (!DEPLOYER_KEY || !DOOT_KEY || !ENDPOINT) {
+  if (!DOOT_CALLER_KEY || !DOOT_KEY || !ENDPOINT) {
     console.error("Missing required environment variables");
     return false;
   }
@@ -34,7 +34,7 @@ async function sendOffchainStateTxn(): Promise<boolean> {
   try {
     const doot = PrivateKey.fromBase58(DOOT_KEY);
     const dootPub = doot.toPublicKey();
-    const deployer = PrivateKey.fromBase58(DEPLOYER_KEY);
+    const deployer = PrivateKey.fromBase58(DOOT_CALLER_KEY);
     const deployerPub = deployer.toPublicKey();
 
     const Devnet = Mina.Network(ENDPOINT);

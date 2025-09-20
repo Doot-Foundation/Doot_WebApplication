@@ -41,7 +41,7 @@ export const AggregationProgram20 = ZkProgram({
           currentSum = currentSum.add(publicInput.pricesArray[i]);
         }
 
-        return currentSum.div(publicInput.count);
+        return { publicOutput: currentSum.div(publicInput.count) };
       },
     },
     generateAggregationProof: {
@@ -58,7 +58,7 @@ export const AggregationProgram20 = ZkProgram({
           currentSum = currentSum.add(publicInput.pricesArray[i]);
         }
 
-        return currentSum.div(publicInput.count);
+        return { publicOutput: currentSum.div(publicInput.count) };
       },
     },
   },
@@ -128,14 +128,14 @@ async function AggregationModule(
 
     console.log(`${isBase ? "Base" : "Step"} Proof20 Generated and checked.`);
 
-    const valid20 = await verify(proof20.toJSON(), vk20);
+    const valid20 = await verify(proof20.proof.toJSON(), vk20);
     if (!valid20) {
       console.error("\nERR! VALID 20 FAILED.\n");
       return [null, BigInt(0)];
     }
 
     console.log("Proof verified against VK.");
-    return [proof20.toJSON(), proof20.publicOutput.toBigInt()];
+    return [proof20.proof.toJSON(), proof20.proof.publicOutput.toBigInt()];
   } catch (error) {
     console.error(
       "Aggregation module failed:",
