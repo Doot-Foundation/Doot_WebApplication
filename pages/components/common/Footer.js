@@ -17,19 +17,6 @@ export default function Footer() {
   return (
     <>
       <Flex direction={"column"} gap={10} h={"fit-content"}>
-        <Flex direction={"column"} position={"relative"}>
-          <Box
-            position={"absolute"}
-            left={0}
-            top={"50%"}
-            borderBottomRadius={"100%"}
-            borderBottom={"1px solid white"}
-            w={"100vw"}
-            m={0}
-            p={0}
-            zIndex={-1}
-          ></Box>
-        </Flex>
         <Flex
           direction={"row"}
           m="0 auto"

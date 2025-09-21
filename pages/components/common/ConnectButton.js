@@ -34,10 +34,11 @@ export default function ConnectButton() {
     });
   }
 
-  async function handleConnection(sessionSigner) {
-    if (typeof window.mina == "undefined") {
+  async function handleConnection(sessionSigner, userTriggered = false) {
+    // Only show wallet popup if user manually triggered the connection
+    if (typeof window.mina == "undefined" && userTriggered) {
       setShowWalletPopup(true);
-    } else {
+    } else if (typeof window.mina !== "undefined") {
       const walletCode = sessionStorage.getItem("errorCode");
       if (sessionSigner != undefined && walletCode != "1002") {
         try {
@@ -53,6 +54,7 @@ export default function ConnectButton() {
 
           dispatch(setSigner(accounts[0]));
           dispatch(setChainName(chName));
+          sessionStorage.setItem("chainName", chName);
         } catch (err) {
           sessionStorage.setItem("errorCode", 1002);
           console.log(err.code);
@@ -80,6 +82,7 @@ export default function ConnectButton() {
 
           dispatch(setSigner(accounts[0]));
           dispatch(setChainName(chName));
+          sessionStorage.setItem("chainName", chName);
         } catch (err) {
           console.log(err.code);
         }
@@ -88,9 +91,16 @@ export default function ConnectButton() {
   }
 
   useEffect(() => {
+    // Hydrate from session only; don't auto-connect or show wallet modal on load
     const sessionSigner = sessionStorage.getItem("signer");
-    console.log(sessionSigner);
-    handleConnection(sessionSigner);
+    if (sessionSigner) {
+      dispatch(setSigner(sessionSigner));
+    }
+    const storedChain = sessionStorage.getItem("chainName");
+    if (storedChain) {
+      dispatch(setChainName(storedChain));
+    }
+    // Don't auto-trigger wallet checks on page load
   }, []);
 
   const handleCloseWalletPopup = () => {

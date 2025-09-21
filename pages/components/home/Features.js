@@ -44,12 +44,19 @@ export default function Features() {
                 <Heading
                   textAlign={"center"}
                   fontFamily={"Montserrat Variable"}
-                  fontWeight={600}
-                  fontSize={"38px"}
+                  fontWeight={700}
+                  fontSize={"42px"}
+                  lineHeight="1.2"
                 >
                   Aggregated
                 </Heading>
-                <Text fontSize={20} textAlign={"center"}>
+                <Text
+                  fontSize={18}
+                  textAlign={"center"}
+                  lineHeight="1.6"
+                  color="#CCCCCC"
+                  maxW="320px"
+                >
                   Our price calculation mechanism ensures unwavering data
                   integrity by sourcing prices from over 13 data providers,
                   filtering them, and finally aggregating the results.
@@ -63,12 +70,19 @@ export default function Features() {
                   <Heading
                     textAlign={"center"}
                     fontFamily={"Montserrat Variable"}
-                    fontWeight={600}
-                    fontSize={"38px"}
+                    fontWeight={700}
+                    fontSize={"42px"}
+                    lineHeight="1.2"
                   >
                     Data Feeds
                   </Heading>
-                  <Text fontSize={20} textAlign={"center"}>
+                  <Text
+                    fontSize={18}
+                    textAlign={"center"}
+                    lineHeight="1.6"
+                    color="#CCCCCC"
+                    maxW="320px"
+                  >
                     Easily access data feeds compatible with Mina Protocol
                     directly within your zkApp, supporting over 10 popular
                     assets today.
@@ -107,12 +121,19 @@ export default function Features() {
                 <Heading
                   textAlign={"center"}
                   fontFamily={"Montserrat Variable"}
-                  fontWeight={600}
-                  fontSize={"38px"}
+                  fontWeight={700}
+                  fontSize={"42px"}
+                  lineHeight="1.2"
                 >
                   Filtered
                 </Heading>
-                <Text fontSize={20} textAlign={"center"}>
+                <Text
+                  fontSize={18}
+                  textAlign={"center"}
+                  lineHeight="1.6"
+                  color="#CCCCCC"
+                  maxW="320px"
+                >
                   We systematically eliminate outliers from the dataset using
                   the MAD Score, ensuring the aggregated value is devoid of
                   disruptive noise, thereby preventing inaccurate results.
@@ -131,12 +152,19 @@ export default function Features() {
                 <Heading
                   textAlign={"center"}
                   fontFamily={"Montserrat Variable"}
-                  fontWeight={600}
-                  fontSize={"38px"}
+                  fontWeight={700}
+                  fontSize={"42px"}
+                  lineHeight="1.2"
                 >
                   Trustless
                 </Heading>
-                <Text textAlign={"center"} fontSize={20}>
+                <Text
+                  textAlign={"center"}
+                  fontSize={18}
+                  lineHeight="1.6"
+                  color="#CCCCCC"
+                  maxW="320px"
+                >
                   Leveraging ZkProgram by O1JS, we can prove the interactions
                   with data providers, thereby eliminating the need for trust.
                   Everything is hence provable by nature on Doot.
@@ -149,12 +177,19 @@ export default function Features() {
                 <Heading
                   textAlign={"center"}
                   fontFamily={"Montserrat Variable"}
-                  fontWeight={600}
-                  fontSize={"38px"}
+                  fontWeight={700}
+                  fontSize={"42px"}
+                  lineHeight="1.2"
                 >
                   Verify
                 </Heading>
-                <Text fontSize={20} textAlign={"center"}>
+                <Text
+                  fontSize={18}
+                  textAlign={"center"}
+                  lineHeight="1.6"
+                  color="#CCCCCC"
+                  maxW="320px"
+                >
                   Every step of our process is transparent and publicly
                   accessible, facilitating independent verification. Our User
                   Interface and Smart Contracts are two of the ways for

@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:fast": "FAST_BUILD=1 next build",
     "start": "next start",
     "lint": "next lint",
     "check-types": "tsc --noEmit"

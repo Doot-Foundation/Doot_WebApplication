@@ -50,7 +50,7 @@ export default function InformationCard({ children }) {
           />
           <Flex
             zIndex={1}
-            p={"40px 20px"}
+            p={"48px 32px"}
             borderRadius="15px"
             direction={"column"}
             align={"center"}

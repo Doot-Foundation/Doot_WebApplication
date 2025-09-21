@@ -30,7 +30,7 @@ import axios from "axios";
 import Features from "./Features";
 
 export default function HomeHero() {
-  const [asset, setAsset] = useState("Select asset");
+  const [asset, setAsset] = useState("");
   const [result, setResult] = useState(null);
   const [mode, setMode] = useState("res");
 
@@ -53,7 +53,7 @@ export default function HomeHero() {
   const assets = [
     "Mina",
     "Ethereum",
-    "Bitcoin  ",
+    "Bitcoin",
     "Chainlink",
     "Solana",
     "Ripple",
@@ -69,12 +69,17 @@ export default function HomeHero() {
 
   const handleSubmit = async () => {
     try {
+      const selected = (asset || '').trim();
+      if (!selected) {
+        toast({ title: 'Please select an asset', status: 'warning', duration: 2000 });
+        return;
+      }
       const key = process.env.NEXT_PUBLIC_API_INTERFACE_KEY;
       const headers = {
         Authorization: "Bearer " + key,
       };
       const response = await axios.get(
-        `/api/get/interface/getPrice?token=${asset}`,
+        `/api/get/interface/getPrice?token=${selected}`,
         {
           headers: headers,
         }
@@ -370,6 +375,7 @@ export default function HomeHero() {
                   position="absolute"
                   bottom={5}
                   onClick={handleSubmit}
+                  isDisabled={!asset || asset.trim()===''}
                   fontFamily={"Source Code Pro Variable"}
                   _hover={{
                     backgroundColor: "#00bc8f",
@@ -457,7 +463,9 @@ export default function HomeHero() {
                           <Text
                             maxW={"100%"}
                             dangerouslySetInnerHTML={{
-                              __html: result,
+                              __html:
+                                result ||
+                                `<span style='color:yellow;'>{</span><br>&nbsp;&nbsp;&nbsp;&nbsp;asset : <span style='color:orange;'>mina</span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;price : <span style='color:orange;'>1817306348</span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;decimals : <span style='color:orange;'>10</span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;timestamp : <span style='color:orange;'>${Math.floor(Date.now() / 1000)}</span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;signature : <span style='color:orange;'>7mXWHULiEs.......4dykprFJoW</span>,<br><span style='color:yellow;'>}</span>`,
                             }}
                           ></Text>
                         </Fade>

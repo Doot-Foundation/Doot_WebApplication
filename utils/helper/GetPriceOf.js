@@ -129,7 +129,7 @@ async function getPriceMessari(token) {
     callSignAPICall(
       `https://data.messari.io/api/v1/assets/${id}/metrics`,
       `data.data.market_data.price_usd`,
-      ""
+      "x-messari-api-key"
     )
   );
 }
@@ -378,11 +378,20 @@ async function getPriceOf(token) {
       token
     );
 
+    // If no valid datapoints returned, bail early to avoid NaN/BigInt errors
+    if (!prices || prices.length === 0) {
+      throw new Error("No valid prices returned from providers");
+    }
+
     // Calculate mean price
     const meanPrice =
       prices.reduce((sum, price) => sum + price, 0) / prices.length;
     const aggregatedAt = Date.now();
     const processedMeanPrice = processFloatString(meanPrice);
+
+    if (processedMeanPrice === "Invalid input") {
+      throw new Error("Processed mean price is invalid");
+    }
 
     // Sign the processed mean price
     const signedPrice = testnetSignatureClient.signFields(

@@ -33,6 +33,7 @@ export default function IndividualAsset({ token }) {
   const [graphData, setGraphData] = useState(null);
   const [graphMin, setGraphMin] = useState(null);
   const [graphMax, setGraphMax] = useState(null);
+  const [timeframe, setTimeframe] = useState('24h');
   const [percentage, setPercentage] = useState("0.00%");
 
   const [latest, setLatest] = useState(null);
@@ -53,9 +54,11 @@ export default function IndividualAsset({ token }) {
   }
 
   function normalizePrice(str) {
-    let num = parseInt(str);
+    let num = parseFloat(str);
     num = num / Math.pow(10, 10);
-    num = Math.round(num * 100) / 100;
+    // Increase precision for small price movements
+    const precision = num < 1 ? 10000 : 1000;
+    num = Math.round(num * precision) / precision;
     return num;
   }
 
@@ -181,12 +184,14 @@ export default function IndividualAsset({ token }) {
             (The displayed price and data may vary due to conversion.)
           </Text>
           <Flex
-            h="455px"
+            h="600px"
             w="100%"
-            bgColor="white"
+            bgColor="#1A1A1A"
             borderRadius="16px"
             direction="column"
             p={10}
+            border="1px solid #333333"
+            boxShadow="0 4px 20px rgba(0, 0, 0, 0.3)"
           >
             {latest ? (
               <>
@@ -194,18 +199,18 @@ export default function IndividualAsset({ token }) {
                   <Text
                     display="inline-block"
                     textAlign="left"
-                    color="black"
+                    color="white"
                     fontFamily="Montserrat Variable"
                     fontSize="30px"
                     fontWeight={500}
                   >
-                    24 Hr
+                    {timeframe === 'all' ? 'All' : timeframe.toUpperCase()}
                   </Text>
                   <Spacer />
                   <Text
                     display="inline-block"
                     textAlign="right"
-                    color="black"
+                    color="white"
                     fontFamily="Montserrat Variable"
                     fontSize="30px"
                     fontWeight={500}
@@ -213,15 +218,68 @@ export default function IndividualAsset({ token }) {
                     $ {normalizePrice(latest.price)}
                   </Text>
                 </Flex>
+                {/* timeframe controls */}
+                <Flex gap={2} wrap="wrap" mb={4}>
+                  {['10m','30m','1h','3h','6h','12h','24h','7d','15d','1m','3m','6m','all'].map(tf => (
+                    <Box
+                      key={tf}
+                      as="button"
+                      onClick={() => setTimeframe(tf)}
+                      px={3}
+                      py={1}
+                      borderRadius={6}
+                      fontSize="sm"
+                      color={timeframe===tf? 'white':'#CCCCCC'}
+                      bg={timeframe===tf? '#6B1BFF': '#333333'}
+                      _hover={{
+                        bg: timeframe===tf? '#5218bd': '#444444',
+                        transition: 'all 0.2s ease'
+                      }}
+                      transition="all 0.2s ease"
+                    >
+                      {tf.toUpperCase()}
+                    </Box>
+                  ))}
+                </Flex>
               </>
             ) : null}
 
             {graphData && graphMax && graphMin && (
-              <PriceGraph
-                graphData={graphData}
-                graphMax={graphMax}
-                graphMin={graphMin}
-              />
+              (() => {
+                // filter by timeframe
+                const now = Date.now();
+                const ranges = {
+                  '10m': 10*60*1000,
+                  '30m': 30*60*1000,
+                  '1h': 60*60*1000,
+                  '3h': 3*60*60*1000,
+                  '6h': 6*60*60*1000,
+                  '12h': 12*60*60*1000,
+                  '24h': 24*60*60*1000,
+                  '7d': 7*24*60*60*1000,
+                  '15d': 15*24*60*60*1000,
+                  '1m': 30*24*60*60*1000,
+                  '3m': 90*24*60*60*1000,
+                  '6m': 180*24*60*60*1000,
+                };
+                const data = timeframe==='all' ? graphData : graphData.filter(p => {
+                  const tsMs = Number(p.timestamp)*1000;
+                  return isFinite(tsMs) && (now - tsMs) <= (ranges[timeframe] || ranges['24h']);
+                });
+                const ys = data.map(d=>d.price);
+                const localMin = ys.length ? Math.min(...ys) : graphMin;
+                const localMax = ys.length ? Math.max(...ys) : graphMax;
+                return (
+                  <Box flex="1" h="400px">
+                    <PriceGraph
+                      graphData={data}
+                      graphMin={localMin}
+                      graphMax={localMax}
+                      timeframe={timeframe}
+                    />
+                  </Box>
+                );
+              })()
             )}
           </Flex>
         </Flex>
@@ -236,7 +294,7 @@ export default function IndividualAsset({ token }) {
           >
             Data Providers
           </Heading>
-          <Box w="100vw">
+          <Box w="100%">
             <MarqueeDataProviders providers={providers} />
           </Box>
         </Flex>
@@ -244,9 +302,10 @@ export default function IndividualAsset({ token }) {
         <Flex
           direction="column"
           bgColor="#202020"
-          h={550}
+          h={580}
           w={930}
           p={10}
+          pb={14}
           borderRadius={20}
         >
           <Flex>
@@ -407,7 +466,7 @@ export default function IndividualAsset({ token }) {
               (The prices are precise upto the 10th decimal)
             </Text>
           </Flex>
-          <Flex maxH={"700"} overflowY="scroll" borderRadius={20}>
+          <Flex w="100%" direction="column" borderRadius={20}>
             {ipfsHistorical && ipfsLatest ? (
               <HistoricalTable
                 ipfsLatest={ipfsLatest}

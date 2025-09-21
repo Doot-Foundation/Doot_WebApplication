@@ -5,11 +5,10 @@
  * @returns {number} Normalized price
  */
 function normalizePrice(subone, str) {
-  const num = parseInt(str) / Math.pow(10, 10);
-  return (
-    (subone ? Math.round(num * 1000) : Math.round(num * 100)) /
-    (subone ? 1000 : 100)
-  );
+  const num = parseFloat(str) / Math.pow(10, 10);
+  // Increase precision significantly for small price movements
+  const precision = num < 1 ? 10000 : (subone ? 1000 : 100);
+  return Math.round(num * precision) / precision;
 }
 
 /**

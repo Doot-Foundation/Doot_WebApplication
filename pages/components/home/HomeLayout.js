@@ -8,9 +8,9 @@ const drift = keyframes`
 
 export default function HomeLayout({ children }) {
   return (
-    <Flex direction="column" position="relative" overflow="hidden">
+    <Flex direction="column" position="relative" overflow="hidden" minH="100vh">
       {/* animated star-like background */}
-      <Box position="absolute" inset={0} zIndex={0} overflow="hidden" pointerEvents="none">
+      <Box position="fixed" inset={0} zIndex={-10} overflow="hidden" pointerEvents="none">
         <Box
           position="absolute"
           top={0}
@@ -28,7 +28,7 @@ export default function HomeLayout({ children }) {
           opacity={0.25}
         />
       </Box>
-      <Box position="relative" zIndex={1}>{children}</Box>
+      <Box position="relative" zIndex={0}>{children}</Box>
     </Flex>
   );
 }
