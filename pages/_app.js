@@ -25,11 +25,14 @@ export default function App({ Component, pageProps }) {
   const theme = extendTheme({
     styles: {
       global: {
-        body: {
+        'html, body': {
           bg: "#171717",
           color: "white",
           fontFamily: "'Poppins', sans-serif",
+          overflowX: 'hidden',
+          width: '100%'
         },
+        '#__next': { overflowX: 'hidden', width: '100%' }
       },
     },
   });
