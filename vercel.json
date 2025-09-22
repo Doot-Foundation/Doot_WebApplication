@@ -6,13 +6,10 @@
     }
   },
   "crons": [
-    {
-      "path": "/api/update/core/updateAllPrices",
-      "schedule": "*/10 * * * *"
-    },
+    { "path": "/api/update/core/updateAllPrices", "schedule": "*/10 * * * *" },
     {
       "path": "/api/update/ipfs/updateHistorical",
-      "schedule": "*/33 * * * *"
+      "schedule": "5-59/10 * * * *"
     }
   ],
   "headers": [
