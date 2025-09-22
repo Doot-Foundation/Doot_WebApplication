@@ -20,12 +20,12 @@ export default function Footer() {
         <Flex
           direction={{ base: "column", md: "row" }}
           m="0 auto"
-          maxW="1200px"
-          w="100%"
+          w={{ base: "100%", md: "1200px" }}
           px={{ base: 4, md: 0 }}
           justify="center"
-          align={{ base: "center", md: "stretch" }}
-          mb={{ base: 12, md: 24 }}
+          align={{ base: "center", md: "center" }}
+          center={{ base: "center", md: "center" }}
+          mb={{ base: 12, md: 100 }}
         >
           <Flex direction={"column"} gap={2} align={{ base: 'center', md: 'flex-start' }}>
             <Image
@@ -71,18 +71,17 @@ export default function Footer() {
             gap={{ base: 6, md: 10 }}
             mt={{ base: 10, md: 0 }}
             fontFamily={"Source Code Pro Variable"}
-            w="100%"
           >
-            <Flex direction={"column"} w="50%">
+            <Flex direction={"column"}>
               <Heading
                 size={"md"}
                 mb={5}
                 fontFamily={"Montserrat Variable"}
-                textAlign={{ base: 'left', md: 'right' }}
+                textAlign={{ base: 'center', md: 'right' }}
               >
                 Learn
               </Heading>
-              <Flex direction={"column"} gap={2} textAlign={{ base: 'left', md: 'right' }}>
+              <Flex direction={"column"} gap={2} textAlign={{ base: 'center', md: 'right' }}>
                 <Link href="https://docs.doot.foundation">Docs</Link>
                 <Link href="https://github.com/Doot-Foundation">Github</Link>
                 <Link href="https://zkignite.minaprotocol.com/zkignite/dev4dev/refineproposals/suggestion/567/detail">
@@ -90,16 +89,16 @@ export default function Footer() {
                 </Link>
               </Flex>
             </Flex>
-            <Flex direction={"column"} w="50%">
+            <Flex direction={"column"}>
               <Heading
                 size={"md"}
                 mb={5}
                 fontFamily={"Montserrat Variable"}
-                textAlign={{ base: 'right', md: 'right' }}
+                textAlign={{ base: 'center', md: 'right' }}
               >
                 Links
               </Heading>
-              <Flex direction={"column"} gap={2} textAlign={{ base: 'right', md: 'right' }}>
+              <Flex direction={"column"} gap={2} textAlign={{ base: 'center', md: 'right' }}>
                 <Link href="/">Home</Link>
                 <Link href="/feeds">Feeds</Link>
                 {/* <Link href="/slots">Slots</Link> */}
