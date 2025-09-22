@@ -4,6 +4,9 @@
 .next
 .turbo
 
+dump/
+additional/
+
 # dependencies
 /node_modules
 /.pnp

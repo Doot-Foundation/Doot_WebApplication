@@ -94,18 +94,29 @@ export default function TokenDescriptionBox({ token }) {
           borderRadius={16}
           bgColor={"#1A1A1A"}
           color={"white"}
-          align="center"
           w={"100%"}
-          p={6}
+          p={{ base: 4, md: 6 }}
           fontWeight={500}
           border="1px solid #333333"
           boxShadow="0 4px 20px rgba(0, 0, 0, 0.3)"
           position="relative"
           overflow="hidden"
+          flexWrap={{ base: "wrap", md: "nowrap" }}
+          rowGap={{ base: 2, md: 0 }}
+          direction={{ base: "column", md: "row" }}
+          align={{ base: "flex-start", md: "center" }}
           css={{
             "@keyframes shimmerMove": {
-              "0%": { transform: "translateX(-120%) rotate(45deg)" },
-              "100%": { transform: "translateX(200%) rotate(45deg)" },
+              "0%": {
+                transform: "translateX(-120%) rotate(45deg)",
+                opacity: 0,
+              },
+              "10%": { opacity: 1 },
+              "90%": { opacity: 1 },
+              "100%": {
+                transform: "translateX(200%) rotate(45deg)",
+                opacity: 0,
+              },
             },
           }}
           _before={{
@@ -118,8 +129,9 @@ export default function TokenDescriptionBox({ token }) {
             background:
               "linear-gradient(45deg, transparent 30%, rgba(107,27,255,0.15) 45%, rgba(0,255,255,0.05) 50%, rgba(107,27,255,0.15) 55%, transparent 70%)",
             opacity: 0,
+            transform: "translateX(-120%) rotate(45deg)",
             transition: "opacity 0.3s ease",
-            willChange: "transform",
+            willChange: "transform, opacity",
           }}
           _hover={{
             transform: "translateY(-4px)",
@@ -128,20 +140,46 @@ export default function TokenDescriptionBox({ token }) {
             borderColor: "#6B1BFF",
             transition: "all 0.3s ease",
             "&::before": {
-              opacity: 1,
-              animation: "shimmerMove 3s ease-out",
+              animation: "shimmerMove 2s ease-out",
             },
           }}
           transition="all 0.3s ease"
         >
-          <Flex direction={"row"} align={"center"} gap={4} w="40%">
-            <Image src={src} h={7} w={7} />
-            <Text fontSize="22px" fontFamily="Montserrat Variable">
+          <Flex
+            direction={"row"}
+            align={"center"}
+            gap={3}
+            w={{ base: "100%", md: "45%" }}
+            minW={0}
+          >
+            <Image
+              src={src}
+              h={{ base: 6, md: 7 }}
+              w={{ base: 6, md: 7 }}
+              flexShrink={0}
+            />
+            <Text
+              fontSize={{ base: "14px", md: "20px", lg: "22px" }}
+              fontFamily="Montserrat Variable"
+              noOfLines={1}
+              fontWeight={600}
+            >
               {TOKEN_TO_SYMBOL[token]} / USD
             </Text>
           </Flex>
-          <Flex align="center" justify="center" cursor="pointer">
-            <Text color={direction == "+" ? "green.400" : "red.400"}>
+          <Flex
+            align="center"
+            justify={{ base: "space-between", md: "center" }}
+            cursor="pointer"
+            w={{ base: "100%", md: "auto" }}
+            minW={0}
+          >
+            <Text
+              color={direction == "+" ? "green.400" : "red.400"}
+              fontSize={{ base: "13px", md: "16px" }}
+              flexShrink={0}
+              fontWeight={500}
+            >
               {percentage}
             </Text>
             <MiniChartDescriptionBox
@@ -153,11 +191,24 @@ export default function TokenDescriptionBox({ token }) {
           </Flex>
           <Spacer />
           {normalizedPrice && (
-            <Flex w="15%">
+            <Flex
+              w={{ base: "100%", md: "30%" }}
+              justify={{ base: "flex-end", md: "flex-end" }}
+              minW={0}
+            >
               <Text
                 fontFamily="Montserrat Variable"
-                letterSpacing="2px"
-                fontSize="22px"
+                letterSpacing={{ base: "0.5px", md: "2px" }}
+                fontSize={{
+                  base:
+                    normalizedPrice?.toString().length > 8 ? "12px" : "14px",
+                  md: normalizedPrice?.toString().length > 10 ? "16px" : "18px",
+                  lg: "20px",
+                }}
+                noOfLines={1}
+                wordBreak="break-all"
+                fontWeight={700}
+                textAlign="right"
               >
                 ${normalizedPrice}
               </Text>

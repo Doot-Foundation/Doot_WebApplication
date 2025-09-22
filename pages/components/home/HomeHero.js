@@ -69,9 +69,13 @@ export default function HomeHero() {
 
   const handleSubmit = async () => {
     try {
-      const selected = (asset || '').trim();
+      const selected = (asset || "").trim();
       if (!selected) {
-        toast({ title: 'Please select an asset', status: 'warning', duration: 2000 });
+        toast({
+          title: "Please select an asset",
+          status: "warning",
+          duration: 2000,
+        });
         return;
       }
       const key = process.env.NEXT_PUBLIC_API_INTERFACE_KEY;
@@ -142,7 +146,13 @@ export default function HomeHero() {
     <>
       <Flex direction={"column"} gap={{ base: 14, md: 24, lg: 120 }}>
         {/* Opening */}
-        <Flex direction={"column"} maxW={"100%"} gap={{ base: 6, md: 7 }} align={"center"} px={{ base: 4, md: 0 }}>
+        <Flex
+          direction={"column"}
+          maxW={"100%"}
+          gap={{ base: 6, md: 7 }}
+          align={"center"}
+          px={{ base: 4, md: 0 }}
+        >
           <Flex
             position="relative"
             direction="column"
@@ -164,11 +174,29 @@ export default function HomeHero() {
               <HeroAnimatedText />
             </Box>
             <Flex direction="column" align="center" lineHeight={1.1}>
-              <Box as="span" fontSize={{ base: '28px', md: '40px', lg: '56px' }} fontWeight={700} whiteSpace="nowrap">Oracle</Box>
-              <Box as="span" fontSize={{ base: '28px', md: '40px', lg: '56px' }} fontWeight={700} whiteSpace="nowrap">For Mina Protocol</Box>
+              <Box
+                as="span"
+                fontSize={{ base: "28px", md: "40px", lg: "56px" }}
+                fontWeight={700}
+                whiteSpace="nowrap"
+              >
+                Oracle
+              </Box>
+              <Box
+                as="span"
+                fontSize={{ base: "28px", md: "40px", lg: "56px" }}
+                fontWeight={700}
+                whiteSpace="nowrap"
+              >
+                For Mina Protocol
+              </Box>
             </Flex>
           </Flex>
-          <Flex gap={{ base: 4, md: 8, lg: 20 }} direction={{ base: "column", md: "row" }} align="center">
+          <Flex
+            gap={{ base: 4, md: 8, lg: 20 }}
+            direction={{ base: "column", md: "row" }}
+            align="center"
+          >
             <Button
               position={"relative"}
               alignItems={"center"}
@@ -249,8 +277,8 @@ export default function HomeHero() {
             fontSize={{ base: "12px", md: "14px", lg: "16px" }}
             px={{ base: 3, md: 6 }}
             py={{ base: 2, md: 3 }}
-            w={{ base: '100%', md: 'fit-content' }}
-            maxW={{ base: '600px', md: 'unset' }}
+            w={{ base: "100%", md: "fit-content" }}
+            maxW={{ base: "600px", md: "unset" }}
             mt={{ base: 2, md: 3 }}
             alignSelf="center"
           >
@@ -259,9 +287,21 @@ export default function HomeHero() {
                 <Text color="gray.400">revolutionary@zkapp</Text>
                 <Text color="gray.400">:~$</Text>
                 <Text color="white">npm install @doot-oracles/client</Text>
-                <Box fontWeight={900} animation={`${blinking} 1.2s step-start infinite`} display="inline" color={"#0ce1ae"}>_</Box>
+                <Box
+                  fontWeight={900}
+                  animation={`${blinking} 1.2s step-start infinite`}
+                  display="inline"
+                  color={"#0ce1ae"}
+                >
+                  _
+                </Box>
               </Flex>
-              <MdOutlineContentCopy color={"gray"} size={18} onClick={copyToClipboard} cursor={"pointer"} />
+              <MdOutlineContentCopy
+                color={"gray"}
+                size={18}
+                onClick={copyToClipboard}
+                cursor={"pointer"}
+              />
             </Flex>
           </Flex>
         </Flex>
@@ -269,9 +309,19 @@ export default function HomeHero() {
         <Features />
         {/* Testing  */}
         <section id="targetSection">
-          <Flex direction={"column"} maxW="1200px" w="100%" px={{ base: 4, md: 0 }} margin="0 auto">
+          <Flex
+            direction={"column"}
+            maxW="1200px"
+            w="100%"
+            px={{ base: 4, md: 0 }}
+            margin="0 auto"
+          >
             <Flex direction={"column"} alignItems={"left"} gap={3}>
-              <Flex direction={{ base: "column", md: "row" }} align={{ base: "flex-start", md: "center" }} gap={{ base: 4, md: 14 }}>
+              <Flex
+                direction={{ base: "column", md: "row" }}
+                align={{ base: "flex-start", md: "center" }}
+                gap={{ base: 4, md: 14 }}
+              >
                 <Box
                   background={
                     "linear-gradient(90deg, #6c35de 0%,rgba(23,0,44,1) 100%)"
@@ -296,7 +346,12 @@ export default function HomeHero() {
               </Heading>
             </Flex>
 
-            <Flex direction={{ base: "column", lg: "row" }} align={"stretch"} mt={{ base: 6, md: 12 }} gap={{ base: 6, md: 5 }}>
+            <Flex
+              direction={{ base: "column", lg: "row" }}
+              align={"stretch"}
+              mt={{ base: 6, md: 12 }}
+              gap={{ base: 6, md: 5 }}
+            >
               <Flex
                 background={"linear-gradient(120deg,#2c0055 0%, #5126a9 100%)"}
                 direction={"column"}
@@ -306,7 +361,9 @@ export default function HomeHero() {
                 w={{ base: "100%", lg: "30%" }}
                 pos={"relative"}
               >
-                <Text fontSize={{ base: 18, md: 22 }}>Choose the asset and run.</Text>
+                <Text fontSize={{ base: 18, md: 22 }}>
+                  Choose the asset and run.
+                </Text>
 
                 <FormControl
                   fontFamily={"Source Code Pro Variable"}
@@ -351,10 +408,10 @@ export default function HomeHero() {
 
                 <Button
                   backgroundColor={"#00eab1"}
-                  position={{ base: 'static', md: 'absolute' }}
+                  position={{ base: "static", md: "absolute" }}
                   bottom={{ base: undefined, md: 5 }}
                   onClick={handleSubmit}
-                  isDisabled={!asset || asset.trim()===''}
+                  isDisabled={!asset || asset.trim() === ""}
                   fontFamily={"Source Code Pro Variable"}
                   _hover={{
                     backgroundColor: "#00bc8f",
@@ -364,8 +421,17 @@ export default function HomeHero() {
                 </Button>
               </Flex>
               {/* Result Window */}
-              <Flex direction={"column"} h={{ base: "auto", md: 450 }} w={{ base: "100%", lg: "70%" }}>
-                <Flex gap={2} background="#5126a9" p={{ base: 2, md: 3 }} borderTopRadius={10}>
+              <Flex
+                direction={"column"}
+                h={{ base: "auto", md: 450 }}
+                w={{ base: "100%", lg: "70%" }}
+              >
+                <Flex
+                  gap={2}
+                  background="#5126a9"
+                  p={{ base: 2, md: 3 }}
+                  borderTopRadius={10}
+                >
                   <Box
                     borderRadius={"50%"}
                     boxSize={3}
@@ -436,20 +502,27 @@ export default function HomeHero() {
                       fontWeight="500"
                       letterSpacing="1px"
                     >
-                      {mode === 'res' ? (
+                      {mode === "res" ? (
                         <Fade in>
                           <Text
                             maxW={"100%"}
                             dangerouslySetInnerHTML={{
                               __html:
                                 result ||
-                                `<span style='color:yellow;'>{</span><br>&nbsp;&nbsp;&nbsp;&nbsp;asset : <span style='color:orange;'>mina</span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;price : <span style='color:orange;'>1817306348</span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;decimals : <span style='color:orange;'>10</span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;timestamp : <span style='color:orange;'>${Math.floor(Date.now() / 1000)}</span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;signature : <span style='color:orange;'>7mXWHULiEs.......4dykprFJoW</span>,<br><span style='color:yellow;'>}</span>`,
+                                `<span style='color:yellow;'>{</span><br>&nbsp;&nbsp;&nbsp;&nbsp;asset : <span style='color:orange;'>mina</span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;price : <span style='color:orange;'>1817306348</span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;decimals : <span style='color:orange;'>10</span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;timestamp : <span style='color:orange;'>${Math.floor(
+                                  Date.now() / 1000
+                                )}</span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;signature : <span style='color:orange;'>7mXWHULiEs.......4dykprFJoW</span>,<br><span style='color:yellow;'>}</span>`,
                             }}
                           />
                         </Fade>
                       ) : (
                         <Fade in>
-                          <Text maxW={"100%"}>
+                          <Text
+                            maxW={"100%"}
+                            whiteSpace="normal"
+                            overflowWrap="anywhere"
+                            wordBreak="break-word"
+                          >
                             {`https://doot.foundation/api/get/getPrice?token=${asset}`}
                           </Text>
                         </Fade>

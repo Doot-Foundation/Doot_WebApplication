@@ -1,4 +1,4 @@
-import { ComposedChart, Area, XAxis, YAxis } from "recharts";
+import { ComposedChart, Area, XAxis, YAxis, ResponsiveContainer } from "recharts";
 import { Flex } from "@chakra-ui/react";
 
 export default function MiniChartDescriptionBox({
@@ -9,14 +9,9 @@ export default function MiniChartDescriptionBox({
 }) {
   return (
     <>
-      <Flex ml="-10">
-        <ComposedChart
-          width={200}
-          height={50}
-          data={data}
-          cursor="pointer"
-          position="absolute"
-        >
+      <Flex ml="-10" w={{ base: '160px', md: '200px' }} h="50px">
+        <ResponsiveContainer width="100%" height="100%">
+        <ComposedChart data={data} cursor="pointer">
           <defs>
             <linearGradient id="gradientgreen" x1="0" y1="0" x2="0" y2="1">
               <stop offset="10%" stopColor="white" stopOpacity={0.2} />
@@ -42,6 +37,7 @@ export default function MiniChartDescriptionBox({
             activeDot={{ r: 5 }}
           />
         </ComposedChart>
+        </ResponsiveContainer>
       </Flex>
     </>
   );

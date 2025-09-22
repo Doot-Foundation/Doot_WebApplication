@@ -33,8 +33,8 @@ export default function InformationCard({ children }) {
       <SlideFade in={isVisible}>
         <Flex
           ref={ref}
-          w="386px"
-          h="480px"
+          w={{ base: "100%", sm: "340px", md: "386px" }}
+          h={{ base: "auto", md: "480px" }}
           position="relative"
           justify="center"
           align="center"
@@ -50,12 +50,12 @@ export default function InformationCard({ children }) {
           />
           <Flex
             zIndex={1}
-            p={"48px 32px"}
+            p={{ base: "28px 20px", md: "48px 32px" }}
             borderRadius="15px"
             direction={"column"}
             align={"center"}
             gap={5}
-            h={"100%"}
+            h={{ base: "auto", md: "100%" }}
             w={"100%"}
             background="#171717"
           >

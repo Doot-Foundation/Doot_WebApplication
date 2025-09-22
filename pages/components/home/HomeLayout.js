@@ -28,7 +28,7 @@ export default function HomeLayout({ children }) {
           opacity={0.25}
         />
       </Box>
-      <Box position="relative" zIndex={0}>{children}</Box>
+      <Box position="relative" zIndex={0} px={{ base: 4, md: 0 }}>{children}</Box>
     </Flex>
   );
 }

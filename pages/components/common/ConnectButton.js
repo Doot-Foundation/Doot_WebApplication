@@ -113,11 +113,12 @@ export default function ConnectButton() {
         {signer != null ? (
           <>
             <Button
-              width="130px"
-              height="48px"
-              position="absolute"
-              left="-140px"
+              width={{ base: "110px", md: "130px" }}
+              height={{ base: "42px", md: "48px" }}
+              position={{ base: 'static', md: 'absolute' }}
+              left={{ md: '-140px' }}
               cursor="default"
+              display={{ base: 'none', md: 'inline-flex' }}
             >
               <Flex
                 direction={"row"}
@@ -126,13 +127,13 @@ export default function ConnectButton() {
                 gap={2}
                 fontWeight="200"
               >
-                <Image src="/static/images/mina.png" h="16px" />
+                <Image src="/static/images/mina.png" alt="Mina" h="16px" />
                 {chainName}
               </Flex>
             </Button>
             <Button
-              width="130px"
-              height="48px"
+              width={{ base: "120px", md: "130px" }}
+              height={{ base: "42px", md: "48px" }}
               background="linear-gradient(93.59deg, #00EAB1 -14.32%, rgba(23, 190, 194, 0.91) 12.24%, rgba(39, 158, 206, 0.65) 35.82%, rgba(61, 116, 221, 0.61) 58.92%, rgba(81, 77, 236, 0.43) 83.94%, #6B1BFF 107.82%)"
               _active={{}}
               _hover={{}}
@@ -145,8 +146,8 @@ export default function ConnectButton() {
         ) : (
           <>
             <Flex
-              width="130px"
-              height="48px"
+              width={{ base: "120px", md: "130px" }}
+              height={{ base: "42px", md: "48px" }}
               p={0}
               justify="center"
               align="center"

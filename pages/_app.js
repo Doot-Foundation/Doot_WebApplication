@@ -12,16 +12,11 @@ import "@fontsource/poppins/800.css";
 import "@fontsource/poppins/900.css";
 
 import Header from "./components/common/Header";
-import MobileViewUnavailable from "./components/common/MobileViewUnavailable";
-
-import { useMediaQuery } from "@chakra-ui/react";
 
 import { Provider } from "react-redux";
 import { store } from "../lib/redux/store";
 
 export default function App({ Component, pageProps }) {
-  const [isLargerThanMd] = useMediaQuery("(min-width: 1280px)");
-
   const theme = extendTheme({
     styles: {
       global: {
@@ -42,17 +37,11 @@ export default function App({ Component, pageProps }) {
       <Provider store={store}>
         <Head>
           <title>Doot</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
         </Head>
         <ChakraProvider theme={theme}>
-          {isLargerThanMd ? (
-            <>
-              <Header />
-              <Component {...pageProps} />
-            </>
-          ) : (
-            <MobileViewUnavailable />
-          )}
-          {/* <Component {...pageProps} /> */}
+          <Header />
+          <Component {...pageProps} />
         </ChakraProvider>
         <Analytics />
       </Provider>

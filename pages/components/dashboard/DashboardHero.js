@@ -108,16 +108,17 @@ export default function DashboardHero() {
           backdropFilter="blur(10px)"
         />
         <ModalContent
-          mt="17%"
+          mt={{ base: "20%", md: "17%" }}
           borderRadius="14px"
           color={"black"}
           justify="center"
           align="center"
-          p={5}
+          p={{ base: 4, md: 5 }}
+          maxW={{ base: "90%", md: "lg" }}
         >
           <ModalHeader
             textAlign="center"
-            fontSize="24px"
+            fontSize={{ base: "20px", md: "24px" }}
             fontFamily="Montserrat Variable"
           >
             Welcome aboard!
@@ -125,7 +126,7 @@ export default function DashboardHero() {
           <ModalBody
             textAlign="center"
             textShadow="2px 2px 4px rgba(0, 0, 0, 0.3)"
-            fontSize="20px"
+            fontSize={{ base: "16px", md: "20px" }}
           >
             It seems you're new here! <br />
             We're excited to guide you through your journey with Doot for the
@@ -134,8 +135,8 @@ export default function DashboardHero() {
           <ModalFooter>
             <Flex
               m={"0 auto"}
-              w="154px"
-              h="61px"
+              w={{ base: "200px", md: "154px" }}
+              h={{ base: "48px", md: "61px" }}
               position="relative"
               p="2px"
               justify="center"

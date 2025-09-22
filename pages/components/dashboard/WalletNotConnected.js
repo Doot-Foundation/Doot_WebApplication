@@ -8,17 +8,19 @@ export default function WalletNotConnected() {
 
   return (
     <Flex
-      h={500}
+      h={{ base: 380, md: 500 }}
       gap={5}
       align="center"
       justify="center"
-      w="100vw"
+      w="100%"
       direction="column"
+      px={{ base: 4, md: 0 }}
+      textAlign="center"
     >
       <Heading
         letterSpacing="1px"
         fontFamily="Montserrat Variable"
-        fontSize="20px"
+        fontSize={{ base: "16px", md: "20px" }}
         fontWeight="300"
       >
         {signer == null ? (
@@ -27,7 +29,7 @@ export default function WalletNotConnected() {
           <>SIGN IN WITH YOUR WALLET</>
         )}
       </Heading>
-      <Heading fontFamily="Poppins" fontWeight={500} fontSize="36px">
+      <Heading fontFamily="Poppins" fontWeight={500} fontSize={{ base: "20px", md: "28px", lg: "36px" }}>
         {signer == null ? (
           <>Connect your wallet to continue.</>
         ) : (

@@ -119,18 +119,27 @@ export default function VerifyHero() {
     <>
       <Flex
         direction="column"
-        w="1300px"
+        maxW="1300px"
+        w="100%"
         margin="0 auto"
-        p={20}
+        p={{ base: 6, md: 10, lg: 20 }}
         pt={0}
-        gap={20}
-        mb={100}
+        gap={{ base: 10, md: 16, lg: 20 }}
+        mb={{ base: 16, md: 24, lg: 100 }}
       >
         <Flex direction={"column"} gap="43px">
-          <Heading fontFamily={"Montserrat Variable"} fontWeight={600}>
+          <Heading
+            fontFamily={"Montserrat Variable"}
+            fontWeight={600}
+            fontSize={{ base: "xl", md: "2xl", lg: "3xl" }}
+          >
             Oracle Signature Verification
           </Heading>
-          <Text fontSize="24px">
+          <Text
+            fontSize={{ base: "15px", md: "18px", lg: "22px" }}
+            wordBreak="break-word"
+            whiteSpace="normal"
+          >
             Securely verify the origins of the information you've provided. By
             using these forms, we can confirm whether the data you've submitted
             has been signed with our private keys, ensuring its integrity and
@@ -138,7 +147,14 @@ export default function VerifyHero() {
           </Text>
         </Flex>
         <Flex direction={"column"} gap={10} align={"center"}>
-          <Flex margin="0 auto" gap={10}>
+          <Flex
+            margin="0 auto"
+            gap={{ base: 4, md: 10 }}
+            direction={{ base: "column", md: "row" }}
+            w="100%"
+            justify="center"
+            px={{ base: 4, md: 0 }}
+          >
             <Flex
               transition="0.5s"
               justify="center"
@@ -152,9 +168,10 @@ export default function VerifyHero() {
               border={mode == false ? "1px solid #975EFF" : "1px solid gray"}
               borderRight={mode == false ? "10px solid #975EFF" : null}
               fontWeight={700}
+              fontSize={{ base: "xs", md: "md" }}
               borderRadius="13px 0px 0px 4px;"
-              width="356px"
-              height="71px"
+              width={{ base: "100%", md: "356px" }}
+              height={{ base: "56px", md: "71px" }}
               cursor="pointer"
               onClick={() => setMode(false)}
             >
@@ -175,8 +192,9 @@ export default function VerifyHero() {
               borderLeft={mode == true ? "10px solid #975EFF" : null}
               borderRadius="0px 13px 4px 0px;"
               fontWeight={700}
-              width="356px"
-              height="71px"
+              fontSize={{ base: "xs", md: "md" }}
+              width={{ base: "100%", md: "356px" }}
+              height={{ base: "56px", md: "71px" }}
               onClick={() => setMode(true)}
             >
               Individual Request Verification
@@ -186,14 +204,16 @@ export default function VerifyHero() {
             <FormControl
               bgColor={"#F5F5F5"}
               color={"black"}
-              p={10}
-              pl={20}
-              pr={20}
-              w="1000px"
+              p={{ base: 6, md: 10 }}
+              pl={{ base: 6, md: 20 }}
+              pr={{ base: 6, md: 20 }}
+              maxW="1000px"
+              w="100%"
               borderRadius={"16px"}
             >
               <Collapse in={mode}>
                 <Select
+                  size={{ base: "sm", md: "md" }}
                   _hover={{}}
                   _focus={{
                     borderColor: "#6B1BFF",
@@ -204,8 +224,8 @@ export default function VerifyHero() {
                   onChange={(e) => setSelectedProvider(e.target.value)}
                   disabled={isSubmitting}
                   display="inline-block"
-                  w="63%"
-                  mr="4%"
+                  w={{ base: "100%", md: "63%" }}
+                  mr={{ md: "4%" }}
                   mb={5}
                 >
                   {PROVIDERS.map((provider, index) => (
@@ -215,13 +235,14 @@ export default function VerifyHero() {
                   ))}
                 </Select>
                 <Select
+                  size={{ base: "sm", md: "md" }}
                   display="inline-block"
                   _hover={{}}
                   _focus={{
                     borderColor: "#6B1BFF",
                   }}
                   border="2px solid #b891ff"
-                  w="33%"
+                  w={{ base: "100%", md: "33%" }}
                   placeholder="Select the asset"
                   value={selectedToken}
                   onChange={(e) => setSelectedToken(e.target.value)}
@@ -242,6 +263,7 @@ export default function VerifyHero() {
                   p={2}
                 >
                   <Input
+                    size={{ base: "sm", md: "md" }}
                     name="url"
                     _hover={{}}
                     _focus={{
@@ -255,6 +277,7 @@ export default function VerifyHero() {
                   />
                 </Tooltip>
                 <Input
+                  size={{ base: "sm", md: "md" }}
                   name="timestamp"
                   _hover={{}}
                   _focus={{
@@ -268,6 +291,7 @@ export default function VerifyHero() {
                 />
               </Collapse>
               <Input
+                size={{ base: "sm", md: "md" }}
                 name="signature"
                 placeholder="Signature"
                 _hover={{}}
@@ -279,8 +303,9 @@ export default function VerifyHero() {
                 disabled={isSubmitting}
                 mb={5}
               />
-              <Flex gap={5} mb={5}>
+              <Flex gap={5} mb={5} wrap={{ base: "wrap", md: "nowrap" }}>
                 <Input
+                  size={{ base: "sm", md: "md" }}
                   name="price"
                   placeholder="Price/Data"
                   _hover={{}}
@@ -288,12 +313,13 @@ export default function VerifyHero() {
                     borderColor: "#6B1BFF",
                   }}
                   border="2px solid #b891ff"
-                  w={"90%"}
+                  w={{ base: "100%", md: "90%" }}
                   onChange={(e) => setPrice(e.target.value)}
                   disabled={isSubmitting}
                 />
                 <Tooltip label="Precision associated." borderRadius={10} p={2}>
                   <Input
+                    size={{ base: "sm", md: "md" }}
                     name="decimals"
                     placeholder="Decimals"
                     _hover={{}}
@@ -303,14 +329,14 @@ export default function VerifyHero() {
                     border="2px solid #b891ff"
                     value={10}
                     disabled={true}
-                    w={"10%"}
+                    w={{ base: "100%", md: "10%" }}
                   />
                 </Tooltip>
               </Flex>
               <Flex w="100%" justify="center">
                 <Button
                   type="submit"
-                  w={"30%"}
+                  w={{ base: "100%", md: "50%", lg: "30%" }}
                   background="linear-gradient(93.52deg, #00EAB1 -14.28%, rgba(23, 190, 194, 0.91) 10.57%, rgba(39, 158, 206, 0.65) 39.37%, rgba(61, 116, 221, 0.61) 54.25%, rgba(81, 77, 236, 0.43) 77.66%, #6B1BFF 100%)"
                   color="white"
                   disabled={isSubmitting}

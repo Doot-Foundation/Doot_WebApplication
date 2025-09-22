@@ -13,8 +13,8 @@ export default function MarqueeDataProviders({ providers = [] }) {
         <>
           <Flex
             key={index}
-            p={5}
-            m={3}
+            p={{ base: 3, md: 5 }}
+            m={{ base: 2, md: 3 }}
             direction="column"
             justify="center"
             align="center"
@@ -24,7 +24,7 @@ export default function MarqueeDataProviders({ providers = [] }) {
               key={index}
               borderRadius={10}
               src={`/static/data_providers/${provider}.png`}
-              boxSize={"70px"}
+              boxSize={{ base: "48px", md: "70px" }}
             />
             <Text fontFamily="Montserrat Variable" fontWeight={600}>
               {capitalizeFirstLetter(provider)}

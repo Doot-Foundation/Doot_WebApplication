@@ -31,7 +31,7 @@ export default function ScaleFadeBox({ children }) {
   return (
     <>
       <ScaleFade in={isVisible}>
-        <Box ref={ref}>{children}</Box>
+        <Box ref={ref} w="100%">{children}</Box>
       </ScaleFade>
     </>
   );

@@ -1,4 +1,5 @@
 // pages/feeds/[coin].js
+import { Box } from "@chakra-ui/react";
 import { useRouter } from "next/router";
 
 import FeedsLayout from "../components/feeds/FeedsLayout";
@@ -17,16 +18,18 @@ export default function TokenPage() {
   const isSupportedToken = SUPPORTED_TOKENS.includes(token);
 
   return (
-    <FeedsLayout>
-      {isSupportedToken ? (
-        <IndividualAsset token={token} />
-      ) : (
-        <>
-          <TokenNotSupported token={token} />
-          <FeedsHero />
-        </>
-      )}
-      <Footer />
-    </FeedsLayout>
+    <Box as="main" w="100%">
+      <FeedsLayout>
+        {isSupportedToken ? (
+          <IndividualAsset token={token} />
+        ) : (
+          <>
+            <TokenNotSupported token={token} />
+            <FeedsHero />
+          </>
+        )}
+        <Footer />
+      </FeedsLayout>
+    </Box>
   );
 }

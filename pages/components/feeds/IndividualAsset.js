@@ -33,7 +33,7 @@ export default function IndividualAsset({ token }) {
   const [graphData, setGraphData] = useState(null);
   const [graphMin, setGraphMin] = useState(null);
   const [graphMax, setGraphMax] = useState(null);
-  const [timeframe, setTimeframe] = useState('24h');
+  const [timeframe, setTimeframe] = useState("24h");
   const [percentage, setPercentage] = useState("0.00%");
 
   const [latest, setLatest] = useState(null);
@@ -171,40 +171,55 @@ export default function IndividualAsset({ token }) {
 
   return (
     <>
-      <Flex direction="column" gap={32} align="center" w={1200} margin="0 auto">
+      <Flex
+        direction="column"
+        gap={32}
+        align="center"
+        maxW="1200px"
+        w="100%"
+        px={{ base: 4, md: 0 }}
+        margin="0 auto"
+      >
         {/* top-graph */}
         <Flex direction={"column"} minH={"100%"} minW={"100%"}>
           <Link href="/feeds" w="fit-content" mb={10}>
             <SlArrowLeft size={"44px"} />
           </Link>
-          <Heading fontSize={"3xl"} fontFamily={"Montserrat Variable"} mb={5}>
+          <Heading
+            fontSize={{ base: "2xl", md: "3xl" }}
+            fontFamily={"Montserrat Variable"}
+            mb={5}
+          >
             {capitalizeFirstLetter(SYMBOL_TO_TOKEN[token])}
           </Heading>
-          <Text mb={14} fontSize={"24px"}>
+          <Text mb={14} fontSize={{ base: "14px", md: "18px", lg: "24px" }}>
             (The displayed price and data may vary due to conversion.)
           </Text>
           <Flex
-            h="600px"
+            h={{ base: "360px", md: "480px", lg: "600px" }}
             w="100%"
             bgColor="#1A1A1A"
             borderRadius="16px"
             direction="column"
-            p={10}
+            p={{ base: 4, md: 8, lg: 10 }}
             border="1px solid #333333"
             boxShadow="0 4px 20px rgba(0, 0, 0, 0.3)"
           >
             {latest ? (
               <>
-                <Flex pb={10}>
+                <Flex
+                  pb={{ base: 4, md: 10 }}
+                  align={{ base: "flex-start", md: "center" }}
+                >
                   <Text
                     display="inline-block"
                     textAlign="left"
                     color="white"
                     fontFamily="Montserrat Variable"
-                    fontSize="30px"
+                    fontSize={{ base: "18px", md: "24px", lg: "30px" }}
                     fontWeight={500}
                   >
-                    {timeframe === 'all' ? 'All' : timeframe.toUpperCase()}
+                    {timeframe === "all" ? "All" : timeframe.toUpperCase()}
                   </Text>
                   <Spacer />
                   <Text
@@ -212,65 +227,122 @@ export default function IndividualAsset({ token }) {
                     textAlign="right"
                     color="white"
                     fontFamily="Montserrat Variable"
-                    fontSize="30px"
+                    fontSize={{ base: "18px", md: "24px", lg: "30px" }}
                     fontWeight={500}
                   >
                     $ {normalizePrice(latest.price)}
                   </Text>
                 </Flex>
                 {/* timeframe controls */}
-                <Flex gap={2} wrap="wrap" mb={4}>
-                  {['10m','30m','1h','3h','6h','12h','24h','7d','15d','1m','3m','6m','all'].map(tf => (
-                    <Box
-                      key={tf}
-                      as="button"
-                      onClick={() => setTimeframe(tf)}
-                      px={3}
-                      py={1}
-                      borderRadius={6}
-                      fontSize="sm"
-                      color={timeframe===tf? 'white':'#CCCCCC'}
-                      bg={timeframe===tf? '#6B1BFF': '#333333'}
-                      _hover={{
-                        bg: timeframe===tf? '#5218bd': '#444444',
-                        transition: 'all 0.2s ease'
-                      }}
-                      transition="all 0.2s ease"
-                    >
-                      {tf.toUpperCase()}
-                    </Box>
-                  ))}
+                <Flex gap={{ base: 1, md: 2 }} wrap="wrap" mb={4}>
+                  {/* Mobile - essential timeframes */}
+                  <Flex
+                    gap={1}
+                    wrap="wrap"
+                    display={{ base: "flex", md: "none" }}
+                  >
+                    {["10m", "1h", "12h", "24h", "1m"].map((tf) => (
+                      <Box
+                        key={tf}
+                        as="button"
+                        onClick={() => setTimeframe(tf)}
+                        px={2}
+                        py={1}
+                        borderRadius={6}
+                        fontSize="xs"
+                        color={timeframe === tf ? "white" : "#CCCCCC"}
+                        bg={timeframe === tf ? "#6B1BFF" : "#333333"}
+                        _hover={{
+                          bg: timeframe === tf ? "#5218bd" : "#444444",
+                          transition: "all 0.2s ease",
+                        }}
+                        transition="all 0.2s ease"
+                      >
+                        {tf.toUpperCase()}
+                      </Box>
+                    ))}
+                  </Flex>
+                  {/* Desktop - all timeframes */}
+                  <Flex
+                    gap={2}
+                    wrap="wrap"
+                    display={{ base: "none", md: "flex" }}
+                  >
+                    {[
+                      "10m",
+                      "30m",
+                      "1h",
+                      "3h",
+                      "6h",
+                      "12h",
+                      "24h",
+                      "7d",
+                      "15d",
+                      "1m",
+                      "3m",
+                      "6m",
+                      "all",
+                    ].map((tf) => (
+                      <Box
+                        key={tf}
+                        as="button"
+                        onClick={() => setTimeframe(tf)}
+                        px={3}
+                        py={1}
+                        borderRadius={6}
+                        fontSize="sm"
+                        color={timeframe === tf ? "white" : "#CCCCCC"}
+                        bg={timeframe === tf ? "#6B1BFF" : "#333333"}
+                        _hover={{
+                          bg: timeframe === tf ? "#5218bd" : "#444444",
+                          transition: "all 0.2s ease",
+                        }}
+                        transition="all 0.2s ease"
+                      >
+                        {tf.toUpperCase()}
+                      </Box>
+                    ))}
+                  </Flex>
                 </Flex>
               </>
             ) : null}
 
-            {graphData && graphMax && graphMin && (
+            {graphData &&
+              graphMax &&
+              graphMin &&
               (() => {
                 // filter by timeframe
                 const now = Date.now();
                 const ranges = {
-                  '10m': 10*60*1000,
-                  '30m': 30*60*1000,
-                  '1h': 60*60*1000,
-                  '3h': 3*60*60*1000,
-                  '6h': 6*60*60*1000,
-                  '12h': 12*60*60*1000,
-                  '24h': 24*60*60*1000,
-                  '7d': 7*24*60*60*1000,
-                  '15d': 15*24*60*60*1000,
-                  '1m': 30*24*60*60*1000,
-                  '3m': 90*24*60*60*1000,
-                  '6m': 180*24*60*60*1000,
+                  "10m": 10 * 60 * 1000,
+                  "30m": 30 * 60 * 1000,
+                  "1h": 60 * 60 * 1000,
+                  "3h": 3 * 60 * 60 * 1000,
+                  "6h": 6 * 60 * 60 * 1000,
+                  "12h": 12 * 60 * 60 * 1000,
+                  "24h": 24 * 60 * 60 * 1000,
+                  "7d": 7 * 24 * 60 * 60 * 1000,
+                  "15d": 15 * 24 * 60 * 60 * 1000,
+                  "1m": 30 * 24 * 60 * 60 * 1000,
+                  "3m": 90 * 24 * 60 * 60 * 1000,
+                  "6m": 180 * 24 * 60 * 60 * 1000,
                 };
-                const data = timeframe==='all' ? graphData : graphData.filter(p => {
-                  const tsMs = Number(p.timestamp)*1000;
-                  return isFinite(tsMs) && (now - tsMs) <= (ranges[timeframe] || ranges['24h']);
-                });
-                const ys = data.map(d=>d.price);
+                const data =
+                  timeframe === "all"
+                    ? graphData
+                    : graphData.filter((p) => {
+                        const tsMs = Number(p.timestamp) * 1000;
+                        return (
+                          isFinite(tsMs) &&
+                          now - tsMs <= (ranges[timeframe] || ranges["24h"])
+                        );
+                      });
+                const ys = data.map((d) => d.price);
                 const localMin = ys.length ? Math.min(...ys) : graphMin;
                 const localMax = ys.length ? Math.max(...ys) : graphMax;
                 return (
-                  <Box flex="1" h="400px">
+                  <Box flex="1" h="100%" minH={{ base: "240px", md: "380px" }}>
+                    {" "}
                     <PriceGraph
                       graphData={data}
                       graphMin={localMin}
@@ -279,12 +351,11 @@ export default function IndividualAsset({ token }) {
                     />
                   </Box>
                 );
-              })()
-            )}
+              })()}
           </Flex>
         </Flex>
         {/* providers */}
-        <Flex w="100%" direction="column" align="center">
+        <Flex w="70vw" direction="column" align="center">
           <Heading
             fontFamily="Montserrat Variable"
             fontSize="3xl"
@@ -302,20 +373,23 @@ export default function IndividualAsset({ token }) {
         <Flex
           direction="column"
           bgColor="#202020"
-          h={580}
-          w={930}
-          p={10}
-          pb={14}
+          h={{ base: "auto", md: 580 }}
+          w={{ base: "100%", md: 930 }}
+          p={{ base: 5, md: 10 }}
+          pb={{ base: 8, md: 14 }}
           borderRadius={20}
         >
           <Flex>
             <Flex gap={5} align="center" justify="center" h={"fit-content"}>
               <Image src={src} h={37} w={37} />
               <Flex direction="column">
-                <Text fontSize="24px">
+                <Text fontSize={{ base: "20px", md: "22px", lg: "24px" }}>
                   {capitalizeFirstLetter(SYMBOL_TO_TOKEN[token]) + "/USD"}
                 </Text>
-                <Text fontSize="16px" color="#83868E">
+                <Text
+                  fontSize={{ base: "12px", md: "14px", lg: "16px" }}
+                  color="#83868E"
+                >
                   Today's stats
                 </Text>
               </Flex>
@@ -324,33 +398,42 @@ export default function IndividualAsset({ token }) {
             {percentage && direction && graphData && (
               <Flex position="relative">
                 <Text
-                  position="absolute"
+                  position={{ base: "static", sm: "absolute" }}
                   color={direction == "+" ? "green.400" : "red.400"}
-                  left={-3}
+                  left={{ base: "0", sm: -3 }}
                 >
                   {percentage}
                 </Text>
-                <MiniChart
-                  direction={direction}
-                  data={graphData}
-                  graphMax={graphMax}
-                  graphMin={graphMin}
-                  percentage={percentage}
-                />
+                <Box display={{ base: "none", sm: "block" }}>
+                  <MiniChart
+                    direction={direction}
+                    data={graphData}
+                    graphMax={graphMax}
+                    graphMin={graphMin}
+                    percentage={percentage}
+                  />
+                </Box>
               </Flex>
             )}
           </Flex>
           {latest ? (
             <>
-              <Flex gap={10} w="100%">
+              <Flex
+                gap={{ base: 6, md: 10 }}
+                w="100%"
+                direction={{ base: "column", md: "row" }}
+              >
                 <Flex
-                  gap={7}
-                  w="40%"
+                  gap={{ base: 4, md: 7 }}
+                  w={{ base: "100%", md: "40%" }}
                   direction="column"
-                  borderRight="2px solid white  "
+                  borderRight={{ base: "none", md: "2px solid white" }}
                 >
                   <Flex direction="column" gap={2}>
-                    <Text fontSize="18px" color="#BFBFBF">
+                    <Text
+                      fontSize={{ base: "14px", md: "16px", lg: "18px" }}
+                      color="#BFBFBF"
+                    >
                       Price
                     </Text>
                     <Flex gap={3} align="center">
@@ -359,11 +442,17 @@ export default function IndividualAsset({ token }) {
                         w={"20px"}
                         h={"15px"}
                       />
-                      <Text fontSize="18px" fontWeight={500}>
+                      <Text
+                        fontSize={{ base: "16px", md: "18px" }}
+                        fontWeight={500}
+                      >
                         ${normalizePrice(latest.price)}
                       </Text>
                       <Flex align="center" gap={2}>
-                        <Text fontSize="12px" color="#F5F5F5">
+                        <Text
+                          fontSize={{ base: "11px", md: "12px" }}
+                          color="#F5F5F5"
+                        >
                           USD
                         </Text>
                         <SlArrowDown size={12} />
@@ -371,38 +460,54 @@ export default function IndividualAsset({ token }) {
                     </Flex>
                   </Flex>
                   <Flex direction="column" gap={2}>
-                    <Text color="#BFBFBF" fontSize="18px">
+                    <Text
+                      color="#BFBFBF"
+                      fontSize={{ base: "14px", md: "16px", lg: "18px" }}
+                    >
                       Decimals
                     </Text>
-                    <Text fontSize="16px">10</Text>
+                    <Text fontSize={{ base: "14px", md: "16px" }}>10</Text>
                   </Flex>
                   <Flex direction="column" gap={2}>
-                    <Text color="#BFBFBF" fontSize="18px">
+                    <Text
+                      color="#BFBFBF"
+                      fontSize={{ base: "14px", md: "16px", lg: "18px" }}
+                    >
                       {" "}
                       Timestamp
                     </Text>
-                    <Text fontSize="16px">
+                    <Text fontSize={{ base: "14px", md: "16px" }}>
                       {latest.aggregationTimestamp} Epoch
                     </Text>
                   </Flex>
                   <Flex direction="column" gap={2}>
-                    <Text color="#BFBFBF" fontSize="18px">
+                    <Text
+                      color="#BFBFBF"
+                      fontSize={{ base: "14px", md: "16px", lg: "18px" }}
+                    >
                       Data{" "}
                     </Text>
-                    <Text fontSize="16px">{latest.signature.data}</Text>
+                    <Text fontSize={{ base: "14px", md: "16px" }}>
+                      {latest.signature.data}
+                    </Text>
                   </Flex>
                 </Flex>
-                <Flex ml={6} w="50%" direction="column" gap={8}>
+                <Flex
+                  ml={{ base: 0, md: 6 }}
+                  w={{ base: "100%", md: "50%" }}
+                  direction="column"
+                  gap={{ base: 5, md: 8 }}
+                >
                   <Flex direction={"column"} gap={2}>
                     <Text
                       color="#BFBFBF"
                       fontFamily={"Montserrat Variable"}
                       fontWeight={400}
-                      fontSize="18px"
+                      fontSize={{ base: "14px", md: "16px", lg: "18px" }}
                     >
                       Providers
                     </Text>
-                    <Text fontSize={"16px"}>
+                    <Text fontSize={{ base: "14px", md: "16px" }}>
                       {latest.signatures.length} / 13
                     </Text>
                   </Flex>
@@ -412,13 +517,13 @@ export default function IndividualAsset({ token }) {
                       color="#BFBFBF"
                       fontFamily={"Montserrat Variable"}
                       fontWeight={400}
-                      fontSize="18px"
+                      fontSize={{ base: "14px", md: "16px", lg: "18px" }}
                     >
                       Signature
                     </Text>
                     <Text
                       onClick={handleCopySignature}
-                      fontSize={"16px"}
+                      fontSize={{ base: "14px", md: "16px" }}
                       _hover={{
                         cursor: "pointer",
                       }}
@@ -431,12 +536,12 @@ export default function IndividualAsset({ token }) {
                       fontFamily={"Montserrat Variable"}
                       color="#BFBFBF"
                       fontWeight={400}
-                      fontSize="18px"
+                      fontSize={{ base: "14px", md: "16px", lg: "18px" }}
                     >
                       Oracle Public Key
                     </Text>
                     <Text
-                      fontSize="16px"
+                      fontSize={{ base: "14px", md: "16px" }}
                       onClick={handleCopyPublicKey}
                       _hover={{
                         cursor: "pointer",
@@ -459,10 +564,14 @@ export default function IndividualAsset({ token }) {
           mb={100}
         >
           <Flex direction="column" align="center">
-            <Heading textAlign="left" fontFamily={"Montserrat Variable"}>
+            <Heading
+              textAlign="left"
+              fontFamily={"Montserrat Variable"}
+              fontSize={{ base: "xl", md: "2xl" }}
+            >
               Historical Information
             </Heading>
-            <Text pb={5} fontSize={"sm"}>
+            <Text pb={5} fontSize={{ base: "xs", md: "sm" }}>
               (The prices are precise upto the 10th decimal)
             </Text>
           </Flex>

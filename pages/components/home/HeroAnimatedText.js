@@ -18,7 +18,7 @@ export default function HeroAnimatedText() {
         cursor={false}
         repeat={Infinity}
         style={{
-          fontSize: "88px",
+          fontSize: "clamp(32px, 12vw, 88px)",
           fontWeight: "700",
           display: "inline-block",
           fontFamily: "'Montserrat Variable'",

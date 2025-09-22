@@ -16,12 +16,27 @@ import {
   MULTIPLICATION_FACTOR,
 } from "../../../utils/constants/info";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 
 export default function HistoricalTable({ ipfsHistorical, ipfsLatest }) {
   const toast = useToast();
   const [page, setPage] = useState(1);
   const pageSize = 5; // 5 serial numbers per page
+  const [showMoreCols, setShowMoreCols] = useState(false);
+
+  // Persist toggle across navigation in the session
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem("doot_table_morecols");
+      if (saved !== null) setShowMoreCols(saved === "1");
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    try {
+      sessionStorage.setItem("doot_table_morecols", showMoreCols ? "1" : "0");
+    } catch {}
+  }, [showMoreCols]);
 
   function urlToProvider(url) {
     if (typeof url == "string") {
@@ -114,12 +129,14 @@ export default function HistoricalTable({ ipfsHistorical, ipfsLatest }) {
           },
           "& th": {
             borderColor: "transparent !important",
-          }
+          },
         }}
       >
         <Thead>
           <Tr bg="linear-gradient(135deg, #4900d1ff 0%, #461b97ff 100%)">
-            <Th color="white">SNo</Th>
+            <Th color="white" fontSize={{ base: "xs", md: "sm" }}>
+              SNo
+            </Th>
             <Tooltip
               label="Signature over the aggregated price."
               bg="#333333"
@@ -127,7 +144,13 @@ export default function HistoricalTable({ ipfsHistorical, ipfsLatest }) {
               borderRadius="6px"
               fontSize="sm"
             >
-              <Th color="white">Agg. Signature</Th>
+              <Th
+                color="white"
+                display={{ base: "none", md: "table-cell" }}
+                fontSize={{ base: "xs", md: "sm" }}
+              >
+                Agg. Signature
+              </Th>
             </Tooltip>
             <Tooltip
               label="The aggregated price after removing outliers."
@@ -136,7 +159,13 @@ export default function HistoricalTable({ ipfsHistorical, ipfsLatest }) {
               borderRadius="6px"
               fontSize="sm"
             >
-              <Th color="white">Agg. Price</Th>
+              <Th
+                color="white"
+                display={{ base: "none", md: "table-cell" }}
+                fontSize={{ base: "xs", md: "sm" }}
+              >
+                Agg. Price
+              </Th>
             </Tooltip>
             <Tooltip
               label="Timestamp when the aggregated price was calculated."
@@ -145,7 +174,13 @@ export default function HistoricalTable({ ipfsHistorical, ipfsLatest }) {
               borderRadius="6px"
               fontSize="sm"
             >
-              <Th color="white">Agg. Timestamp</Th>
+              <Th
+                color="white"
+                display={{ base: "none", md: "table-cell" }}
+                fontSize={{ base: "xs", md: "sm" }}
+              >
+                Agg. Timestamp
+              </Th>
             </Tooltip>
             <Tooltip
               label="Data provider called."
@@ -154,7 +189,14 @@ export default function HistoricalTable({ ipfsHistorical, ipfsLatest }) {
               borderRadius="6px"
               fontSize="sm"
             >
-              <Th color="white" minW="180px" w="180px">Provider</Th>
+              <Th
+                color="white"
+                minW={{ base: "80px", md: "160px" }}
+                w={{ base: "80px", md: "160px" }}
+                fontSize={{ base: "xs", md: "sm" }}
+              >
+                Provider
+              </Th>
             </Tooltip>
             <Tooltip
               label="Returned price from the data provider."
@@ -163,7 +205,9 @@ export default function HistoricalTable({ ipfsHistorical, ipfsLatest }) {
               borderRadius="6px"
               fontSize="sm"
             >
-              <Th color="white">Price</Th>
+              <Th color="white" fontSize={{ base: "xs", md: "sm" }}>
+                Price
+              </Th>
             </Tooltip>
             <Tooltip
               label="Signature over the response price from the data provider."
@@ -172,7 +216,13 @@ export default function HistoricalTable({ ipfsHistorical, ipfsLatest }) {
               borderRadius="6px"
               fontSize="sm"
             >
-              <Th color="white">Signature</Th>
+              <Th
+                color="white"
+                display={{ base: "none", md: "table-cell" }}
+                fontSize={{ base: "xs", md: "sm" }}
+              >
+                Signature
+              </Th>
             </Tooltip>
             <Tooltip
               label="Timestamp when the response was received."
@@ -181,7 +231,13 @@ export default function HistoricalTable({ ipfsHistorical, ipfsLatest }) {
               borderRadius="6px"
               fontSize="sm"
             >
-              <Th color="white">Timestamp</Th>
+              <Th
+                color="white"
+                display={{ base: "none", md: "table-cell" }}
+                fontSize={{ base: "xs", md: "sm" }}
+              >
+                Timestamp
+              </Th>
             </Tooltip>
           </Tr>
         </Thead>
@@ -224,10 +280,14 @@ export default function HistoricalTable({ ipfsHistorical, ipfsLatest }) {
                     }}
                     transition="all 0.2s ease"
                   >
-                    <Td>{x == 0 ? start + key + 1 : ""}</Td>
+                    <Td fontSize={{ base: "xs", md: "sm" }}>
+                      {x == 0 ? start + key + 1 : ""}
+                    </Td>
                     <Td
                       _hover={{ cursor: "pointer" }}
                       onClick={() => handleCopy(collectiveSignature)}
+                      display={{ base: "none", md: "table-cell" }}
+                      fontSize={{ base: "xs", md: "sm" }}
                     >
                       {collectiveSignature
                         ? collectiveSignature.slice(0, 4) +
@@ -235,13 +295,34 @@ export default function HistoricalTable({ ipfsHistorical, ipfsLatest }) {
                           collectiveSignature.slice(-4)
                         : null}
                     </Td>
-                    <Td>{collectivePrice}</Td>
-                    <Td>{collectiveTimestamp}</Td>
-                    <Td minW="180px" w="180px" whiteSpace="nowrap">{urlToProvider(urls[x])}</Td>
-                    <Td>{processFloatString(prices_returned[x])}</Td>
+                    <Td
+                      display={{ base: "none", md: "table-cell" }}
+                      fontSize={{ base: "xs", md: "sm" }}
+                    >
+                      {collectivePrice}
+                    </Td>
+                    <Td
+                      display={{ base: "none", md: "table-cell" }}
+                      fontSize={{ base: "xs", md: "sm" }}
+                    >
+                      {collectiveTimestamp}
+                    </Td>
+                    <Td
+                      minW={{ base: "80px", md: "160px" }}
+                      w={{ base: "80px", md: "160px" }}
+                      whiteSpace="nowrap"
+                      fontSize={{ base: "xs", md: "sm" }}
+                    >
+                      {urlToProvider(urls[x])}
+                    </Td>
+                    <Td fontSize={{ base: "xs", md: "sm" }}>
+                      {processFloatString(prices_returned[x])}
+                    </Td>
                     <Td
                       _hover={{ cursor: "pointer" }}
                       onClick={() => handleCopy(signatures[x].signature)}
+                      display={{ base: "none", md: "table-cell" }}
+                      fontSize={{ base: "xs", md: "sm" }}
                     >
                       {signatures[x] && signatures[x].signature
                         ? signatures[x].signature.slice(0, 4) +
@@ -249,7 +330,12 @@ export default function HistoricalTable({ ipfsHistorical, ipfsLatest }) {
                           signatures[x].signature.slice(-4)
                         : null}
                     </Td>
-                    <Td>{timestamps[x]}</Td>
+                    <Td
+                      display={{ base: "none", md: "table-cell" }}
+                      fontSize={{ base: "xs", md: "sm" }}
+                    >
+                      {timestamps[x]}
+                    </Td>
                   </Tr>
                 );
               });
@@ -264,7 +350,7 @@ export default function HistoricalTable({ ipfsHistorical, ipfsLatest }) {
       {/* Pagination controls */}
       <Flex justify="center" align="center" mt={8} gap={3} w="100%">
         <Button
-          size="md"
+          size={{ base: "sm", md: "md" }}
           variant="outline"
           onClick={() => goTo(page - 1)}
           isDisabled={page === 1}
@@ -274,7 +360,7 @@ export default function HistoricalTable({ ipfsHistorical, ipfsLatest }) {
           color="#6B1BFF"
           fontWeight="600"
           borderRadius="12px"
-          px={6}
+          px={{ base: 3, md: 6 }}
           py={3}
           _hover={{
             bg: "#6B1BFF",
@@ -297,26 +383,36 @@ export default function HistoricalTable({ ipfsHistorical, ipfsLatest }) {
           }}
           transition="all 0.2s ease"
         >
-          Previous
+          <Text display={{ base: "none", md: "block" }}>Previous</Text>
+          <Text display={{ base: "block", md: "none" }}>Prev</Text>
         </Button>
 
         <Flex
           align="center"
-          px={6}
+          px={{ base: 3, md: 6 }}
           py={3}
           borderRadius="12px"
           bg="rgba(107, 27, 255, 0.1)"
           border="2px solid transparent"
-          minW="120px"
+          minW={{ base: "60px", md: "120px" }}
           justify="center"
         >
-          <Text fontSize="md" fontWeight="600" color="#6B1BFF">
-            Page {page} of {totalPages}
+          <Text
+            fontSize={{ base: "sm", md: "md" }}
+            fontWeight="600"
+            color="#6B1BFF"
+          >
+            <Text display={{ base: "block", md: "none" }}>
+              {page}/{totalPages}
+            </Text>
+            <Text display={{ base: "none", md: "block" }}>
+              Page {page} of {totalPages}
+            </Text>
           </Text>
         </Flex>
 
         <Button
-          size="md"
+          size={{ base: "sm", md: "md" }}
           variant="outline"
           onClick={() => goTo(page + 1)}
           isDisabled={page === totalPages}
@@ -326,7 +422,7 @@ export default function HistoricalTable({ ipfsHistorical, ipfsLatest }) {
           color="#6B1BFF"
           fontWeight="600"
           borderRadius="12px"
-          px={6}
+          px={{ base: 3, md: 6 }}
           py={3}
           _hover={{
             bg: "#6B1BFF",
@@ -349,7 +445,8 @@ export default function HistoricalTable({ ipfsHistorical, ipfsLatest }) {
           }}
           transition="all 0.2s ease"
         >
-          Next
+          <Text display={{ base: "none", md: "block" }}>Next</Text>
+          <Text display={{ base: "block", md: "none" }}>Next</Text>
         </Button>
       </Flex>
     </>
