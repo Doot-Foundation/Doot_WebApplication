@@ -14,6 +14,7 @@ export default function Features() {
             borderRadius="16px"
             p="20px 28px"
             fontWeight={600}
+            textAlign="center"
             style={{
               backgroundClip: "text",
               WebkitTextFillColor: "transparent",
@@ -29,6 +30,8 @@ export default function Features() {
             fontSize={{ base: "26px", md: "32px", lg: "45px" }}
             maxW="1200px"
             align="center"
+            mt={6}
+            mx={{ base: 4, md: 6, lg: 8 }}
           >
             Fulfill your zkApp's data feed requirements with a focus on
             transparent, accurate, precise and provable nature right out of the
@@ -38,7 +41,7 @@ export default function Features() {
         {/* ============= */}
         <Box align="center" p={{ base: 6, md: 12, lg: 20 }} w="100%">
           <Flex align="center" w="100%" justify="center" direction={{ base: 'column', lg: 'row' }}>
-            <Box mr={{ base: 0, lg: -370 }} mt={{ base: 0, lg: -410 }}>
+            <Box mr={{ base: 0, lg: -370 }} mt={{ base: 0, lg: -410 }} display={{ base: 'none', lg: 'block' }}>
               <InformationCard>
                 <Image src="/static/images/data_feeds.png" alt="Data Feeds" />
                 <Heading
@@ -112,7 +115,7 @@ export default function Features() {
                 ></Box>
               </Box>
             </Flex>
-            <Box ml={{ base: 0, lg: -370 }} mt={{ base: 0, lg: -410 }}>
+            <Box ml={{ base: 0, lg: -370 }} mt={{ base: 0, lg: -410 }} display={{ base: 'none', lg: 'block' }}>
               <InformationCard>
                 <Image src="/static/images/magnifying.png" />
                 <Heading
