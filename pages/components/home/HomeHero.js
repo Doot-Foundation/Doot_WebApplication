@@ -140,15 +140,15 @@ export default function HomeHero() {
 
   return (
     <>
-      <Flex direction={"column"} gap={120}>
+      <Flex direction={"column"} gap={{ base: 14, md: 24, lg: 120 }}>
         {/* Opening */}
-        <Flex direction={"column"} maxW={"100%"} gap={7} align={"center"}>
+        <Flex direction={"column"} maxW={"100%"} gap={{ base: 6, md: 7 }} align={"center"} px={{ base: 4, md: 0 }}>
           <Flex
             position="relative"
             direction="column"
             align="center"
             justify="center"
-            fontSize="70px"
+            fontSize={{ base: "36px", md: "56px", lg: "70px" }}
             fontWeight={600}
           >
             <Image
@@ -160,20 +160,20 @@ export default function HomeHero() {
               maxW="180%"
               filter="brightness(50%)"
             />
-            <Box h={120}>
+            <Box h={{ base: "72px", md: "96px", lg: "120px" }}>
               <HeroAnimatedText />
             </Box>
-            <Flex direction="column" align="center">
-              <Box h={"102px"}>Oracle</Box>
-              <Box>For Mina Protocol</Box>
+            <Flex direction="column" align="center" lineHeight={1.1}>
+              <Box as="span" fontSize={{ base: '28px', md: '40px', lg: '56px' }} fontWeight={700} whiteSpace="nowrap">Oracle</Box>
+              <Box as="span" fontSize={{ base: '28px', md: '40px', lg: '56px' }} fontWeight={700} whiteSpace="nowrap">For Mina Protocol</Box>
             </Flex>
           </Flex>
-          <Flex gap={20}>
+          <Flex gap={{ base: 4, md: 8, lg: 20 }} direction={{ base: "column", md: "row" }} align="center">
             <Button
               position={"relative"}
               alignItems={"center"}
               justifyItems={"center"}
-              p={"33px 54px"}
+              p={{ base: "20px 28px", md: "28px 40px", lg: "33px 54px" }}
               gap={2}
               transition={"0.2s"}
               _active={{}}
@@ -187,8 +187,8 @@ export default function HomeHero() {
             >
               <Box
                 position="absolute"
-                width="134px"
-                height="40px"
+                width={{ base: "100px", md: "120px", lg: "134px" }}
+                height={{ base: "32px", md: "36px", lg: "40px" }}
                 left="calc(50% - 134px/2)"
                 top="calc(50% - 40px/2 + 39.95px)"
                 background="#9470DD"
@@ -207,8 +207,8 @@ export default function HomeHero() {
               _hover={{}}
             >
               <Flex
-                w="224px"
-                h="67px"
+                w={{ base: "200px", md: "224px" }}
+                h={{ base: "56px", md: "67px" }}
                 position="relative"
                 p="4px 2px"
                 justify="center"
@@ -235,7 +235,7 @@ export default function HomeHero() {
                   onClick={sendEmail}
                 >
                   <Flex gap={2} justify="center" align="center">
-                    <Image src="/static/images/stars.png" />
+                    <Image src="/static/images/stars.png" alt="Stars" />
                     Learn More
                   </Flex>
                 </Button>
@@ -244,45 +244,24 @@ export default function HomeHero() {
           </Flex>
           <Flex
             fontFamily="Source Code Pro Variable"
-            borderRadius={100}
+            borderRadius={24}
             backgroundColor="#202020"
-            fontSize="18px"
-            p="20px 50px"
-            w="fit-content"
-            gap={6}
-            mt={3}
+            fontSize={{ base: "12px", md: "14px", lg: "16px" }}
+            px={{ base: 3, md: 6 }}
+            py={{ base: 2, md: 3 }}
+            w={{ base: '100%', md: 'fit-content' }}
+            maxW={{ base: '600px', md: 'unset' }}
+            mt={{ base: 2, md: 3 }}
+            alignSelf="center"
           >
-            <Flex align="center" gap={5}>
-              <MdOutlineContentCopy
-                color={"gray"}
-                size={22}
-                onClick={copyToClipboard}
-                cursor={"pointer"}
-              />
-              <Box border="1px solid gray" h="100%"></Box>
-              <Flex gap={2}>
-                <Flex>
-                  <Box fontFamily={"Source Code Pro Variable"}>
-                    revolutionary@zkapp
-                  </Box>
-                  <Text>:~$</Text>
-                </Flex>
-                <Text
-                  color="white"
-                  onClick={copyToClipboard}
-                  cursor={"pointer"}
-                >
-                  npm install @doot-oracles/client
-                </Text>
-                <Box
-                  fontWeight={900}
-                  animation={`${blinking} 1.2s step-start infinite`}
-                  display={"inline"}
-                  color={"#0ce1ae"}
-                >
-                  _
-                </Box>
+            <Flex align="center" w="100%" gap={3} justify="space-between">
+              <Flex gap={2} overflowX="auto" whiteSpace="nowrap" flex="1">
+                <Text color="gray.400">revolutionary@zkapp</Text>
+                <Text color="gray.400">:~$</Text>
+                <Text color="white">npm install @doot-oracles/client</Text>
+                <Box fontWeight={900} animation={`${blinking} 1.2s step-start infinite`} display="inline" color={"#0ce1ae"}>_</Box>
               </Flex>
+              <MdOutlineContentCopy color={"gray"} size={18} onClick={copyToClipboard} cursor={"pointer"} />
             </Flex>
           </Flex>
         </Flex>
@@ -290,19 +269,19 @@ export default function HomeHero() {
         <Features />
         {/* Testing  */}
         <section id="targetSection">
-          <Flex direction={"column"} maxW="1200" margin="0 auto">
+          <Flex direction={"column"} maxW="1200px" w="100%" px={{ base: 4, md: 0 }} margin="0 auto">
             <Flex direction={"column"} alignItems={"left"} gap={3}>
-              <Flex direction={"row"} align={"center"} gap={14}>
+              <Flex direction={{ base: "column", md: "row" }} align={{ base: "flex-start", md: "center" }} gap={{ base: 4, md: 14 }}>
                 <Box
                   background={
                     "linear-gradient(90deg, #6c35de 0%,rgba(23,0,44,1) 100%)"
                   }
-                  w={200}
-                  h={5}
+                  w={{ base: 120, md: 200 }}
+                  h={{ base: 3, md: 5 }}
                 />
                 <Heading
                   letterSpacing={3}
-                  size={"3xl"}
+                  size={{ base: "xl", md: "3xl" }}
                   fontFamily={"Montserrat Variable"}
                 >
                   TRY DOOT
@@ -310,24 +289,24 @@ export default function HomeHero() {
               </Flex>{" "}
               <Heading
                 letterSpacing={3}
-                size={"3xl"}
+                size={{ base: "2xl", md: "3xl" }}
                 fontFamily={"Montserrat Variable"}
               >
                 DATA FEEDS
               </Heading>
             </Flex>
 
-            <Flex direction={"row"} align={"center"} mt={50} gap={5}>
+            <Flex direction={{ base: "column", lg: "row" }} align={"stretch"} mt={{ base: 6, md: 12 }} gap={{ base: 6, md: 5 }}>
               <Flex
                 background={"linear-gradient(120deg,#2c0055 0%, #5126a9 100%)"}
                 direction={"column"}
                 borderRadius={10}
-                p={5}
-                minH={450}
-                w={"30%"}
+                p={{ base: 4, md: 5 }}
+                minH={{ base: "auto", md: 450 }}
+                w={{ base: "100%", lg: "30%" }}
                 pos={"relative"}
               >
-                <Text fontSize={25}>Choose the asset and run.</Text>
+                <Text fontSize={{ base: 18, md: 22 }}>Choose the asset and run.</Text>
 
                 <FormControl
                   fontFamily={"Source Code Pro Variable"}
@@ -372,8 +351,8 @@ export default function HomeHero() {
 
                 <Button
                   backgroundColor={"#00eab1"}
-                  position="absolute"
-                  bottom={5}
+                  position={{ base: 'static', md: 'absolute' }}
+                  bottom={{ base: undefined, md: 5 }}
                   onClick={handleSubmit}
                   isDisabled={!asset || asset.trim()===''}
                   fontFamily={"Source Code Pro Variable"}
@@ -385,8 +364,8 @@ export default function HomeHero() {
                 </Button>
               </Flex>
               {/* Result Window */}
-              <Flex direction={"column"} h={450} w={"70%"}>
-                <Flex gap={2} background="#5126a9" p={3} borderTopRadius={10}>
+              <Flex direction={"column"} h={{ base: "auto", md: 450 }} w={{ base: "100%", lg: "70%" }}>
+                <Flex gap={2} background="#5126a9" p={{ base: 2, md: 3 }} borderTopRadius={10}>
                   <Box
                     borderRadius={"50%"}
                     boxSize={3}
@@ -407,8 +386,8 @@ export default function HomeHero() {
                 <Flex
                   backgroundColor="#2c0055"
                   borderBottomRadius={10}
-                  p="0 20px 20px 20px"
-                  h={"100%"}
+                  p={{ base: "0 12px 12px 12px", md: "0 20px 20px 20px" }}
+                  h={{ base: "auto", md: "100%" }}
                 >
                   <Flex
                     maxW={"100%"}
@@ -418,18 +397,18 @@ export default function HomeHero() {
                     w={"100%"}
                   >
                     <Flex
-                      direction={"row"}
+                      direction={{ base: "column", md: "row" }}
                       borderBottom={"2px solid white"}
-                      p={5}
-                      pt={7}
-                      pl={5}
-                      gap={20}
-                      ml={10}
-                      mr={10}
+                      p={{ base: 3, md: 5 }}
+                      pt={{ base: 4, md: 7 }}
+                      pl={{ base: 3, md: 5 }}
+                      gap={{ base: 6, md: 20 }}
+                      ml={{ base: 4, md: 10 }}
+                      mr={{ base: 4, md: 10 }}
                       color={"#0ce1ae"}
                     >
                       <Box
-                        w={"20%"}
+                        w={{ base: "100%", md: "20%" }}
                         cursor={"pointer"}
                         onClick={() => {
                           setMode("res");
@@ -451,15 +430,14 @@ export default function HomeHero() {
                       </Box>
                     </Flex>
                     <Flex
-                      p={10}
-                      position="relative"
-                      fontSize={"20px"}
+                      p={{ base: 4, md: 10 }}
+                      fontSize={{ base: "14px", md: "16px", lg: "20px" }}
                       fontFamily="Montserrat Variable"
                       fontWeight="500"
                       letterSpacing="1px"
                     >
-                      <Box position="absolute">
-                        <Fade in={mode == "res"}>
+                      {mode === 'res' ? (
+                        <Fade in>
                           <Text
                             maxW={"100%"}
                             dangerouslySetInnerHTML={{
@@ -467,16 +445,15 @@ export default function HomeHero() {
                                 result ||
                                 `<span style='color:yellow;'>{</span><br>&nbsp;&nbsp;&nbsp;&nbsp;asset : <span style='color:orange;'>mina</span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;price : <span style='color:orange;'>1817306348</span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;decimals : <span style='color:orange;'>10</span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;timestamp : <span style='color:orange;'>${Math.floor(Date.now() / 1000)}</span>,<br>&nbsp;&nbsp;&nbsp;&nbsp;signature : <span style='color:orange;'>7mXWHULiEs.......4dykprFJoW</span>,<br><span style='color:yellow;'>}</span>`,
                             }}
-                          ></Text>
+                          />
                         </Fade>
-                      </Box>
-                      <Box position="absolute">
-                        <Fade in={mode == "req"}>
+                      ) : (
+                        <Fade in>
                           <Text maxW={"100%"}>
                             {`https://doot.foundation/api/get/getPrice?token=${asset}`}
                           </Text>
                         </Fade>
-                      </Box>
+                      )}
                     </Flex>
                   </Flex>
                 </Flex>
@@ -502,7 +479,7 @@ export default function HomeHero() {
           <Heading
             maxW="1200px"
             fontFamily={"Montserrat Variable"}
-            fontSize="30px"
+            fontSize={{ base: "18px", md: "22px", lg: "30px" }}
             textAlign="center"
           >
             Seemlessly integrate it with your next{" "}
@@ -513,10 +490,10 @@ export default function HomeHero() {
             step.
           </Heading>
           <Flex
-            mt={10}
-            mb={20}
-            w="224px"
-            h="61px"
+            mt={{ base: 6, md: 10 }}
+            mb={{ base: 10, md: 20 }}
+            w={{ base: "200px", md: "224px" }}
+            h={{ base: "52px", md: "61px" }}
             position="relative"
             p="4px 2px"
             justify="center"
@@ -543,7 +520,7 @@ export default function HomeHero() {
               onClick={sendEmail}
             >
               <Flex gap={1} justify="center" align="center">
-                <Image src="/static/images/stars.png" />
+                <Image src="/static/images/stars.png" alt="Stars" />
                 Contact Us
               </Flex>
             </Button>
