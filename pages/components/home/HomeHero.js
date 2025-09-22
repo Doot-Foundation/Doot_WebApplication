@@ -144,21 +144,21 @@ export default function HomeHero() {
 
   return (
     <>
-      <Flex direction={"column"} gap={{ base: 14, md: 24, lg: 120 }}>
+      <Flex direction={"column"} gap={{ base: 14, md: 20, lg: 120 }}>
         {/* Opening */}
         <Flex
           direction={"column"}
           maxW={"100%"}
-          gap={{ base: 6, md: 7 }}
+          gap={{ base: 6, md: 8, lg: 7 }}
           align={"center"}
-          px={{ base: 4, md: 0 }}
+          px={{ base: 4, md: 8, lg: 0 }}
         >
           <Flex
             position="relative"
             direction="column"
             align="center"
             justify="center"
-            fontSize={{ base: "36px", md: "56px", lg: "70px" }}
+            fontSize={{ base: "36px", md: "48px", lg: "70px" }}
             fontWeight={600}
           >
             <Image
@@ -167,7 +167,7 @@ export default function HomeHero() {
               src={"/static/animation/dots.gif"}
               zIndex={"-1"}
               position={"absolute"}
-              maxW="180%"
+              maxW={{ base: "180%", md: "160%", lg: "180%" }}
               filter="brightness(50%)"
             />
             <Box h={{ base: "72px", md: "96px", lg: "120px" }}>
@@ -176,7 +176,7 @@ export default function HomeHero() {
             <Flex direction="column" align="center" lineHeight={1.1}>
               <Box
                 as="span"
-                fontSize={{ base: "28px", md: "40px", lg: "56px" }}
+                fontSize={{ base: "28px", md: "36px", lg: "56px" }}
                 fontWeight={700}
                 whiteSpace="nowrap"
               >
@@ -184,7 +184,7 @@ export default function HomeHero() {
               </Box>
               <Box
                 as="span"
-                fontSize={{ base: "28px", md: "40px", lg: "56px" }}
+                fontSize={{ base: "28px", md: "36px", lg: "56px" }}
                 fontWeight={700}
                 whiteSpace="nowrap"
               >
@@ -193,7 +193,7 @@ export default function HomeHero() {
             </Flex>
           </Flex>
           <Flex
-            gap={{ base: 4, md: 8, lg: 20 }}
+            gap={{ base: 4, md: 6, lg: 20 }}
             direction={{ base: "column", md: "row" }}
             align="center"
           >
@@ -201,7 +201,7 @@ export default function HomeHero() {
               position={"relative"}
               alignItems={"center"}
               justifyItems={"center"}
-              p={{ base: "20px 28px", md: "28px 40px", lg: "33px 54px" }}
+              p={{ base: "20px 28px", md: "24px 36px", lg: "33px 54px" }}
               gap={2}
               transition={"0.2s"}
               _active={{}}
@@ -209,7 +209,7 @@ export default function HomeHero() {
               background="#6B1BFF"
               boxShadow="0px 0px 200px #6B1BFF, inset 0px -3px 0px rgba(0, 0, 0, 0.2), inset 0px 1px 0px rgba(255, 255, 255, 0.4)"
               borderRadius="100px"
-              fontSize={"20px"}
+              fontSize={{ base: "18px", md: "19px", lg: "20px" }}
               overflow="hidden"
               onClick={() => scrollToElement("targetSection")}
             >
@@ -235,8 +235,8 @@ export default function HomeHero() {
               _hover={{}}
             >
               <Flex
-                w={{ base: "200px", md: "224px" }}
-                h={{ base: "56px", md: "67px" }}
+                w={{ base: "200px", md: "210px", lg: "224px" }}
+                h={{ base: "56px", md: "62px", lg: "67px" }}
                 position="relative"
                 p="4px 2px"
                 justify="center"
@@ -274,12 +274,12 @@ export default function HomeHero() {
             fontFamily="Source Code Pro Variable"
             borderRadius={24}
             backgroundColor="#202020"
-            fontSize={{ base: "12px", md: "14px", lg: "16px" }}
-            px={{ base: 3, md: 6 }}
-            py={{ base: 2, md: 3 }}
+            fontSize={{ base: "12px", md: "13px", lg: "16px" }}
+            px={{ base: 3, md: 5, lg: 6 }}
+            py={{ base: 2, md: 2.5, lg: 3 }}
             w={{ base: "100%", md: "fit-content" }}
-            maxW={{ base: "600px", md: "unset" }}
-            mt={{ base: 2, md: 3 }}
+            maxW={{ base: "600px", md: "700px", lg: "unset" }}
+            mt={{ base: 2, md: 4, lg: 3 }}
             alignSelf="center"
           >
             <Flex align="center" w="100%" gap={3} justify="space-between">
@@ -349,8 +349,8 @@ export default function HomeHero() {
             <Flex
               direction={{ base: "column", lg: "row" }}
               align={"stretch"}
-              mt={{ base: 6, md: 12 }}
-              gap={{ base: 6, md: 5 }}
+              mt={{ base: 6, md: 8, lg: 12 }}
+              gap={{ base: 6, md: 6, lg: 5 }}
             >
               <Flex
                 background={"linear-gradient(120deg,#2c0055 0%, #5126a9 100%)"}
@@ -407,14 +407,23 @@ export default function HomeHero() {
                 </FormControl>
 
                 <Button
-                  backgroundColor={"#00eab1"}
+                  backgroundColor={!asset || asset.trim() === "" ? "#4a5568" : "#00eab1"}
                   position={{ base: "static", md: "absolute" }}
                   bottom={{ base: undefined, md: 5 }}
+                  mt={{ base: 4, md: 0 }}
                   onClick={handleSubmit}
                   isDisabled={!asset || asset.trim() === ""}
                   fontFamily={"Source Code Pro Variable"}
                   _hover={{
-                    backgroundColor: "#00bc8f",
+                    backgroundColor: !asset || asset.trim() === "" ? "#4a5568" : "#00c99aff",
+                  }}
+                  _disabled={{
+                    backgroundColor: "#4a5568",
+                    color: "#a0a0a0",
+                    cursor: "not-allowed",
+                    _hover: {
+                      backgroundColor: "#4a5568",
+                    }
                   }}
                 >
                   RUN REQUEST
@@ -552,8 +561,9 @@ export default function HomeHero() {
           <Heading
             maxW="1200px"
             fontFamily={"Montserrat Variable"}
-            fontSize={{ base: "18px", md: "22px", lg: "30px" }}
+            fontSize={{ base: "18px", md: "20px", lg: "30px" }}
             textAlign="center"
+            px={{ base: 4, md: 8, lg: 0 }}
           >
             Seemlessly integrate it with your next{" "}
             <b>
@@ -563,10 +573,10 @@ export default function HomeHero() {
             step.
           </Heading>
           <Flex
-            mt={{ base: 6, md: 10 }}
-            mb={{ base: 10, md: 20 }}
-            w={{ base: "200px", md: "224px" }}
-            h={{ base: "52px", md: "61px" }}
+            mt={{ base: 6, md: 8, lg: 10 }}
+            mb={{ base: 10, md: 16, lg: 20 }}
+            w={{ base: "200px", md: "210px", lg: "224px" }}
+            h={{ base: "52px", md: "58px", lg: "61px" }}
             position="relative"
             p="4px 2px"
             justify="center"

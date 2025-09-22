@@ -7,6 +7,7 @@ import {
   Image,
   Spacer,
   Link,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 import {
@@ -26,6 +27,7 @@ export default function IndividualAsset({ token }) {
     return <div>Loading...</div>; // Or any loading indicator
   }
 
+  const arrowSize = useBreakpointValue({ base: "32px", md: "44px" });
   const axios = require("axios");
   const GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
 
@@ -183,7 +185,7 @@ export default function IndividualAsset({ token }) {
         {/* top-graph */}
         <Flex direction={"column"} minH={"100%"} minW={"100%"}>
           <Link href="/feeds" w="fit-content" mb={10}>
-            <SlArrowLeft size={"44px"} />
+            <SlArrowLeft size={arrowSize} />
           </Link>
           <Heading
             fontSize={{ base: "2xl", md: "3xl" }}
@@ -365,7 +367,7 @@ export default function IndividualAsset({ token }) {
           >
             Data Providers
           </Heading>
-          <Box w="100%">
+          <Box w="80vw">
             <MarqueeDataProviders providers={providers} />
           </Box>
         </Flex>

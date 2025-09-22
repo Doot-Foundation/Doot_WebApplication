@@ -37,8 +37,8 @@ export default function Features() {
         </Flex>
         {/* ============= */}
         <Box align="center" p={{ base: 6, md: 12, lg: 20 }} w="100%">
-          <Flex align="center" w="100%" justify="center" direction={{ base: 'column', xl: 'row' }}>
-            <Box mr={{ base: 0, xl: -370 }} mt={{ base: 0, xl: -410 }}>
+          <Flex align="center" w="100%" justify="center" direction={{ base: 'column', lg: 'row' }}>
+            <Box mr={{ base: 0, lg: -370 }} mt={{ base: 0, lg: -410 }}>
               <InformationCard>
                 <Image src="/static/images/data_feeds.png" alt="Data Feeds" />
                 <Heading
@@ -63,7 +63,7 @@ export default function Features() {
                 </Text>
               </InformationCard>
             </Box>
-            <Flex direction="column" align="center" display={{ base: 'none', xl: 'flex' }}>
+            <Flex direction="column" align="center" display={{ base: 'none', lg: 'flex' }}>
               <Box>
                 <InformationCard>
                   <CiBadgeDollar size={120} color="#E8E8E8" />
@@ -112,12 +112,9 @@ export default function Features() {
                 ></Box>
               </Box>
             </Flex>
-            <Box ml={{ base: 0, xl: -370 }} mt={{ base: 0, xl: -410 }}>
+            <Box ml={{ base: 0, lg: -370 }} mt={{ base: 0, lg: -410 }}>
               <InformationCard>
-                <Image
-                  src="
-                /static/images/magnifying.png"
-                />
+                <Image src="/static/images/magnifying.png" />
                 <Heading
                   textAlign={"center"}
                   fontFamily={"Montserrat Variable"}
@@ -141,7 +138,7 @@ export default function Features() {
               </InformationCard>
             </Box>
           </Flex>
-          <Flex justify="center" align="center" gap={320} mt={-530} display={{ base: 'none', xl: 'flex' }}>
+          <Flex justify="center" align="center" gap={320} mt={-530} display={{ base: 'none', lg: 'flex' }}>
             <Box>
               <InformationCard>
                 <Image
@@ -199,34 +196,62 @@ export default function Features() {
             </Box>
           </Flex>
           {/* Stacked cards for smaller screens */}
-          <Flex direction="column" align="center" gap={6} display={{ base: 'flex', xl: 'none' }} mt={6}>
-            <InformationCard>
-              <CiBadgeDollar size={100} color="#E8E8E8" />
-              <Heading textAlign="center" fontFamily="Montserrat Variable" fontWeight={700} fontSize={{ base: "28px", md: "36px" }}>
-                Data Feeds
-              </Heading>
-              <Text fontSize={{ base: 14, md: 16 }} textAlign="center" lineHeight="1.6" color="#CCCCCC" maxW="320px">
-                Easily access data feeds compatible with Mina Protocol directly within your zkApp, supporting over 10 popular assets today.
-              </Text>
-            </InformationCard>
-            <InformationCard>
-              <Image src={'/static/images/trustless.png'} />
-              <Heading textAlign="center" fontFamily="Montserrat Variable" fontWeight={700} fontSize={{ base: "28px", md: "36px" }}>
-                Trustless
-              </Heading>
-              <Text fontSize={{ base: 14, md: 16 }} textAlign="center" lineHeight="1.6" color="#CCCCCC" maxW="320px">
-                Leveraging ZkProgram by O1JS, we can prove interactions with data providers, eliminating the need for trust.
-              </Text>
-            </InformationCard>
-            <InformationCard>
-              <Image src={'/static/images/verification.png'} />
-              <Heading textAlign="center" fontFamily="Montserrat Variable" fontWeight={700} fontSize={{ base: "28px", md: "36px" }}>
-                Verify
-              </Heading>
-              <Text fontSize={{ base: 14, md: 16 }} textAlign="center" lineHeight="1.6" color="#CCCCCC" maxW="320px">
-                Every step is transparent and verifiable through our UI and smart contracts.
-              </Text>
-            </InformationCard>
+          <Flex direction="column" gap={6} display={{ base: 'flex', lg: 'none' }} mt={6}>
+            <Box>
+              <InformationCard>
+                <Image src="/static/images/data_feeds.png" alt="Data Feeds" />
+                <Heading textAlign="center" fontFamily="Montserrat Variable" fontWeight={700} fontSize={{ base: "28px", md: "36px" }}>
+                  Aggregated
+                </Heading>
+                <Text fontSize={{ base: 14, md: 16 }} textAlign="center" lineHeight="1.6" color="#CCCCCC" maxW="320px">
+                  Our price calculation mechanism ensures unwavering data integrity by sourcing prices from over 13 data providers, filtering them, and finally aggregating the results.
+                </Text>
+              </InformationCard>
+            </Box>
+            <Box>
+              <InformationCard>
+                <Image src="/static/images/magnifying.png" />
+                <Heading textAlign="center" fontFamily="Montserrat Variable" fontWeight={700} fontSize={{ base: "28px", md: "36px" }}>
+                  Filtered
+                </Heading>
+                <Text fontSize={{ base: 14, md: 16 }} textAlign="center" lineHeight="1.6" color="#CCCCCC" maxW="320px">
+                  We systematically eliminate outliers from the dataset using the MAD Score, ensuring the aggregated value is devoid of disruptive noise, thereby preventing inaccurate results.
+                </Text>
+              </InformationCard>
+            </Box>
+            <Box>
+              <InformationCard>
+                <CiBadgeDollar size={100} color="#E8E8E8" />
+                <Heading textAlign="center" fontFamily="Montserrat Variable" fontWeight={700} fontSize={{ base: "28px", md: "36px" }}>
+                  Data Feeds
+                </Heading>
+                <Text fontSize={{ base: 14, md: 16 }} textAlign="center" lineHeight="1.6" color="#CCCCCC" maxW="320px">
+                  Easily access data feeds compatible with Mina Protocol directly within your zkApp, supporting over 10 popular assets today.
+                </Text>
+              </InformationCard>
+            </Box>
+            <Box>
+              <InformationCard>
+                <Image src={'/static/images/trustless.png'} />
+                <Heading textAlign="center" fontFamily="Montserrat Variable" fontWeight={700} fontSize={{ base: "28px", md: "36px" }}>
+                  Trustless
+                </Heading>
+                <Text fontSize={{ base: 14, md: 16 }} textAlign="center" lineHeight="1.6" color="#CCCCCC" maxW="320px">
+                  Leveraging ZkProgram by O1JS, we can prove interactions with data providers, eliminating the need for trust.
+                </Text>
+              </InformationCard>
+            </Box>
+            <Box>
+              <InformationCard>
+                <Image src={'/static/images/verification.png'} />
+                <Heading textAlign="center" fontFamily="Montserrat Variable" fontWeight={700} fontSize={{ base: "28px", md: "36px" }}>
+                  Verify
+                </Heading>
+                <Text fontSize={{ base: 14, md: 16 }} textAlign="center" lineHeight="1.6" color="#CCCCCC" maxW="320px">
+                  Every step is transparent and verifiable through our UI and smart contracts.
+                </Text>
+              </InformationCard>
+            </Box>
           </Flex>
         </Box>
         {/* ============= */}
@@ -239,12 +264,6 @@ export default function Features() {
           position="relative"
           gap={"40px"}
         >
-          {/* <Image
-            position="absolute"
-            src="/static/images/Background_Lines.svg"
-            minW="100vw"
-            zIndex={-10}
-          /> */}
           <Flex
             gap={10}
             mt={32}
@@ -275,7 +294,7 @@ export default function Features() {
               for much more exciting features and improvements!
             </Heading>
             <Text fontWeight={"400"} fontSize={{ base: "16px", md: "20px", lg: "34px" }} align="center">
-              We’re dedicated to streamlining the developer experience for
+              We're dedicated to streamlining the developer experience for
               integrating Oracles on the Mina Protocol, allowing them to focus
               on their zkApps and let us take care of their data feed needs.
               Look forward to much exciting enhancements and features coming

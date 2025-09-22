@@ -16,7 +16,13 @@ import {
   Divider,
 } from "@chakra-ui/react";
 import { HiMenu } from "react-icons/hi";
-import { FiTrendingUp, FiCheckCircle, FiGrid, FiBook } from "react-icons/fi";
+import {
+  FiTrendingUp,
+  FiCheckCircle,
+  FiGrid,
+  FiBook,
+  FiHome,
+} from "react-icons/fi";
 import ConnectButton from "./ConnectButton";
 import { useRouter } from "next/router";
 
@@ -25,7 +31,8 @@ export default function Header() {
   // if (!isLargerThanMd) return;
   const { isOpen, onOpen, onClose } = useDisclosure();
   const router = useRouter();
-  const isActive = (href) => router.pathname === href || router.pathname.startsWith(href + '/');
+  const isActive = (href) =>
+    router.pathname === href || router.pathname.startsWith(href + "/");
 
   return (
     <>
@@ -53,7 +60,12 @@ export default function Header() {
         />
 
         <Link href="/">
-          <Image src="/static/images/DootWhite.png" alt="Doot" h={{ base: 6, md: 7 }} w="auto" />
+          <Image
+            src="/static/images/DootWhite.png"
+            alt="Doot"
+            h={{ base: 6, md: 7 }}
+            w="auto"
+          />
         </Link>
         <Spacer />
         {/* Desktop nav */}
@@ -72,13 +84,25 @@ export default function Header() {
           >
             Docs
           </Link>
-          <Link href="/feeds" _hover={{ color: "white", textDecoration: "none" }} color={isActive('/feeds') ? 'white' : undefined}>
+          <Link
+            href="/feeds"
+            _hover={{ color: "white", textDecoration: "none" }}
+            color={isActive("/feeds") ? "white" : undefined}
+          >
             Feeds
           </Link>
-          <Link href="/verify" _hover={{ color: "white", textDecoration: "none" }} color={isActive('/verify') ? 'white' : undefined}>
+          <Link
+            href="/verify"
+            _hover={{ color: "white", textDecoration: "none" }}
+            color={isActive("/verify") ? "white" : undefined}
+          >
             Verify
           </Link>
-          <Link href="/dashboard" _hover={{ color: "white", textDecoration: "none" }} color={isActive('/dashboard') ? 'white' : undefined}>
+          <Link
+            href="/dashboard"
+            _hover={{ color: "white", textDecoration: "none" }}
+            color={isActive("/dashboard") ? "white" : undefined}
+          >
             Dashboard
           </Link>
         </Flex>
@@ -95,8 +119,13 @@ export default function Header() {
         <DrawerContent bg="#171717" color="white">
           <DrawerHeader>
             <Flex align="center" gap={3}>
-              <Image src="/static/images/DootWhite.png" alt="Doot" h={6} w="auto" />
-              <Box fontWeight={700}>Doot</Box>
+              <Image
+                src="/static/images/DootWhite.png"
+                alt="Doot"
+                h={6}
+                w="auto"
+              />
+              {/* <Box fontWeight={700}>Doot</Box> */}
               <Spacer />
               <DrawerCloseButton position="static" />
             </Flex>
@@ -104,30 +133,116 @@ export default function Header() {
           <Divider borderColor="#2a2a2a" />
           <DrawerBody>
             <VStack align="flex-start" spacing={2}>
-              <Box fontSize="sm" color="#9a9a9a" px={2} pb={1} textTransform="uppercase" letterSpacing="0.08em">
+              <Box
+                fontSize="sm"
+                color="#9a9a9a"
+                px={2}
+                pb={1}
+                textTransform="uppercase"
+                letterSpacing="0.08em"
+              >
                 Navigation
               </Box>
-              <Link href="/feeds" onClick={onClose} w="100%">
-                <Flex align="center" gap={3} px={2} py={2} borderLeft={isActive('/feeds') ? '3px solid #6B1BFF' : '3px solid transparent'} _hover={{ bg: '#1f1f1f' }}>
-                  <FiTrendingUp />
-                  <Box as="span" color={isActive('/feeds') ? '#FFFFFF' : '#BFBFBF'}>Feeds</Box>
-                </Flex>
-              </Link>
-              <Link href="/verify" onClick={onClose} w="100%">
-                <Flex align="center" gap={3} px={2} py={2} borderLeft={isActive('/verify') ? '3px solid #6B1BFF' : '3px solid transparent'} _hover={{ bg: '#1f1f1f' }}>
-                  <FiCheckCircle />
-                  <Box as="span" color={isActive('/verify') ? '#FFFFFF' : '#BFBFBF'}>Verify</Box>
-                </Flex>
-              </Link>
-              <Link href="/dashboard" onClick={onClose} w="100%">
-                <Flex align="center" gap={3} px={2} py={2} borderLeft={isActive('/dashboard') ? '3px solid #6B1BFF' : '3px solid transparent'} _hover={{ bg: '#1f1f1f' }}>
-                  <FiGrid />
-                  <Box as="span" color={isActive('/dashboard') ? '#FFFFFF' : '#BFBFBF'}>Dashboard</Box>
+              <Link href="/" onClick={onClose} w="100%">
+                <Flex
+                  align="center"
+                  gap={3}
+                  px={2}
+                  py={2}
+                  borderLeft={
+                    isActive("/")
+                      ? "3px solid #6B1BFF"
+                      : "3px solid transparent"
+                  }
+                  _hover={{ bg: "#1f1f1f" }}
+                >
+                  <FiHome />
+                  <Box as="span" color={isActive("/") ? "#FFFFFF" : "#BFBFBF"}>
+                    Home
+                  </Box>
                 </Flex>
               </Link>
               <Divider borderColor="#2a2a2a" />
-              <Link href="https://docs.doot.foundation/" target="_blank" onClick={onClose} w="100%">
-                <Flex align="center" gap={3} px={2} py={2} _hover={{ bg: '#1f1f1f' }}>
+              <Link href="/feeds" onClick={onClose} w="100%">
+                <Flex
+                  align="center"
+                  gap={3}
+                  px={2}
+                  py={2}
+                  borderLeft={
+                    isActive("/feeds")
+                      ? "3px solid #6B1BFF"
+                      : "3px solid transparent"
+                  }
+                  _hover={{ bg: "#1f1f1f" }}
+                >
+                  <FiTrendingUp />
+                  <Box
+                    as="span"
+                    color={isActive("/feeds") ? "#FFFFFF" : "#BFBFBF"}
+                  >
+                    Feeds
+                  </Box>
+                </Flex>
+              </Link>
+              <Link href="/verify" onClick={onClose} w="100%">
+                <Flex
+                  align="center"
+                  gap={3}
+                  px={2}
+                  py={2}
+                  borderLeft={
+                    isActive("/verify")
+                      ? "3px solid #6B1BFF"
+                      : "3px solid transparent"
+                  }
+                  _hover={{ bg: "#1f1f1f" }}
+                >
+                  <FiCheckCircle />
+                  <Box
+                    as="span"
+                    color={isActive("/verify") ? "#FFFFFF" : "#BFBFBF"}
+                  >
+                    Verify
+                  </Box>
+                </Flex>
+              </Link>
+              <Link href="/dashboard" onClick={onClose} w="100%">
+                <Flex
+                  align="center"
+                  gap={3}
+                  px={2}
+                  py={2}
+                  borderLeft={
+                    isActive("/dashboard")
+                      ? "3px solid #6B1BFF"
+                      : "3px solid transparent"
+                  }
+                  _hover={{ bg: "#1f1f1f" }}
+                >
+                  <FiGrid />
+                  <Box
+                    as="span"
+                    color={isActive("/dashboard") ? "#FFFFFF" : "#BFBFBF"}
+                  >
+                    Dashboard
+                  </Box>
+                </Flex>
+              </Link>
+              <Divider borderColor="#2a2a2a" />
+              <Link
+                href="https://docs.doot.foundation/"
+                target="_blank"
+                onClick={onClose}
+                w="100%"
+              >
+                <Flex
+                  align="center"
+                  gap={3}
+                  px={2}
+                  py={2}
+                  _hover={{ bg: "#1f1f1f" }}
+                >
                   <FiBook />
                   <Box as="span">Docs</Box>
                 </Flex>
