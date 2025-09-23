@@ -1,8 +1,5 @@
-const { redis } = require("../../../../utils/helper/init/InitRedis");
-const {
-  TOKEN_TO_CACHE,
-  TOKEN_TO_SYMBOL,
-} = require("../../../../utils/constants/info");
+const { redis } = require("@/utils/helper/init/InitRedis");
+const { TOKEN_TO_CACHE, TOKEN_TO_SYMBOL } = require("@/utils/constants/info");
 
 const KEY = process.env.NEXT_PUBLIC_API_INTERFACE_KEY;
 
@@ -22,6 +19,7 @@ export default async function handler(req, res) {
       return res.status(401).json("Unauthorized.");
     }
 
+    /// Instead of this, return data from historical.
     const cachedData = await redis.get(TOKEN_TO_CACHE[token]);
 
     if (cachedData) {

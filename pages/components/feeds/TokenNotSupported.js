@@ -19,19 +19,20 @@ export default function TokenNotSupported({ token }) {
 
   return (
     <>
-      <Modal isOpen={isOpen} onClose={onClose} isCentered size={"xl"}>
+      <Modal isOpen={isOpen} onClose={onClose} isCentered>
         <ModalOverlay bg="rgba(0, 0, 0, 0.9)" />
         <ModalContent
+          maxW={{ base: "90%", md: "xl" }}
           color={"white"}
           bg="linear-gradient(180deg, rgba(42,0,82,1) 0%, rgba(71,30,127,1) 50%, rgba(83,0,188,1) 100%)"
         >
-          <ModalHeader fontSize={80} fontFamily={"Montserrat Variable"}>
+          <ModalHeader fontSize={{ base: 36, md: 56, lg: 72 }} fontFamily={"Montserrat Variable"}>
             Oops!
           </ModalHeader>
-          <ModalBody p={5}>
+          <ModalBody p={{ base: 4, md: 5 }}>
             <Text fontWeight={600}>
               It Looks Like We Are Not Tracking{" "}
-              <span style={{ color: "orange" }}>'{token}'</span>
+              <span style={{ color: "orange" }}>&apos;{token}&apos;</span>
               Just Yet :(
             </Text>
             <br />

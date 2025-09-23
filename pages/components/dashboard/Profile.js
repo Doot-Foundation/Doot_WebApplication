@@ -101,26 +101,31 @@ export default function Profile({ info = {} }) {
     <>
       <Flex
         direction={"column"}
-        p={20}
-        pt={11}
+        p={{ base: 6, md: 10, lg: 20 }}
+        pt={{ base: 6, md: 11 }}
         textAlign={"left"}
-        gap={10}
-        w={1300}
+        gap={{ base: 6, md: 10 }}
+        maxW={1300}
+        w={"100%"}
         m={"0 auto"}
       >
         <Heading fontFamily={"Montserrat Variable"}>User Dashboard</Heading>
         <Flex
           backgroundColor="white"
-          p={20}
-          pt={16}
-          pl={16}
+          p={{ base: 6, md: 10, lg: 20 }}
+          pt={{ base: 6, md: 16 }}
+          pl={{ base: 6, md: 16 }}
           borderRadius="14px"
           align="left"
           direction="column"
-          gap={16}
+          gap={{ base: 8, md: 16 }}
         >
           <Flex color="black" direction="column" gap={3}>
-            <Heading fontFamily="Poppins" fontSize="26px" fontWeight="600">
+            <Heading
+              fontFamily="Poppins"
+              fontSize={{ base: "20px", md: "24px", lg: "26px" }}
+              fontWeight="600"
+            >
               API Usage Volume
             </Heading>
             <Text fontFamily="Montserrat Variable">
@@ -131,9 +136,9 @@ export default function Profile({ info = {} }) {
           <GradientLineChart calls={calls} />
         </Flex>
         <Flex
-          gap={5}
+          gap={{ base: 4, md: 5 }}
           backgroundColor="white"
-          p={16}
+          p={{ base: 6, md: 12, lg: 16 }}
           borderRadius={14}
           color="black"
           direction="column"
@@ -141,8 +146,11 @@ export default function Profile({ info = {} }) {
           <Heading fontSize={26} mb={5} fontFamily="Montserrat Variable">
             Keys
           </Heading>
-          <Flex>
-            <Flex direction="column" w="20%" gap={7}>
+          <Flex
+            direction={{ base: "column", md: "row" }}
+            gap={{ base: 6, md: 0 }}
+          >
+            <Flex direction="column" w={{ base: "100%", md: "20%" }} gap={7}>
               <Flex gap={2}>
                 <TfiUser size={25} />
                 <Text ml={"10px"}>Public Key</Text>
@@ -154,10 +162,10 @@ export default function Profile({ info = {} }) {
                 </Text>
               </Flex>
             </Flex>
-            <Flex direction="column" w="80%" gap={5}>
+            <Flex direction="column" w={{ base: "100%", md: "80%" }} gap={5}>
               <Text>{publicKey}</Text>
 
-              <Flex align="center">
+              <Flex align="center" gap={{ base: 4, md: 0 }}>
                 {api ? (
                   <>
                     <Tooltip label={api} placement="top">
@@ -166,28 +174,41 @@ export default function Profile({ info = {} }) {
                         cursor="pointer"
                         letterSpacing="1px"
                         fontWeight="500"
+                        flex="1"
                       >
-                        {api
-                          ? api.slice(0, 6) + " ..... " + api.slice(-6)
-                          : null}
+                        <Text display={{ base: "block", md: "none" }}>
+                          {api
+                            ? api.slice(0, 2) + " ..... " + api.slice(-2)
+                            : null}
+                        </Text>
+                        <Text display={{ base: "none", md: "inline" }}>
+                          {api
+                            ? api.slice(0, 6) + "....." + api.slice(-6)
+                            : null}
+                        </Text>
                       </Text>
                     </Tooltip>
                   </>
                 ) : null}
 
-                <Spacer />
-                <Text>{formatDate(timestamp)}</Text>
-                <Spacer />
-                {api ? <Text>Active</Text> : <Text>NA</Text>}
-                <Spacer />
+                <Spacer display={{ base: "none", md: "block" }} />
+                <Text display={{ base: "none", md: "block" }}>
+                  {formatDate(timestamp)}
+                </Text>
+                <Spacer display={{ base: "none", md: "block" }} />
+                <Text display={{ base: "none", md: "block" }}>
+                  {api ? "Active" : "NA"}
+                </Text>
+                <Spacer display={{ base: "none", md: "block" }} />
                 <Flex
-                  width="150px"
-                  height="48px"
+                  width={{ base: "120px", md: "150px" }}
+                  height={{ base: "40px", md: "48px" }}
                   p={0}
                   justify="center"
                   align="center"
                   borderRadius="12px"
                   background="linear-gradient(93.59deg, #00EAB1 -14.32%, rgba(23, 190, 194, 0.91) 12.24%, rgba(39, 158, 206, 0.65) 35.82%, rgba(61, 116, 221, 0.61) 58.92%, rgba(81, 77, 236, 0.43) 83.94%, #6B1BFF 107.82%)"
+                  flexShrink={0}
                 >
                   <Button
                     w="95%"
@@ -195,6 +216,7 @@ export default function Profile({ info = {} }) {
                     borderRadius="8px"
                     background="white"
                     fontWeight={400}
+                    fontSize={{ base: "sm", md: "md" }}
                     onClick={handleUpdateAPI}
                     _hover={{}}
                     _active={{

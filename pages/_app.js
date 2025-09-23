@@ -20,11 +20,14 @@ export default function App({ Component, pageProps }) {
   const theme = extendTheme({
     styles: {
       global: {
-        body: {
+        'html, body': {
           bg: "#171717",
           color: "white",
           fontFamily: "'Poppins', sans-serif",
+          overflowX: 'hidden',
+          width: '100%'
         },
+        '#__next': { overflowX: 'hidden', width: '100%' }
       },
     },
   });
@@ -34,12 +37,13 @@ export default function App({ Component, pageProps }) {
       <Provider store={store}>
         <Head>
           <title>Doot</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
         </Head>
         <ChakraProvider theme={theme}>
           <Header />
           <Component {...pageProps} />
-          <Analytics />
         </ChakraProvider>
+        <Analytics />
       </Provider>
     </>
   );

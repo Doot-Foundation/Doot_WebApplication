@@ -1,15 +1,10 @@
+const DOOT_CALLER_KEY = process.env.DOOT_CALLER_KEY;
+
 const axios = require("axios");
 const _ = require("lodash");
-
-const DEPLOYER_KEY = process.env.DEPLOYER_KEY;
-
-const {
-  signatureClient,
-  testnetSignatureClient,
-} = require("./SignatureClient");
 const { CircuitString } = require("o1js");
-
-const { MULTIPLICATION_FACTOR } = require("../constants/info");
+const { testnetSignatureClient } = require("./init/InitSignatureClient");
+const { MULTIPLICATION_FACTOR } = require("@/utils/constants/info");
 
 /// MULTIPLY BY 10 AND DROP THE DECIMALS
 function processFloatString(input) {
@@ -32,9 +27,12 @@ function getTimestamp(data) {
 }
 
 async function callSignAPICall(url, resultPath, headerName) {
-  var API_KEY =
+  // Resolve provider API keys based on header name (supports Messari)
+  let API_KEY =
     headerName == "X-CMC_PRO_API_KEY"
       ? process.env.CMC_KEY
+      : headerName == "x-messari-api-key"
+      ? process.env.MESSARI_KEY || process.env.MESSARI_API_KEY
       : headerName == "X-CoinAPI-Key"
       ? process.env.COIN_API_KEY
       : headerName == "x-access-token"
@@ -42,18 +40,28 @@ async function callSignAPICall(url, resultPath, headerName) {
       : headerName == "x-api-key"
       ? process.env.SWAP_ZONE_KEY
       : "";
-  API_KEY = API_KEY.replace(/^'(.*)'$/, "$1");
 
-  var header = { [headerName]: API_KEY };
+  if (typeof API_KEY === "string") {
+    API_KEY = API_KEY.replace(/^'(.*)'$/, "$1");
+  } else {
+    API_KEY = "";
+  }
 
-  const response =
-    headerName !== ""
-      ? await axios.get(url, {
-          headers: header,
-        })
-      : await axios.get(url);
+  let header = headerName ? { [headerName]: API_KEY } : undefined;
+  let response;
 
-  header = null;
+  if (url.toLowerCase().includes("coingecko")) {
+    if (url.toLowerCase().includes("mina")) {
+      response = await axios.get(url, { timeout: 15000 });
+    } else {
+      throw new Error("Specific for Mina.");
+    }
+  } else {
+    response = header
+      ? await axios.get(url, { headers: header, timeout: 15000 })
+      : await axios.get(url, { timeout: 15000 });
+  }
+  // no need to mutate header further; allow GC to clean up
 
   const price = _.get(response, resultPath);
   var Price;
@@ -68,7 +76,7 @@ async function callSignAPICall(url, resultPath, headerName) {
 
   const signature = testnetSignatureClient.signFields(
     [fieldURL, fieldPrice, fieldDecimals, fieldTimestamp],
-    DEPLOYER_KEY
+    DOOT_CALLER_KEY
   );
 
   // USED SINCE UNABLE TO TRANSFER BIGINT OVER REST API CALLS.

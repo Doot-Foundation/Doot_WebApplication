@@ -5,7 +5,8 @@ export default function BackgroundImageComponent({ children, imageURL }) {
     <>
       <Flex position={"relative"} h={"fit-content"} direction={"column"}>
         <Box
-          h={500}
+          h={{ base: 320, md: 500 }}
+          w={"100%"}
           position={"absolute"}
           top={0}
           left={0}
@@ -16,7 +17,8 @@ export default function BackgroundImageComponent({ children, imageURL }) {
           bgRepeat={"no-repeat"}
         />
         <Box
-          h={500}
+          h={{ base: 320, md: 500 }}
+          w={"100%"}
           zIndex={-1}
           direction={"column"}
           position={"absolute"}

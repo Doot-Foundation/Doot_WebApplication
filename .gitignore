@@ -4,6 +4,9 @@
 .next
 .turbo
 
+dump/
+additional/
+
 # dependencies
 /node_modules
 /.pnp
@@ -37,3 +40,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+contracts_README.md

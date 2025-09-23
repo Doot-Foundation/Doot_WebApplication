@@ -1,4 +1,4 @@
-import { ComposedChart, Area, XAxis, YAxis, Tooltip } from "recharts";
+import { ComposedChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 
 export default function GradientLineChart({ calls = {} }) {
   function transformJsonToArray(json) {
@@ -34,9 +34,8 @@ export default function GradientLineChart({ calls = {} }) {
 
   return (
     <>
+      <ResponsiveContainer width="100%" height={300}>
       <ComposedChart
-        width={940}
-        height={300}
         data={data}
         margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
       >
@@ -76,6 +75,7 @@ export default function GradientLineChart({ calls = {} }) {
           activeDot={{ r: 10 }}
         />
       </ComposedChart>
+      </ResponsiveContainer>
     </>
   );
 }

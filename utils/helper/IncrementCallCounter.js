@@ -1,13 +1,27 @@
+/**
+ * Increments the call counter for the current month
+ * @param {Object} obj - Object containing monthly counters
+ * @returns {Object} Updated counter object
+ */
 async function incrementCallCounter(obj) {
-  const now = new Date();
-  const currentMonth = now.getMonth();
+  try {
+    // Get current month index once
+    const currentMonth = new Date().getMonth();
 
-  const months = Object.keys(obj);
-  const toIncrement = months[currentMonth];
+    // Get month key directly without creating array
+    const monthKey = Object.keys(obj)[currentMonth];
 
-  obj[toIncrement]++;
+    // Increment counter
+    obj[monthKey]++;
 
-  return obj;
+    return obj;
+  } catch (error) {
+    console.error(
+      "Error incrementing counter:",
+      error.message || "Unknown error"
+    );
+    throw error;
+  }
 }
 
 module.exports = incrementCallCounter;

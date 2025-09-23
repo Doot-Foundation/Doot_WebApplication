@@ -1,4 +1,4 @@
-const { supabase } = require("../../../../utils/helper/init/InitSupabase.js");
+const { supabaseService } = require("@/utils/helper/init/InitSupabase.js");
 
 const uuid = require("uuid");
 const uuidv4 = uuid.v4;
@@ -19,16 +19,9 @@ export default async function handler(req, res) {
     const key = userInformation.key;
     console.log(publicKey, "called reset with original key :", key);
 
-    const MAIL = process.env.SUPABASE_USER;
-    const PASS = process.env.SUPABASE_USER_PASS;
 
-    await supabase.auth.signInWithPassword({
-      email: MAIL,
-      password: PASS,
-    });
-
-    const { data: select_data, error: select_error } = await supabase
-      .from("Auro_Login")
+    const { data: select_data, error: select_error } = await supabaseService
+      .from("login")
       .select("generated_key, address")
       .eq("generated_key", key);
 
@@ -41,12 +34,11 @@ export default async function handler(req, res) {
     }
 
     const updatedKey = uuidv4();
-    const { data, error } = await supabase
-      .from("Auro_Login")
+    const { data, error } = await supabaseService
+      .from("login")
       .update({ generated_key: updatedKey })
       .eq("generated_key", key);
 
-    await supabase.auth.signOut();
 
     return res.status(200).json({
       status: true,

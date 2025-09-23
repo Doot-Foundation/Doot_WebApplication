@@ -1,22 +1,16 @@
-const { redis } = require("../../../utils/helper/init/InitRedis.js");
+const { redis } = require("@/utils/helper/init/InitRedis.js");
 
 const {
   TOKEN_TO_CACHE,
-  TOKEN_TO_SIGNED_SLOT,
   TOKEN_TO_GRAPH_DATA,
+  TOKEN_TO_AGGREGATION_PROOF_CACHE,
   HISTORICAL_CID_CACHE,
-  HISTORICAL_MAX_SIGNED_SLOT_CACHE,
   MINA_CID_CACHE,
-  MINA_MAX_SIGNED_SLOT_CACHE,
-} = require("../../../utils/constants/info.js");
+} = require("@/utils/constants/info.js");
 
-const pinHistoricalObject = require("../../../utils/helper/PinHistorical.js");
-
-const pinMinaObject = require("../../../utils/helper/PinMinaObject.ts");
-
-const getPriceOf = require("../../../utils/helper/GetPriceOf.js");
-
-const appendSignatureToSlot = require("../../../utils/helper/AppendSignatureToSlot.js");
+const pinHistoricalObject = require("@/utils/helper/PinHistorical.js");
+const pinMinaObject = require("@/utils/helper/PinMinaObject.js");
+const getPriceOf = require("@/utils/helper/GetPriceOf.js");
 
 async function PriceOf(key) {
   return new Promise((resolve) => {
@@ -25,108 +19,197 @@ async function PriceOf(key) {
   });
 }
 
-async function resetTokenCache(keys) {
-  for (const key of keys) {
-    console.log(key);
-    const results = await PriceOf(key);
+// Step 1: Clear ALL existing cache keys
+async function clearAllCaches() {
+  console.log("🧹 CLEARING ALL EXISTING CACHE KEYS...");
 
-    await redis.set(TOKEN_TO_CACHE[key], results[1]);
-    await redis.set(TOKEN_TO_SIGNED_SLOT[key], "NULL");
-  }
-}
+  const tokenKeys = Object.keys(TOKEN_TO_CACHE);
 
-async function resetHistoricalCache(keys) {
-  var finalObject = {};
+  // Clear all cache types for all tokens
+  for (const tokenKey of tokenKeys) {
+    // Clear price cache
+    await redis.del(TOKEN_TO_CACHE[tokenKey]);
+    console.log(`  ✅ Cleared price cache: ${TOKEN_TO_CACHE[tokenKey]}`);
 
-  for (const key of keys) {
-    const CACHED_DATA = await redis.get(TOKEN_TO_CACHE[key]);
-    finalObject[key] = CACHED_DATA;
-  }
+    // Clear graph cache
+    await redis.del(TOKEN_TO_GRAPH_DATA[tokenKey]);
+    console.log(`  ✅ Cleared graph cache: ${TOKEN_TO_GRAPH_DATA[tokenKey]}`);
 
-  const updatedCID = await pinHistoricalObject("NULL", finalObject);
-  await redis.set(HISTORICAL_CID_CACHE, updatedCID);
-}
-
-async function resetHistoricalSignedCache(keys) {
-  var finalObj = {};
-
-  for (const key of keys) {
-    finalObj[key] = { community: {} };
-  }
-  await redis.set(HISTORICAL_MAX_SIGNED_SLOT_CACHE, finalObj);
-}
-
-async function resetMinaCache(keys) {
-  const finalObj = {};
-
-  for (const key of keys) {
-    const CACHED_DATA = await redis.get(TOKEN_TO_CACHE[key]);
-    finalObj[key] = CACHED_DATA;
+    // Clear aggregation proof cache
+    await redis.del(TOKEN_TO_AGGREGATION_PROOF_CACHE[tokenKey]);
+    console.log(`  ✅ Cleared aggregation cache: ${TOKEN_TO_AGGREGATION_PROOF_CACHE[tokenKey]}`);
   }
 
-  const updatedCID = await pinMinaObject(finalObj, "NULL");
-  await redis.set(MINA_CID_CACHE, updatedCID);
+  // Clear IPFS CID caches
+  await redis.del(HISTORICAL_CID_CACHE);
+  console.log(`  ✅ Cleared historical CID cache: ${HISTORICAL_CID_CACHE}`);
+
+  await redis.del(MINA_CID_CACHE);
+  console.log(`  ✅ Cleared Mina CID cache: ${MINA_CID_CACHE}`);
+
+  console.log("🧹 ALL CACHES CLEARED!\n");
 }
 
-async function resetMinaSignedCache(keys) {
-  var finalObj = {};
+// Step 2: Initialize price caches with fresh data
+async function initializeTokenCaches(keys) {
+  console.log("💰 INITIALIZING PRICE CACHES...");
 
   for (const key of keys) {
-    finalObj[key] = { community: {} };
+    try {
+      console.log(`  📊 Fetching fresh prices for: ${key}`);
+      const results = await PriceOf(key);
+
+      // results[1] is the complete assetCacheObject from GetPriceOf
+      await redis.set(TOKEN_TO_CACHE[key], results[1]);
+      console.log(`  ✅ Initialized price cache: ${TOKEN_TO_CACHE[key]}`);
+    } catch (error) {
+      console.error(`  ❌ Failed to initialize ${key}:`, error.message);
+      // Continue with other tokens even if one fails
+    }
   }
 
-  await redis.set(MINA_MAX_SIGNED_SLOT_CACHE, finalObj);
+  console.log("💰 PRICE CACHES INITIALIZED!\n");
 }
 
-async function resetSlots(keys) {
-  const DEPLOYER_PUBLIC_KEY = process.env.NEXT_PUBLIC_DEPLOYER_PUBLIC_KEY;
+// Step 3: Initialize graph caches with empty but valid structure
+async function initializeGraphCaches(keys) {
+  console.log("📈 INITIALIZING GRAPH CACHES...");
 
   for (const key of keys) {
-    const CACHED_DATA = await redis.get(TOKEN_TO_CACHE[key]);
-
-    await appendSignatureToSlot(
-      key,
-      CACHED_DATA,
-      CACHED_DATA.signature,
-      DEPLOYER_PUBLIC_KEY
-    );
-  }
-}
-
-async function resetGraphCache(keys) {
-  for (const key of keys) {
-    await redis.set(TOKEN_TO_GRAPH_DATA[key], {
+    const emptyGraphData = {
       graph_data: [],
-      max_price: 0,
       min_price: 0,
+      max_price: 0,
       percentage_change: "0",
-    });
+    };
 
-    console.log("Added graph slot for", key);
+    await redis.set(TOKEN_TO_GRAPH_DATA[key], emptyGraphData);
+    console.log(`  ✅ Initialized graph cache: ${TOKEN_TO_GRAPH_DATA[key]}`);
   }
+
+  console.log("📈 GRAPH CACHES INITIALIZED!\n");
+}
+
+// Step 4: Initialize aggregation proof caches with default structure
+async function initializeAggregationCaches(keys) {
+  console.log("🔐 INITIALIZING AGGREGATION PROOF CACHES...");
+
+  for (const key of keys) {
+    const defaultProofStructure = {
+      publicInput: [],
+      publicOutput: [],
+      maxProofsVerified: 0,
+      proof: "",
+    };
+
+    await redis.set(TOKEN_TO_AGGREGATION_PROOF_CACHE[key], defaultProofStructure);
+    console.log(`  ✅ Initialized aggregation cache: ${TOKEN_TO_AGGREGATION_PROOF_CACHE[key]}`);
+  }
+
+  console.log("🔐 AGGREGATION PROOF CACHES INITIALIZED!\n");
+}
+
+// Step 5: Initialize IPFS caches with fresh data
+async function initializeIPFSCaches(keys) {
+  console.log("🌐 INITIALIZING IPFS CACHES...");
+
+  try {
+    // Prepare data object for IPFS pinning
+    const ipfsDataObject = {};
+
+    for (const key of keys) {
+      const cachedData = await redis.get(TOKEN_TO_CACHE[key]);
+      if (cachedData) {
+        ipfsDataObject[key] = cachedData;
+      }
+    }
+
+    // Initialize historical IPFS with fresh data
+    console.log("  📚 Creating fresh historical IPFS data...");
+    const historicalCID = await pinHistoricalObject("NULL", ipfsDataObject);
+    await redis.set(HISTORICAL_CID_CACHE, historicalCID);
+    console.log(`  ✅ Initialized historical CID: ${historicalCID}`);
+
+    // Initialize Mina IPFS with fresh data
+    console.log("  ⛓️  Creating fresh Mina IPFS data...");
+    console.log("  🔍 pinMinaObject type:", typeof pinMinaObject);
+    console.log("  🔍 ipfsDataObject keys:", Object.keys(ipfsDataObject));
+    console.log("  🔍 Sample data:", JSON.stringify(ipfsDataObject.mina?.price || "NO MINA DATA"));
+
+    const minaResult = await pinMinaObject(ipfsDataObject, "NULL");
+    // minaResult returns [ipfsHash, commitment]
+    await redis.set(MINA_CID_CACHE, minaResult);
+    console.log(`  ✅ Initialized Mina CID: ${minaResult[0]}, Commitment: ${minaResult[1]}`);
+
+  } catch (error) {
+    console.error("  ❌ Failed to initialize IPFS caches:", error.message);
+    throw error;
+  }
+
+  console.log("🌐 IPFS CACHES INITIALIZED!\n");
 }
 
 export default async function handler(req, res) {
-  const authHeader = req.headers.authorization;
+  let responseAlreadySent = false;
 
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    res.status(401).json("Unauthorized");
-    return;
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+      return res.status(401).json("Unauthorized");
+    }
+
+    const keys = Object.keys(TOKEN_TO_CACHE);
+    console.log("\n🚀 =============== COMPLETE CACHE RESET & INITIALIZATION =============== 🚀\n");
+
+    // Step 1: Clear all existing caches
+    await clearAllCaches();
+
+    // Step 2: Initialize price caches with fresh data
+    await initializeTokenCaches(keys);
+
+    // Step 3: Initialize graph caches with empty valid structure
+    await initializeGraphCaches(keys);
+
+    // Step 4: Initialize aggregation proof caches
+    await initializeAggregationCaches(keys);
+
+    // Step 5: Initialize IPFS caches with fresh pinned data
+    await initializeIPFSCaches(keys);
+
+    console.log("🎉 =============== CACHE RESET COMPLETED SUCCESSFULLY! =============== 🎉\n");
+    console.log("📋 SUMMARY:");
+    console.log(`   • Price Caches: ${Object.keys(TOKEN_TO_CACHE).length} tokens initialized`);
+    console.log(`   • Graph Caches: ${Object.keys(TOKEN_TO_GRAPH_DATA).length} tokens initialized`);
+    console.log(`   • Aggregation Caches: ${Object.keys(TOKEN_TO_AGGREGATION_PROOF_CACHE).length} tokens initialized`);
+    console.log(`   • IPFS Caches: 2 CID caches (historical + mina) initialized`);
+    console.log(`   • Total Cache Keys Managed: ${Object.keys(TOKEN_TO_CACHE).length * 3 + 2}`);
+    console.log("\n✅ System is ready for normal cron operations!");
+
+    if (!responseAlreadySent) {
+      responseAlreadySent = true;
+      return res.status(200).json({
+        status: true,
+        message: "Complete cache reset and initialization successful!",
+        data: {
+          tokensInitialized: Object.keys(TOKEN_TO_CACHE).length,
+          cacheTypesInitialized: ["prices", "graphs", "aggregation_proofs", "ipfs_cids"],
+          totalCacheKeys: Object.keys(TOKEN_TO_CACHE).length * 3 + 2,
+          readyForCrons: true,
+        },
+      });
+    }
+  } catch (error) {
+    console.error("❌ CACHE RESET FAILED:", error.message || "Unknown error");
+    console.error("Stack trace:", error.stack);
+
+    if (!responseAlreadySent) {
+      responseAlreadySent = true;
+      return res.status(500).json({
+        status: false,
+        message: "Cache reset failed",
+        error: error.message || "Internal Server Error",
+      });
+    }
   }
-
-  const keys = Object.keys(TOKEN_TO_CACHE);
-  console.log("\n=============== INIT RESET JOB!! ===============\n");
-
-  await resetTokenCache(keys);
-  await resetHistoricalCache(keys);
-  await resetHistoricalSignedCache(keys);
-  await resetMinaCache(keys);
-  await resetMinaSignedCache(keys);
-  await resetSlots(keys);
-  await resetGraphCache(keys);
-
-  // AFTER ALL IS DONE YOU NEED TO CALL UPDATE HISTORICAL TO POPULATE THE HISTORICAL.HISTORICAL
-  console.log("\n=============== FINISHED JOB!! ===============\n");
-
-  return res.status(200).json("Init Cache!");
 }
