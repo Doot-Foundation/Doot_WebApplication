@@ -32,7 +32,7 @@ export default function TokenNotSupported({ token }) {
           <ModalBody p={{ base: 4, md: 5 }}>
             <Text fontWeight={600}>
               It Looks Like We Are Not Tracking{" "}
-              <span style={{ color: "orange" }}>'{token}'</span>
+              <span style={{ color: "orange" }}>&apos;{token}&apos;</span>
               Just Yet :(
             </Text>
             <br />

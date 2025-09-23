@@ -128,8 +128,8 @@ export default function DashboardHero() {
             textShadow="2px 2px 4px rgba(0, 0, 0, 0.3)"
             fontSize={{ base: "16px", md: "20px" }}
           >
-            It seems you're new here! <br />
-            We're excited to guide you through your journey with Doot for the
+            It seems you&apos;re new here! <br />
+            We&apos;re excited to guide you through your journey with Doot for the
             Mina Protocol.
           </ModalBody>
           <ModalFooter>

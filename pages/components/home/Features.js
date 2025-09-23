@@ -33,7 +33,7 @@ export default function Features() {
             mt={6}
             mx={{ base: 4, md: 6, lg: 8 }}
           >
-            Fulfill your zkApp's data feed requirements with a focus on
+            Fulfill your zkApp&apos;s data feed requirements with a focus on
             transparent, accurate, precise and provable nature right out of the
             box.
           </Heading>
@@ -297,7 +297,7 @@ export default function Features() {
               for much more exciting features and improvements!
             </Heading>
             <Text fontWeight={"400"} fontSize={{ base: "16px", md: "20px", lg: "34px" }} align="center">
-              We're dedicated to streamlining the developer experience for
+              We&apos;re dedicated to streamlining the developer experience for
               integrating Oracles on the Mina Protocol, allowing them to focus
               on their zkApps and let us take care of their data feed needs.
               Look forward to much exciting enhancements and features coming

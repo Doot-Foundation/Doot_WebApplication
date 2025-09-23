@@ -29,7 +29,7 @@ export default function WalletError({ isOpen, onClose }) {
             Oops!
           </ModalHeader>
           <ModalBody>
-            <Text>It Looks Like You Don't Have Auro Wallet :(</Text>
+            <Text>It Looks Like You Don&apos;t Have Auro Wallet :(</Text>
             <br />
             <Text>
               As of now, we only support Auro Wallet. If you wish to use our

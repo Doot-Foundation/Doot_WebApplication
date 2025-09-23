@@ -140,8 +140,8 @@ export default function VerifyHero() {
             wordBreak="break-word"
             whiteSpace="normal"
           >
-            Securely verify the origins of the information you've provided. By
-            using these forms, we can confirm whether the data you've submitted
+            Securely verify the origins of the information you&apos;ve provided. By
+            using these forms, we can confirm whether the data you&apos;ve submitted
             has been signed with our private keys, ensuring its integrity and
             authenticity.
           </Text>

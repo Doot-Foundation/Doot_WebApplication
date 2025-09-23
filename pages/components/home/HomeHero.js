@@ -569,7 +569,7 @@ export default function HomeHero() {
             <b>
               <i>BIG THING&#9889; </i>
             </b>
-            on the Mina Protocol and we'll be there to support you through every
+            on the Mina Protocol and we&apos;ll be there to support you through every
             step.
           </Heading>
           <Flex

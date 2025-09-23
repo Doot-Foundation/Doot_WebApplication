@@ -53,15 +53,38 @@ async function generateGraphData(
       { minPrice: Infinity, maxPrice: -Infinity }
     );
 
-    // Get first historical price, falling back through available data
-    const firstHistoricalPrice = parseFloat(
+    // Get 24h ago price for percentage calculation
+    const currentTime = Date.now();
+    const twentyFourHoursAgo = currentTime - (24 * 60 * 60 * 1000); // 24h in milliseconds
+
+    // Find the price closest to 24h ago
+    let twentyFourHourPrice = null;
+    let closestTimeDiff = Infinity;
+
+    for (const item of combinedArray) {
+      if (item?.aggregationTimestamp && item?.price) {
+        // Handle both millisecond and second timestamps
+        const itemTimestamp = item.aggregationTimestamp > 1e12
+          ? item.aggregationTimestamp
+          : item.aggregationTimestamp * 1000;
+
+        const timeDiff = Math.abs(itemTimestamp - twentyFourHoursAgo);
+        if (timeDiff < closestTimeDiff) {
+          closestTimeDiff = timeDiff;
+          twentyFourHourPrice = parseFloat(item.price);
+        }
+      }
+    }
+
+    // Fallback to oldest available price if no 24h data found
+    const basePrice = twentyFourHourPrice || parseFloat(
       (historical_historical?.[0] || historical_latest?.[0] || latest[0]).price
     );
 
-    // Calculate immediate price and percentage change
+    // Calculate immediate price and percentage change vs 24h ago
     const immediatePrice = parseFloat(latest[0].price);
     const percentageChange =
-      ((immediatePrice - firstHistoricalPrice) / firstHistoricalPrice) * 100;
+      ((immediatePrice - basePrice) / basePrice) * 100;
     const formattedPercentageChange = `${
       percentageChange >= 0 ? "+" : ""
     }${percentageChange.toFixed(2)}%`;
