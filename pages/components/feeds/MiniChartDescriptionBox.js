@@ -7,11 +7,36 @@ export default function MiniChartDescriptionBox({
   graphMax,
   graphMin,
 }) {
+  // Filter data to last 24 hours only (same as MiniChart)
+  const filteredData = (() => {
+    if (!data || !Array.isArray(data)) return [];
+
+    const { filterDataByTimeWindow } = require("@/utils/helper/TimeWindowFilter");
+    return filterDataByTimeWindow(data, '24h', 0);
+  })();
+
+  // Calculate min/max for the filtered 24h data
+  const { min24h, max24h } = (() => {
+    if (!filteredData || filteredData.length === 0) {
+      return { min24h: graphMin, max24h: graphMax };
+    }
+
+    const prices = filteredData.map(item => Number(item.price)).filter(price => !isNaN(price));
+    if (prices.length === 0) {
+      return { min24h: graphMin, max24h: graphMax };
+    }
+
+    return {
+      min24h: Math.min(...prices),
+      max24h: Math.max(...prices)
+    };
+  })();
+
   return (
     <>
       <Flex ml="-10" w={{ base: '160px', md: '200px' }} h="50px">
         <ResponsiveContainer width="100%" height="100%">
-        <ComposedChart data={data} cursor="pointer">
+        <ComposedChart data={filteredData} cursor="pointer">
           <defs>
             <linearGradient id="gradientgreen" x1="0" y1="0" x2="0" y2="1">
               <stop offset="10%" stopColor="white" stopOpacity={0.2} />
@@ -26,7 +51,7 @@ export default function MiniChartDescriptionBox({
             dataKey="price"
             axisLine={false}
             tick={false}
-            domain={[graphMin, graphMax]} // Set the absolute limits
+            domain={[min24h, max24h]} // Set the 24h limits for better scaling
           />
           <Area
             type="monotone"

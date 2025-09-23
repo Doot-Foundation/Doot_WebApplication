@@ -15,6 +15,18 @@ export default function TokenPage() {
   const router = useRouter();
   const { token } = router.query;
 
+  // Don't render anything until router is ready and token is loaded
+  if (!router.isReady || !token) {
+    return (
+      <Box as="main" w="100%">
+        <FeedsLayout>
+          <div>Loading...</div>
+          <Footer />
+        </FeedsLayout>
+      </Box>
+    );
+  }
+
   const isSupportedToken = SUPPORTED_TOKENS.includes(token);
 
   return (

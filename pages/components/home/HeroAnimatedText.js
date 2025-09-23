@@ -26,6 +26,8 @@ export default function HeroAnimatedText() {
             "linear-gradient(91.65deg, #6B1BFF -5.86%, #D2B9FF 99.55%)",
           backgroundClip: "text",
           WebkitTextFillColor: "transparent",
+          minHeight: "1.2em",
+          lineHeight: "1.2",
         }}
       />
     </>

@@ -152,28 +152,44 @@ export default function HomeHero() {
           gap={{ base: 6, md: 8, lg: 7 }}
           align={"center"}
           px={{ base: 4, md: 8, lg: 0 }}
+          position="relative"
         >
+          <Image
+            alt="bg animation"
+            height="auto"
+            m="auto"
+            src={"/static/animation/dots.gif"}
+            zIndex={"-1"}
+            position={"absolute"}
+            top={{ md: "-275px", lg: "-212px" }}
+            left="50%"
+            transform="translateX(-50%)"
+            maxW={{ base: "180%", md: "160%", lg: "180%" }}
+            filter="brightness(50%)"
+            pointerEvents="none"
+            display={{ base: "none", md: "block" }}
+          />
           <Flex
-            position="relative"
             direction="column"
             align="center"
             justify="center"
             fontSize={{ base: "36px", md: "48px", lg: "70px" }}
             fontWeight={600}
           >
-            <Image
-              height="auto"
-              m="auto"
-              src={"/static/animation/dots.gif"}
-              zIndex={"-1"}
-              position={"absolute"}
-              maxW={{ base: "180%", md: "160%", lg: "180%" }}
-              filter="brightness(50%)"
-            />
-            <Box h={{ base: "72px", md: "96px", lg: "120px" }}>
+            <Box
+              h={{ base: "72px", md: "96px", lg: "120px" }}
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+            >
               <HeroAnimatedText />
             </Box>
-            <Flex direction="column" align="center" lineHeight={1.1}>
+            <Flex
+              direction="column"
+              align="center"
+              lineHeight={1.1}
+              mt={{ base: "5px", sm: "20px", md: 0 }}
+            >
               <Box
                 as="span"
                 fontSize={{ base: "28px", md: "36px", lg: "56px" }}
@@ -407,7 +423,9 @@ export default function HomeHero() {
                 </FormControl>
 
                 <Button
-                  backgroundColor={!asset || asset.trim() === "" ? "#4a5568" : "#00eab1"}
+                  backgroundColor={
+                    !asset || asset.trim() === "" ? "#4a5568" : "#00eab1"
+                  }
                   position={{ base: "static", md: "absolute" }}
                   bottom={{ base: undefined, md: 5 }}
                   mt={{ base: 4, md: 0 }}
@@ -415,7 +433,8 @@ export default function HomeHero() {
                   isDisabled={!asset || asset.trim() === ""}
                   fontFamily={"Source Code Pro Variable"}
                   _hover={{
-                    backgroundColor: !asset || asset.trim() === "" ? "#4a5568" : "#00c99aff",
+                    backgroundColor:
+                      !asset || asset.trim() === "" ? "#4a5568" : "#00c99aff",
                   }}
                   _disabled={{
                     backgroundColor: "#4a5568",
@@ -423,7 +442,7 @@ export default function HomeHero() {
                     cursor: "not-allowed",
                     _hover: {
                       backgroundColor: "#4a5568",
-                    }
+                    },
                   }}
                 >
                   RUN REQUEST
@@ -506,7 +525,7 @@ export default function HomeHero() {
                     </Flex>
                     <Flex
                       p={{ base: 4, md: 10 }}
-                      fontSize={{ base: "14px", md: "16px", lg: "20px" }}
+                      fontSize={{ base: "12px", md: "18px", lg: "18.5px" }}
                       fontFamily="Montserrat Variable"
                       fontWeight="500"
                       letterSpacing="1px"
@@ -569,8 +588,8 @@ export default function HomeHero() {
             <b>
               <i>BIG THING&#9889; </i>
             </b>
-            on the Mina Protocol and we&apos;ll be there to support you through every
-            step.
+            on the Mina Protocol and we&apos;ll be there to support you through
+            every step.
           </Heading>
           <Flex
             mt={{ base: 6, md: 8, lg: 10 }}
