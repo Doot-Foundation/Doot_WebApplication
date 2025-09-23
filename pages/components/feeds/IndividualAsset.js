@@ -243,7 +243,7 @@ export default function IndividualAsset({ token }) {
                     wrap="wrap"
                     display={{ base: "flex", md: "none" }}
                   >
-                    {["10m", "1h", "12h", "24h", "1m"].map((tf) => (
+                    {["10min", "1h", "12h", "24h", "1m"].map((tf) => (
                       <Box
                         key={tf}
                         as="button"
@@ -271,8 +271,8 @@ export default function IndividualAsset({ token }) {
                     display={{ base: "none", md: "flex" }}
                   >
                     {[
-                      "10m",
-                      "30m",
+                      "10min",
+                      "30min",
                       "1h",
                       "3h",
                       "6h",
@@ -313,42 +313,46 @@ export default function IndividualAsset({ token }) {
               graphMax &&
               graphMin &&
               (() => {
-                // filter by timeframe
-                const now = Date.now();
-                const ranges = {
-                  "10m": 10 * 60 * 1000,
-                  "30m": 30 * 60 * 1000,
-                  "1h": 60 * 60 * 1000,
-                  "3h": 3 * 60 * 60 * 1000,
-                  "6h": 6 * 60 * 60 * 1000,
-                  "12h": 12 * 60 * 60 * 1000,
-                  "24h": 24 * 60 * 60 * 1000,
-                  "7d": 7 * 24 * 60 * 60 * 1000,
-                  "15d": 15 * 24 * 60 * 60 * 1000,
-                  "1m": 30 * 24 * 60 * 60 * 1000,
-                  "3m": 90 * 24 * 60 * 60 * 1000,
-                  "6m": 180 * 24 * 60 * 60 * 1000,
-                };
-                const data =
-                  timeframe === "all"
-                    ? graphData
-                    : graphData.filter((p) => {
-                        const tsMs = Number(p.timestamp) * 1000;
-                        return (
-                          isFinite(tsMs) &&
-                          now - tsMs <= (ranges[timeframe] || ranges["24h"])
-                        );
-                      });
-                const ys = data.map((d) => d.price);
-                const localMin = ys.length ? Math.min(...ys) : graphMin;
-                const localMax = ys.length ? Math.max(...ys) : graphMax;
+                // aggregate by timeframe (replaces old filtering logic)
+                const {
+                  aggregateDataByTimeframe,
+                  calculateAggregatedMinMax,
+                  logAggregationStats
+                } = require("@/utils/helper/AggregateTimeframeData");
+                const {
+                  getIntervalForTimeframe,
+                  requiresAggregation
+                } = require("@/utils/helper/TimeframeConfig");
+
+                // Get aggregation interval for the selected timeframe
+                const interval = getIntervalForTimeframe(timeframe);
+
+                let data;
+                if (interval === null || !requiresAggregation(timeframe)) {
+                  // Show all data for 'all' timeframe or 10min (no aggregation)
+                  data = graphData;
+                } else {
+                  // Aggregate data to the specified interval
+                  data = aggregateDataByTimeframe(graphData, interval);
+
+                  // Log aggregation stats in development
+                  if (process.env.NODE_ENV === 'development') {
+                    logAggregationStats(graphData, data, interval);
+                  }
+                }
+                // Calculate min/max from aggregated data for accurate chart scaling
+                const { min: localMin, max: localMax } = calculateAggregatedMinMax(data);
+
+                // Fallback to original values if no aggregated data
+                const finalMin = localMin > 0 ? localMin : graphMin;
+                const finalMax = localMax > 0 ? localMax : graphMax;
                 return (
                   <Box flex="1" h="100%" minH={{ base: "240px", md: "380px" }}>
                     {" "}
                     <PriceGraph
                       graphData={data}
-                      graphMin={localMin}
-                      graphMax={localMax}
+                      graphMin={finalMin}
+                      graphMax={finalMax}
                       timeframe={timeframe}
                     />
                   </Box>

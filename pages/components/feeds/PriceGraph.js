@@ -6,6 +6,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { createXAxisTickFormatter } from "@/utils/helper/TimeAxisFormatter";
 
 function calculateNiceRange(min, max) {
   const range = max - min;
@@ -81,11 +82,21 @@ export default function PriceGraph({
 
   const { niceMin, niceMax } = calculateNiceRange(graphMin, graphMax);
 
+  // Create timezone-aware time formatter and explicit ticks for X-axis
+  const timeFormatter = createXAxisTickFormatter(graphData, timeframe);
+
+  // Generate explicit tick values for Recharts to prevent interval override
+  const {
+    generateSmartTimeLabels,
+  } = require("@/utils/helper/TimeAxisFormatter");
+  const smartLabels = generateSmartTimeLabels(graphData, timeframe);
+  const explicitTicks = smartLabels.ticks.map((tick) => tick.timestamp);
+
   return (
     <ResponsiveContainer width="100%" height="100%">
       <AreaChart
         data={graphData}
-        margin={{ top: 10, right: 20, left: 10, bottom: 10 }}
+        margin={{ top: 10, right: 20, left: 10, bottom: 30 }} // Extra bottom margin for time labels
       >
         <defs>
           <linearGradient id="priceGradient" x1="0" y1="0" x2="0" y2="1">
@@ -93,7 +104,20 @@ export default function PriceGraph({
             <stop offset="95%" stopColor="#6B1BFF" stopOpacity={0} />
           </linearGradient>
         </defs>
-        <XAxis dataKey="timestamp" tick={false} axisLine={false} />
+        <XAxis
+          dataKey="timestamp"
+          tick={{
+            fontWeight: "600",
+            fontSize: "11px",
+            fill: "#CCCCCC",
+            dy: 10, // Move labels 5px down from their default position
+          }}
+          tickLine={false}
+          axisLine={false}
+          tickFormatter={timeFormatter}
+          ticks={explicitTicks}
+          height={30}
+        />
         <YAxis
           tick={{
             fontWeight: "600",
