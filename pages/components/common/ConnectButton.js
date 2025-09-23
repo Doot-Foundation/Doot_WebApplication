@@ -1,19 +1,16 @@
-import { Button, Flex, Image } from "@chakra-ui/react";
+import { Button, Flex, Image, useToast } from "@chakra-ui/react";
 
 import { useDispatch, useSelector } from "react-redux";
 import { setSigner, setChainName } from "../../../lib/redux/slice";
-
-import WalletError from "./WalletError";
 
 import { useEffect, useState } from "react";
 
 export default function ConnectButton() {
   const dispatch = useDispatch();
+  const toast = useToast();
 
   const signer = useSelector((state) => state.network.signer);
   const chainName = useSelector((state) => state.network.chainName);
-
-  const [showWalletPopup, setShowWalletPopup] = useState(false);
 
   if (typeof window === "undefined") {
   } else {
@@ -35,10 +32,7 @@ export default function ConnectButton() {
   }
 
   async function handleConnection(sessionSigner, userTriggered = false) {
-    // Only show wallet popup if user manually triggered the connection
-    if (typeof window.mina == "undefined" && userTriggered) {
-      setShowWalletPopup(true);
-    } else if (typeof window.mina !== "undefined") {
+    if (typeof window.mina !== "undefined") {
       const walletCode = sessionStorage.getItem("errorCode");
       if (sessionSigner != undefined && walletCode != "1002") {
         try {
@@ -65,7 +59,16 @@ export default function ConnectButton() {
 
   async function handleConnectionManual() {
     if (typeof window.mina == "undefined") {
-      setShowWalletPopup(true);
+      toast({
+        title: "Auro Wallet Not Found",
+        description:
+          "Please install Auro Wallet to connect. Visit aurowallet.com",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom-right",
+      });
+      return;
     } else {
       if (!signer) {
         try {
@@ -103,10 +106,6 @@ export default function ConnectButton() {
     // Don't auto-trigger wallet checks on page load
   }, []);
 
-  const handleCloseWalletPopup = () => {
-    setShowWalletPopup(false); // Close the WalletPopup
-  };
-
   return (
     <>
       <Flex direction="row" position="relative">
@@ -115,10 +114,10 @@ export default function ConnectButton() {
             <Button
               width={{ base: "110px", md: "130px" }}
               height={{ base: "42px", md: "48px" }}
-              position={{ base: 'static', md: 'absolute' }}
-              left={{ md: '-140px' }}
+              position={{ base: "static", md: "absolute" }}
+              left={{ md: "-140px" }}
               cursor="default"
-              display={{ base: 'none', md: 'inline-flex' }}
+              display={{ base: "none", md: "inline-flex" }}
             >
               <Flex
                 direction={"row"}
@@ -140,7 +139,7 @@ export default function ConnectButton() {
               color="white"
               cursor="default"
             >
-              {signer.slice(0, 4) + "..." + signer.slice(-4)}
+              {signer.slice(0, 3) + "..." + signer.slice(-3)}
             </Button>
           </>
         ) : (
@@ -167,13 +166,6 @@ export default function ConnectButton() {
               </Button>
             </Flex>
           </>
-        )}
-
-        {showWalletPopup && (
-          <WalletError
-            isOpen={showWalletPopup}
-            onClose={handleCloseWalletPopup}
-          />
         )}
       </Flex>
     </>

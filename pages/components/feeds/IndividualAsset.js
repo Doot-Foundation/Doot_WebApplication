@@ -616,8 +616,22 @@ export default function IndividualAsset({ token }) {
                       const { filterDataByTimeWindow } = require("@/utils/helper/TimeWindowFilter");
                       return filterDataByTimeWindow(graphData, '24h', 0);
                     })()}
-                    graphMax={graphMax}
-                    graphMin={graphMin}
+                    graphMax={(() => {
+                      // Calculate 24h max for better domain scaling
+                      const { filterDataByTimeWindow } = require("@/utils/helper/TimeWindowFilter");
+                      const filtered24h = filterDataByTimeWindow(graphData, '24h', 0);
+                      if (!filtered24h || filtered24h.length === 0) return graphMax;
+                      const prices = filtered24h.map(item => Number(item.price)).filter(price => !isNaN(price));
+                      return prices.length > 0 ? Math.max(...prices) : graphMax;
+                    })()}
+                    graphMin={(() => {
+                      // Calculate 24h min for better domain scaling
+                      const { filterDataByTimeWindow } = require("@/utils/helper/TimeWindowFilter");
+                      const filtered24h = filterDataByTimeWindow(graphData, '24h', 0);
+                      if (!filtered24h || filtered24h.length === 0) return graphMin;
+                      const prices = filtered24h.map(item => Number(item.price)).filter(price => !isNaN(price));
+                      return prices.length > 0 ? Math.min(...prices) : graphMin;
+                    })()}
                     percentage={percentage}
                   />
                 </Box>

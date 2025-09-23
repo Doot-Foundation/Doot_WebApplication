@@ -3,7 +3,7 @@ const { CircuitString } = require("o1js");
 
 export default function handler(req, res) {
   const { price, signature, url, decimals, timestamp } = req.query;
-  const KEY = process.env.NEXT_PUBLIC_DEPLOYER_PUBLIC_KEY;
+  const KEY = process.env.NEXT_PUBLIC_DOOT_CALLER_PUBLIC_KEY;
   try {
     const fieldURL = BigInt(CircuitString.fromString(url).hash());
     const fieldPrice = BigInt(price);
