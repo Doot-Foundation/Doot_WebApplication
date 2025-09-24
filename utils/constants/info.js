@@ -123,7 +123,6 @@ const ENDPOINT_TO_DATA_PROVIDER = {
   "cex.io": "Cex.io",
   mexc: "MEXC",
   gateio: "Gate.io",
-  "gate.io": "Gate.io",
   okx: "OKX",
   poloniex: "Poloniex",
   btse: "BTSE",
@@ -156,9 +155,9 @@ function DATA_PROVIDER_TO_ENDPOINT(provider, token) {
     Binance: `https://api.binance.com/api/v3/ticker/price?symbol=${binance_id}USDT`,
     "Coin Cap": `https://rest.coincap.io/v3/price/bysymbol/${coincap_id}`,
     "Coin Gecko": `https://api.coingecko.com/api/v3/simple/price?ids=${ciongecko_id}&vs_currencies=usd`,
-    "CoinMarketCap": `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=${cmc_id}&convert=USD`,
+    CoinMarketCap: `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=${cmc_id}&convert=USD`,
     "Crypto Compare": `https://min-api.cryptocompare.com/data/price?fsym=${cryptocompare_id}&tsyms=USD`,
-    "CoinAPI": `https://rest.coinapi.io/v1/exchangerate/${coinapi_id}/USD`,
+    CoinAPI: `https://rest.coinapi.io/v1/exchangerate/${coinapi_id}/USD`,
     "Coin Paprika": `https://api.coinpaprika.com/v1/tickers/${pricepaprika_id}`,
     Messari: `https://api.messari.io/metrics/v2/assets/details?slugs=${messari_id}`,
     "Coin Codex": `https://coincodex.com/api/coincodex/get_coin/${coincodex_id}`,
@@ -217,6 +216,34 @@ const SYMBOL_TO_TOKEN = {
   DOGE: "dogecoin",
 };
 
+function ENDPOINT_KEY_TO_IMAGE_NAME(endpointKey) {
+  // Map endpoint keys to image filenames
+  const keyToImage = {
+    binance: "binance",
+    coincap: "coincap",
+    coingecko: "coingecko",
+    "pro-api.coinmarketcap": "coinmarketcap",
+    cryptocompare: "cryptocompare",
+    "rest.coinapi.io": "coinapi",
+    coinpaprika: "coinpaprika",
+    messari: "messari",
+    coincodex: "coincodex",
+    coinlore: "coinlore",
+    coinranking: "coinranking",
+    kucoin: "kucoin",
+    huobi: "huobi",
+    bybit: "bybit",
+    "cex.io": "cex.io",
+    mexc: "mexc",
+    gateio: "gate.io",
+    okx: "okx",
+    poloniex: "poloniex",
+    btse: "btse",
+  };
+
+  return keyToImage[endpointKey] || endpointKey;
+}
+
 module.exports = {
   TOKEN_TO_CACHE,
   TOKEN_TO_SYMBOL,
@@ -233,4 +260,5 @@ module.exports = {
   PROVIDERS,
   ENDPOINT_TO_DATA_PROVIDER,
   DATA_PROVIDER_TO_ENDPOINT,
+  ENDPOINT_KEY_TO_IMAGE_NAME,
 };
