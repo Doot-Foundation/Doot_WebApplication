@@ -26,19 +26,22 @@ function getTimestamp(data) {
   return Math.floor(date.getTime() / 1000);
 }
 
+
 async function callSignAPICall(url, resultPath, headerName) {
-  // Resolve provider API keys based on header name (supports Messari)
+  // Resolve provider API keys based on header name
   let API_KEY =
     headerName == "X-CMC_PRO_API_KEY"
       ? process.env.CMC_KEY
       : headerName == "x-messari-api-key"
-      ? process.env.MESSARI_KEY || process.env.MESSARI_API_KEY
+      ? process.env.MESSARI_KEY
       : headerName == "X-CoinAPI-Key"
       ? process.env.COIN_API_KEY
       : headerName == "x-access-token"
       ? process.env.COIN_RANKING_KEY
       : headerName == "x-api-key"
       ? process.env.SWAP_ZONE_KEY
+      : headerName == "Authorization"
+      ? `Bearer ${process.env.COIN_CAP_KEY}`
       : "";
 
   if (typeof API_KEY === "string") {
@@ -50,20 +53,13 @@ async function callSignAPICall(url, resultPath, headerName) {
   let header = headerName ? { [headerName]: API_KEY } : undefined;
   let response;
 
-  if (url.toLowerCase().includes("coingecko")) {
-    if (url.toLowerCase().includes("mina")) {
-      response = await axios.get(url, { timeout: 15000 });
-    } else {
-      throw new Error("Specific for Mina.");
-    }
-  } else {
-    response = header
-      ? await axios.get(url, { headers: header, timeout: 15000 })
-      : await axios.get(url, { timeout: 15000 });
-  }
+  response = header
+    ? await axios.get(url, { headers: header, timeout: 15000 })
+    : await axios.get(url, { timeout: 15000 });
   // no need to mutate header further; allow GC to clean up
 
   const price = _.get(response, resultPath);
+
   var Price;
   if (headerName == "x-api-key") Price = String(price / 1000);
   else Price = String(price);

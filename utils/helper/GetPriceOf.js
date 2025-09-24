@@ -124,23 +124,33 @@ async function getPricePaprika(token) {
 }
 
 async function getPriceMessari(token) {
-  const id = PriceMessariSymbols[token.toLowerCase()];
+  if (!process.env.MESSARI_KEY) {
+    console.log("Messari API key not configured, skipping...");
+    return ["0"];
+  }
+
+  const slug = PriceMessariSymbols[token.toLowerCase()];
   return safeApiCall("messari", () =>
     callSignAPICall(
-      `https://data.messari.io/api/v1/assets/${id}/metrics`,
-      `data.data.market_data.price_usd`,
+      `https://api.messari.io/metrics/v2/assets/details?slugs=${slug}`,
+      `data.data[0].marketData.priceUsd`,
       "x-messari-api-key"
     )
   );
 }
 
 async function getPriceCoinCap(token) {
+  if (!process.env.COIN_CAP_KEY) {
+    console.log("CoinCap API key not configured, skipping...");
+    return ["0"];
+  }
+
   const id = CoinCapSymbols[token.toLowerCase()];
   return safeApiCall("coin cap", () =>
     callSignAPICall(
-      `https://api.coincap.io/v2/assets/${id}`,
+      `https://rest.coincap.io/v3/price/bysymbol/${id}`,
       `data.data.priceUsd`,
-      ""
+      "Authorization"
     )
   );
 }
@@ -206,8 +216,8 @@ async function getPriceByBit(token) {
   const id = ByBitSymbols[token.toLowerCase()];
   return safeApiCall("bybit", () =>
     callSignAPICall(
-      `https://api.bybit.com/derivatives/v3/public/tickers?symbol=${id}USDT`,
-      `data.result.list[0].prevPrice1h`,
+      `https://api.bybit.com/v5/market/tickers?category=linear&symbol=${id}USDT`,
+      `data.result.list[0].lastPrice`,
       ""
     )
   );
@@ -327,17 +337,22 @@ async function createAssetInfoArray(token) {
     getPriceBinance,
     getPriceCoinCap,
     getPriceCoinGecko,
+    getPriceCMC,
+    getPriceCryptoCompare,
+    getPriceCoinAPI,
+    getPricePaprika,
+    getPriceMessari,
     getPriceCoinCodex,
     getPriceCoinlore,
-    getPriceCryptoCompare,
-    getPriceMessari,
-    getPricePaprika,
+    getPriceCoinRanking,
     getPriceKuCoin,
     getPriceHuobi,
+    getPriceByBit,
     getPriceCexIO,
+    // getPriceSwapZone,  // Commented out - DEX aggregator not suitable for simple price feeds
     getPriceMexc,
-    getPriceOkx,
     getPriceGateio,
+    getPriceOkx,
     getPricePoloniex,
     getPriceBtse,
   ];
