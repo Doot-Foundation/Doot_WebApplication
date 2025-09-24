@@ -730,7 +730,7 @@ export default function IndividualAsset({ token }) {
                       Providers
                     </Text>
                     <Text fontSize={{ base: "14px", md: "16px" }}>
-                      {latest.signatures.length} / 13
+                      {latest.signatures.length} / 19
                     </Text>
                   </Flex>
 

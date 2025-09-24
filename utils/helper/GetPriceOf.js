@@ -22,7 +22,7 @@ const {
   HuobiSymbols,
   ByBitSymbols,
   CexIOSymbols,
-  SwapZoneSymbols,
+  // SwapZoneSymbols, // SwapZone commented out - DEX aggregator not suitable for simple price feeds
   MEXCSymbols,
   GateIOSymbols,
   OKXSymbols,
@@ -167,8 +167,6 @@ async function getPriceCoinlore(token) {
 }
 
 async function getPriceCoinRanking(token) {
-  if (token.toLowerCase() === "mina") return [0, 0, ""];
-
   const id = CoinRankingSymbols[token.toLowerCase()];
   return safeApiCall("coin ranking", () =>
     callSignAPICall(
@@ -234,16 +232,16 @@ async function getPriceCexIO(token) {
   );
 }
 
-async function getPriceSwapZone(token) {
-  const id = SwapZoneSymbols[token.toLowerCase()];
-  return safeApiCall("swapzone", () =>
-    callSignAPICall(
-      `https://api.swapzone.io/v1/exchange/get-rate?from=${id}&to=usdc&amount=1000`,
-      `data.amountTo`,
-      "x-api-key"
-    )
-  );
-}
+// async function getPriceSwapZone(token) {
+//   const id = SwapZoneSymbols[token.toLowerCase()];
+//   return safeApiCall("swapzone", () =>
+//     callSignAPICall(
+//       `https://api.swapzone.io/v1/exchange/get-rate?from=${id}&to=usdc&amount=1000`,
+//       `data.amountTo`,
+//       "x-api-key"
+//     )
+//   );
+// }
 
 async function getPriceMexc(token) {
   const id = MEXCSymbols[token.toLowerCase()];
