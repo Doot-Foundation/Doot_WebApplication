@@ -90,16 +90,16 @@ const PriceMessariSymbols = {
 };
 
 const CoinCapSymbols = {
-  ethereum: "ethereum",
-  bitcoin: "bitcoin",
-  chainlink: "chainlink",
+  ethereum: "ETH",
+  bitcoin: "BTC",
+  chainlink: "LINK",
   mina: "mina",
-  solana: "solana",
-  ripple: "xrp",
-  dogecoin: "dogecoin",
-  polygon: "polygon",
-  avalanche: "avalanche",
-  cardano: "cardano",
+  solana: "SOL",
+  ripple: "XRP",
+  dogecoin: "DOGE",
+  polygon: "MATIC",
+  avalanche: "AVAX",
+  cardano: "ADA",
 };
 
 const CoinLoreSymbols = {
