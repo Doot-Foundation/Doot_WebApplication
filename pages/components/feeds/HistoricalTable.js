@@ -40,17 +40,6 @@ export default function HistoricalTable({ ipfsHistorical, ipfsLatest }) {
 
   function urlToProvider(url) {
     if (typeof url == "string") {
-      // Special cases for specific API endpoints that are not in the main mapping
-      if (url.includes("gateio") || url.includes("gate.io")) {
-        return "Gate.io";
-      }
-      if (url.includes("poloniex")) {
-        return "Poloniex";
-      }
-      if (url.includes("btse")) {
-        return "BTSE";
-      }
-
       // Check against the main ENDPOINT_TO_DATA_PROVIDER mapping
       const keys = Object.keys(ENDPOINT_TO_DATA_PROVIDER);
       for (let key of keys) {

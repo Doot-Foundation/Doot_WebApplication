@@ -119,7 +119,7 @@ const CoinRankingSymbols = {
   ethereum: "razxDUgYGNAdQ",
   bitcoin: "Qwsogvtv82FCd",
   chainlink: "VLqpJwogdhHNb",
-  mina: "",
+  mina: "J7st_qGwz",
   solana: "zNZHO_Sjf",
   ripple: "-l8Mn2pVlRs-p",
   dogecoin: "a91GCGd_u96cF",
