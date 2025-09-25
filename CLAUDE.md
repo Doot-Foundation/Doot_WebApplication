@@ -18,6 +18,7 @@ Doot is a data feed oracle for Mina Protocol that provides price updates every 1
 ## Architecture Overview
 
 ### Frontend Structure
+
 - **Framework**: Next.js 14 with React 18
 - **UI Library**: Chakra UI with custom dark theme (background #171717)
 - **State Management**: Redux Toolkit with store in `lib/redux/`
@@ -27,7 +28,9 @@ Doot is a data feed oracle for Mina Protocol that provides price updates every 1
 - **Components**: Located in `pages/components/` with dashboard, home, and common directories
 
 ### Backend API Structure
+
 Located in `pages/api/` with organized endpoints:
+
 - `get/` - Data retrieval endpoints
   - `user/` - User status, key status, and information
   - `pinned/` - IPFS pinned data and CID management
@@ -39,13 +42,15 @@ Located in `pages/api/` with organized endpoints:
   - `user/` - User management and API key updates
 
 ### Price Feed System
+
 - **Data Providers**: 16 providers including Binance, CoinGecko, CryptoCompare, etc.
 - **Update Frequency**: Every 10 minutes via Vercel cron
 - **Aggregation**: Uses median calculation with error handling
 - **Historical Data**: Updated every 10 minutes (5-59/10 schedule), stores 1 year of data
 - **Caching**: Redis-based caching with separate keys for prices, graph data, and aggregation proofs
 
-### Zero-Knowledge Proof Integration
+### Zero-Knowledge Proof Integration and Smart Contract Deployment
+
 - **Smart Contract**: `utils/constants/Doot.js` defines the main contract
   - Manages commitment, IPFS CID, and owner state
   - Supports offchain state for token information arrays
@@ -53,7 +58,26 @@ Located in `pages/api/` with organized endpoints:
 - **Proof System**: Uses o1js with offchain state management
 - **IPFS Integration**: Pinata gateway for decentralized data storage
 
+### Live Smart Contract Deployment (Zeko L2)
+
+- **Network**: Zeko L2 Devnet (https://devnet.zeko.io/graphql)
+- **Contract Address**: `B62qrbDCjDYEypocUpG3m6eL62zcvexsaRjhSJp5JWUQeny1qVEKbyP`
+- **Owner**: `B62qod2DugDjy9Jxhzd56gFS7npN8pWhanxxb36MLPzDDqtzzDyBy5z`
+- **Deployer**: `B62qkoGddv1djrxNY7CAdrNWkkjrU72BKCoAfdKxWUqYV5bWk5kej27`
+- **Explorer**: https://zekoscan.io/testnet/account/B62qrbDCjDYEypocUpG3m6eL62zcvexsaRjhSJp5JWUQeny1qVEKbyP
+- **Version**: 0.2.0
+- **Status**: ✅ Live and Operational
+- **Documentation**: Complete deployment details in `contracts_CLAUDE.md`
+
+### Contract Architecture
+
+- **Doot Oracle**: 4 Fields (commitment[1], ipfsCID[2], owner[1])
+- **Registry Contract**: 4 Fields (source tracking and transparency)
+- **Aggregation System**: Stateless verification (20/100-batch processing)
+- **Performance**: 50s compilation, 1.3s deployment, 5-6min settlement proofs
+
 ### Key Integrations
+
 - **Mina Protocol**: o1js for zero-knowledge proofs and blockchain interaction
 - **IPFS**: Pinata gateway (`NEXT_PUBLIC_PINATA_GATEWAY`) for decentralized storage
 - **ZKON SDK**: Provable data fetching from GitHub repository
@@ -61,6 +85,7 @@ Located in `pages/api/` with organized endpoints:
 - **Analytics**: Vercel Analytics integration
 
 ### Utility Structure
+
 - `utils/helper/` - Core blockchain and data helpers
   - `GetMinaInfo.ts` - Mina blockchain data fetching with proper error handling
   - `AggregationModule.ts` - Proof aggregation logic
@@ -73,6 +98,7 @@ Located in `pages/api/` with organized endpoints:
   - `symbols.js` - Exchange-specific symbol mappings
 
 ### Environment Variables Required
+
 - `NEXT_PUBLIC_PINATA_GATEWAY` - IPFS gateway URL
 - `NEXT_PUBLIC_MINA_ENDPOINT` - Mina network endpoint
 - `NEXT_PUBLIC_DOOT_PUBLIC_KEY` - Doot contract public key
@@ -80,6 +106,7 @@ Located in `pages/api/` with organized endpoints:
 - Redis configuration for caching
 
 ### Deployment Configuration
+
 - **Vercel**: Configured with cron jobs for automated updates
   - Price updates: Every 10 minutes (`*/10 * * * *`)
   - Historical data: Every 10 minutes starting at 5 minutes (`5-59/10 * * * *`)
@@ -88,6 +115,7 @@ Located in `pages/api/` with organized endpoints:
 - **Rate Limiting**: Implemented on update endpoints
 
 ### Development Notes
+
 - TypeScript configuration uses ES2020 target with strict mode enabled
 - Path mapping configured with `@/*` for root imports
 - Turbo.json configured for monorepo-style builds with caching
@@ -96,40 +124,48 @@ Located in `pages/api/` with organized endpoints:
 - Uses mixed .js and .ts files (constants in .js, helpers in .ts)
 
 ### Testing and Quality
+
 When making changes, ensure to run both linting and type checking:
+
 ```bash
 npm run lint
 npm run check-types
 ```
 
 ### Token Support
+
 Currently supports 10 tokens with mapping between full names and symbols:
+
 - mina (MINA), bitcoin (BTC), ethereum (ETH), solana (SOL), ripple (XRP)
 - cardano (ADA), avalanche (AVAX), polygon (MATIC), chainlink (LINK), dogecoin (DOGE)
 
 ## Professional Price Chart System
 
 ### Timeframe Aggregation Architecture
+
 The application implements professional-grade timeframe aggregation following industry standards (TradingView, CoinGecko, Binance patterns).
 
 #### **Core Aggregation Logic**
+
 - **Base Interval**: 10-minute price data collection
 - **Aggregation Method**: Mathematical point selection (every Nth data point)
 - **Pure Functions**: Stateless, testable aggregation algorithms
 
 #### **Timeframe Configuration (`utils/helper/TimeframeConfig.js`)**
+
 ```javascript
 const TIMEFRAME_INTERVALS = {
-  '10min': 10,    // No aggregation - all data points
-  '30min': 30,    // Every 3rd point (30 ÷ 10 = 3)
-  '1h': 60,       // Every 6th point (60 ÷ 10 = 6)
-  '6h': 360,      // Every 36th point (360 ÷ 10 = 36)
-  '24h': 1440,    // Every 144th point (1440 ÷ 10 = 144)
-  'all': null     // No aggregation - complete dataset
+  "10min": 10, // No aggregation - all data points
+  "30min": 30, // Every 3rd point (30 ÷ 10 = 3)
+  "1h": 60, // Every 6th point (60 ÷ 10 = 6)
+  "6h": 360, // Every 36th point (360 ÷ 10 = 36)
+  "24h": 1440, // Every 144th point (1440 ÷ 10 = 144)
+  all: null, // No aggregation - complete dataset
 };
 ```
 
 #### **Data Flow Pipeline**
+
 ```
 Raw 10min Data → Timeframe Selection → Aggregation Logic → Chart Rendering
      ↓                    ↓                    ↓               ↓
@@ -137,6 +173,7 @@ Raw 10min Data → Timeframe Selection → Aggregation Logic → Chart Rendering
 ```
 
 #### **Aggregation Engine (`utils/helper/AggregateTimeframeData.js`)**
+
 - **Statistical Processing**: Maintains chronological order with defensive sorting
 - **Edge Case Handling**: Single data points, invalid intervals, empty datasets
 - **Performance**: O(n) time complexity with single-pass processing
@@ -145,12 +182,15 @@ Raw 10min Data → Timeframe Selection → Aggregation Logic → Chart Rendering
 ### X-Axis Time Label System
 
 #### **Timezone-Aware Formatting (`utils/helper/TimeAxisFormatter.js`)**
+
 - **Universal Compatibility**: Auto-detects timestamp format (milliseconds vs seconds)
 - **Locale Support**: Uses `Intl.DateTimeFormat` for international users
 - **No Hardcoded Timezones**: Respects user's browser/system timezone
 
 #### **Intelligent Label Density Control**
+
 **Timeframe-Based Format Selection**:
+
 ```javascript
 // Short timeframes (10min-6h): Hour:Minute format + High density
 '10min': { format: { hour: '2-digit', minute: '2-digit' }, maxLabels: 14 }
@@ -163,11 +203,13 @@ Raw 10min Data → Timeframe Selection → Aggregation Logic → Chart Rendering
 ```
 
 #### **Recharts Integration**
+
 - **Explicit Tick Control**: Generates precise tick positions to override Recharts defaults
 - **Gap Prevention**: Fixed algorithm ensures continuous time progression
 - **Visual Spacing**: 10px offset (`dy: 10`) for optimal label readability
 
 #### **Label Format Examples**
+
 - **10MIN**: `14:30, 15:40, 16:50` (14+ time labels)
 - **30MIN**: `14:30, 16:00, 17:30` (12+ time labels)
 - **12H/24H**: `22/09 14:30, 23/09 02:15` (date + time)
@@ -176,21 +218,25 @@ Raw 10min Data → Timeframe Selection → Aggregation Logic → Chart Rendering
 ### Chart Component Architecture (`pages/components/feeds/PriceGraph.js`)
 
 #### **Integration Pattern**
+
 ```javascript
 // Timeframe-aware aggregation
 const interval = getIntervalForTimeframe(timeframe);
-const data = interval ? aggregateDataByTimeframe(graphData, interval) : graphData;
+const data = interval
+  ? aggregateDataByTimeframe(graphData, interval)
+  : graphData;
 
 // Timezone-aware time formatting
 const timeFormatter = createXAxisTickFormatter(data, timeframe);
 const smartLabels = generateSmartTimeLabels(data, timeframe);
-const explicitTicks = smartLabels.ticks.map(tick => tick.timestamp);
+const explicitTicks = smartLabels.ticks.map((tick) => tick.timestamp);
 
 // Recharts configuration
-<XAxis ticks={explicitTicks} tickFormatter={timeFormatter} />
+<XAxis ticks={explicitTicks} tickFormatter={timeFormatter} />;
 ```
 
 #### **Performance Optimizations**
+
 - **Cached Calculations**: Min/max price calculations during aggregation
 - **Efficient Rendering**: Only specified tick positions rendered
 - **Memory Management**: Pure functions prevent memory leaks in chart updates
@@ -198,11 +244,13 @@ const explicitTicks = smartLabels.ticks.map(tick => tick.timestamp);
 ### Data Consistency & Validation
 
 #### **Timestamp Handling**
+
 - **Format Detection**: Automatic millisecond vs second timestamp detection
 - **Timezone Conversion**: Backend US-East → User local timezone
 - **Chronological Integrity**: Defensive sorting ensures proper time sequence
 
 #### **Price Data Integrity**
+
 - **Aggregation Validation**: Preserves statistical properties (min/max ranges)
 - **Outlier Handling**: MAD-based statistical filtering at provider level
 - **Precision Maintenance**: Proper decimal handling for sub-dollar cryptocurrencies
@@ -210,15 +258,25 @@ const explicitTicks = smartLabels.ticks.map(tick => tick.timestamp);
 ## Recent Major Enhancements (September 2025)
 
 ### **Professional Timeframe Aggregation System**
-**Problem Solved**: Replaced broken time-range filtering with industry-standard aggregation
+
+**Problem Solved**: Replaced broken time-range filtering with industry-standard aggregation following TradingView/CoinGecko patterns
 **Files Created/Modified**:
-- `utils/helper/AggregateTimeframeData.js` - Pure aggregation engine
-- `utils/helper/TimeframeConfig.js` - Timeframe-to-interval mappings
-- `utils/helper/TimeAxisFormatter.js` - Timezone-aware time formatting
-- `pages/components/feeds/PriceGraph.js` - Chart integration
-- `pages/components/feeds/IndividualAsset.js` - Data flow integration
+
+- `utils/helper/AggregateTimeframeData.js` - Pure mathematical aggregation engine
+- `utils/helper/TimeframeConfig.js` - Professional timeframe-to-interval mappings
+- `utils/helper/TimeAxisFormatter.js` - Advanced timezone-aware time formatting
+- `pages/components/feeds/PriceGraph.js` - Recharts integration with explicit tick control
+- `pages/components/feeds/IndividualAsset.js` - Complete data flow integration
+
+### **Technical Implementation Details**
+
+**Core Architecture**: Mathematical point selection (every Nth data point) vs time-range filtering
+**Aggregation Logic**: Stateless, pure functions for testability and performance
+**Timezone Handling**: Auto-detects timestamp format, respects user's browser timezone
+**Chart Integration**: Recharts explicit tick control to prevent framework overrides
 
 **Key Technical Decisions**:
+
 - Mathematical point selection vs time-range filtering
 - Pure, stateless functions for testability
 - Timezone-agnostic design for global users
@@ -227,6 +285,7 @@ const explicitTicks = smartLabels.ticks.map(tick => tick.timestamp);
 ### **Critical Implementation Notes**
 
 #### **Timestamp Format Handling**
+
 ```javascript
 // CRITICAL: Backend uses Date.now() (milliseconds), not Unix seconds
 const aggregatedAt = Date.now(); // in GetPriceOf.js line 389
@@ -237,14 +296,16 @@ return new Date(isMilliseconds ? timestamp : timestamp * 1000);
 ```
 
 #### **Recharts Override Prevention**
+
 ```javascript
 // CRITICAL: Must use explicit ticks to prevent Recharts interval override
-const explicitTicks = smartLabels.ticks.map(tick => tick.timestamp);
-<XAxis ticks={explicitTicks} tickFormatter={timeFormatter} />
+const explicitTicks = smartLabels.ticks.map((tick) => tick.timestamp);
+<XAxis ticks={explicitTicks} tickFormatter={timeFormatter} />;
 // DO NOT use interval="preserveStartEnd" - it overrides our tick logic
 ```
 
 #### **Aggregation Algorithm Fix**
+
 ```javascript
 // FIXED: Previous gap issue in tick positioning
 // OLD (buggy): for (let i = step; i < data.length - step; i += step)
@@ -254,12 +315,14 @@ const explicitTicks = smartLabels.ticks.map(tick => tick.timestamp);
 ### **Development Workflow Recommendations**
 
 #### **When Modifying Chart System**
+
 1. **Test aggregation**: Run `node -e "require('./utils/helper/AggregateTimeframeData.js')..."`
 2. **Test time formatting**: Check all timeframes with realistic data spans
 3. **Verify timezone handling**: Test with different browser timezone settings
 4. **Check Recharts integration**: Ensure explicit ticks override default intervals
 
 #### **Common Pitfalls to Avoid**
+
 - **Never hardcode timezones** - use `Intl.DateTimeFormat` with `timeZone: undefined`
 - **Never assume Unix seconds** - timestamps may be milliseconds or seconds
 - **Never rely on Recharts auto-intervals** - always provide explicit ticks
@@ -268,17 +331,20 @@ const explicitTicks = smartLabels.ticks.map(tick => tick.timestamp);
 ### **Key File Relationships**
 
 #### **Data Flow Chain**
+
 ```
 API (GetPriceOf.js) → Redis Cache → IndividualAsset.js → TimeframeConfig.js →
 AggregateTimeframeData.js → PriceGraph.js → TimeAxisFormatter.js → Recharts
 ```
 
 #### **Import Dependencies**
+
 - `PriceGraph.js` requires: `TimeAxisFormatter.js`
 - `IndividualAsset.js` requires: `TimeframeConfig.js`, `AggregateTimeframeData.js`
 - All modules are pure functions - no circular dependencies
 
 ### **Testing & Verification Commands**
+
 ```bash
 # Essential verification commands
 npm run check-types  # TypeScript validation
@@ -298,6 +364,7 @@ node -e "const { aggregateDataByTimeframe } = require('./utils/helper/AggregateT
 ### Core Dependency Clusters (Shared Infrastructure)
 
 #### 1. **Core Infrastructure Cluster** (Universal Dependencies)
+
 - **Primary Components**: `InitRedis.js`, `info.js`
 - **Usage Pattern**: Required by all 22 endpoints
 - **Dependency Chain**:
@@ -308,6 +375,7 @@ node -e "const { aggregateDataByTimeframe } = require('./utils/helper/AggregateT
 - **Critical Constants**: 40+ cache keys, 16 provider symbol mappings, multiplication factor (10^10)
 
 #### 2. **Authentication & User Management Cluster**
+
 - **Primary Components**: `InitSupabase.js`, `IncrementCallCounter.js`, `InitSignatureClient.js`
 - **Usage Pattern**: 6 endpoints (user endpoints + rate-limited public endpoints)
 - **Dependency Chain**:
@@ -319,6 +387,7 @@ node -e "const { aggregateDataByTimeframe } = require('./utils/helper/AggregateT
 - **Security Layer**: API key validation + signature verification + call counting
 
 #### 3. **Price Aggregation & Statistical Processing Cluster**
+
 - **Primary Components**: `GetPriceOf.js`, `CallAndSignAPICalls.js`, `GenerateGraphData.js`
 - **Usage Pattern**: 3 core update endpoints
 - **Deep Dependency Analysis**:
@@ -332,6 +401,7 @@ node -e "const { aggregateDataByTimeframe } = require('./utils/helper/AggregateT
 - **Data Flow**: 16 providers → parallel API calls → outlier removal (MAD 2.5σ) → median calculation → signature generation
 
 #### 4. **Zero-Knowledge Proof Generation Cluster**
+
 - **Primary Components**: `AggregationModule.ts`, `GenerateAggregationProof.js`, `LoadCache.ts`
 - **Usage Pattern**: 2 endpoints (proof generation + verification)
 - **Complex Dependency Chain**:
@@ -344,9 +414,11 @@ node -e "const { aggregateDataByTimeframe } = require('./utils/helper/AggregateT
 - **Technical Specifics**: Recursive ZK proofs, max 20 prices per proof, base + step proof architecture
 
 #### 5. **IPFS & Blockchain Integration Cluster**
+
 - **Primary Components**: `PinMinaObject.ts`, `PinHistorical.js`, `SendMinaTxn.ts`
 - **Usage Pattern**: 4 endpoints (IPFS operations + blockchain transactions)
 - **Interconnected Dependencies**:
+
   ```
   IPFS Updates → PinMinaObject.ts → o1js (MerkleMap, Field) → Commitment Generation
                                   → Unpin.js → Automatic Cleanup
@@ -359,6 +431,7 @@ node -e "const { aggregateDataByTimeframe } = require('./utils/helper/AggregateT
 ### Critical Dependency Paths & Data Flow Patterns
 
 #### **Path 1: Price Update Flow** (Every 10 minutes)
+
 ```
 Vercel CRON → UpdateAllPrices.js
            → GetPriceOf.js → 16 Parallel API Calls
@@ -371,6 +444,7 @@ Vercel CRON → UpdateAllPrices.js
 ```
 
 #### **Path 2: ZK Proof Generation Flow** (On-demand)
+
 ```
 UpdateAggregationProof.js → Redis Cache Retrieval
                          → Price Validation (BigInt conversion)
@@ -382,6 +456,7 @@ UpdateAggregationProof.js → Redis Cache Retrieval
 ```
 
 #### **Path 3: IPFS Pinning Flow** (Every 10 minutes)
+
 ```
 UpdateMina.js → Cache Aggregation → All token data retrieval
              → PinMinaObject.ts → MerkleMap construction
@@ -392,6 +467,7 @@ UpdateMina.js → Cache Aggregation → All token data retrieval
 ```
 
 #### **Path 4: Blockchain Transaction Flow** (Manual trigger)
+
 ```
 SendMinaTxn.js → GetMinaInfo.ts → IPFS data correlation
               → Account fetching → Nonce management
@@ -401,6 +477,7 @@ SendMinaTxn.js → GetMinaInfo.ts → IPFS data correlation
 ```
 
 #### **Path 5: User Authentication Flow**
+
 ```
 User Endpoints → InitSupabase.js → Database connection
               → Signature verification → Timestamp validation (60min window)
@@ -412,24 +489,28 @@ User Endpoints → InitSupabase.js → Database connection
 ### Advanced Technical Implementation Details
 
 #### **Statistical Processing Pipeline**
+
 - **Algorithm**: Median Absolute Deviation (MAD) with 2.5σ threshold
 - **Implementation**: Single-pass array processing for performance
 - **Outlier Logic**: `|value - median| <= 2.5 * MAD(array)`
 - **Performance**: Parallel Promise.all() for 16 provider calls
 
 #### **ZK Proof Architecture**
+
 - **Structure**: `PriceAggregationArray20` with fixed 20-element array
 - **Padding**: Automatic zero-padding for arrays < 20 elements
 - **Recursion**: Base proofs + step proofs for scalable aggregation
 - **Verification**: On-chain verification key validation
 
 #### **IPFS Data Management**
+
 - **MerkleMap**: 10 assets mapped to commitment root
 - **Witness Generation**: Parallel witness creation for all assets
 - **Lifecycle**: Automatic unpinning with 1-year retention
 - **Metadata**: Timestamp-based naming for version tracking
 
 #### **Signature Generation System**
+
 - **Multi-field**: URL hash + price + decimals + timestamp
 - **Circuit Integration**: o1js CircuitString for hash generation
 - **Key Management**: Environment-based private key storage
@@ -438,26 +519,31 @@ User Endpoints → InitSupabase.js → Database connection
 ### Authentication & Authorization Patterns
 
 #### **Pattern 1: CRON Protection** (8 endpoints)
+
 ```
 Bearer Token → CRON_SECRET validation → Update operations
 ```
 
 #### **Pattern 2: API Key Validation** (2 endpoints)
+
 ```
 Supabase Query → API key existence check → Call counter increment
 ```
 
 #### **Pattern 3: Interface Authentication** (4 endpoints)
+
 ```
 Bearer Token → NEXT_PUBLIC_API_INTERFACE_KEY → Interface access
 ```
 
 #### **Pattern 4: Signature Verification** (1 endpoint)
+
 ```
 Bearer + Signature → Mina signature validation → Timestamp verification → User data access
 ```
 
 #### **Pattern 5: Public Access** (7 endpoints)
+
 ```
 No authentication → Direct data access → Cached responses
 ```
@@ -465,16 +551,19 @@ No authentication → Direct data access → Cached responses
 ### Performance & Optimization Strategies
 
 #### **Caching Strategy**
+
 - **Multi-layer**: Redis primary + FileSystem secondary (ZK cache)
 - **Key Separation**: Prices, proofs, graph data, CIDs use distinct keys
 - **TTL Management**: Automatic expiration + manual cleanup
 
 #### **Parallel Processing**
+
 - **API Calls**: Promise.all() for 16 concurrent provider requests
 - **Array Operations**: Single-pass processing with reduce()
 - **IPFS Operations**: Parallel upload + unpinning
 
 #### **Error Handling**
+
 - **Graceful Degradation**: Default "0" values for failed providers
 - **Retry Logic**: Built into individual provider calls
 - **Validation**: BigInt type checking + NaN filtering
@@ -482,53 +571,64 @@ No authentication → Direct data access → Cached responses
 ### API Endpoint Structure (22 endpoints total)
 
 #### GET Endpoints (11 files)
+
 1. **`pages/api/get/aggregation_proof.js`** - Returns aggregation proofs for tokens
+
    - **Auth**: Supabase API key validation + call counter increment
    - **Dependencies**: `InitSupabase.js`, `InitRedis.js`, `IncrementCallCounter.js`, `info.js`, `uuid`
    - **Response**: Cached aggregation proof data for requested token
 
 2. **`pages/api/get/interface/getGraphData.js`** - Returns graph data for tokens
+
    - **Auth**: Bearer token with `NEXT_PUBLIC_API_INTERFACE_KEY`
    - **Dependencies**: `InitRedis.js`, `info.js` (TOKEN_TO_GRAPH_DATA, TOKEN_TO_SYMBOL)
    - **Response**: Cached graph data (timestamps, prices, min/max, percentage change)
 
 3. **`pages/api/get/interface/getPrice.js`** - Returns price data for tokens
+
    - **Auth**: Bearer token with `NEXT_PUBLIC_API_INTERFACE_KEY`
    - **Dependencies**: `InitRedis.js`, `info.js` (TOKEN_TO_CACHE, TOKEN_TO_SYMBOL)
    - **Response**: Latest price data from Redis cache
 
 4. **`pages/api/get/pinned/getLatestHistoricalPinCID.js`** - Returns latest historical IPFS CID
+
    - **Auth**: None (public endpoint)
    - **Dependencies**: `InitRedis.js`, `info.js` (HISTORICAL_CID_CACHE)
    - **Response**: Current historical data IPFS CID
 
 5. **`pages/api/get/pinned/getLatestMinaPinCID.js`** - Returns latest Mina IPFS CID
+
    - **Auth**: None (public endpoint)
    - **Dependencies**: `InitRedis.js`, `info.js` (MINA_CID_CACHE)
    - **Response**: Current Mina data IPFS CID and commitment
 
 6. **`pages/api/get/pinned/getPinnedHistoricalInfo.js`** - Returns historical IPFS data
+
    - **Auth**: None (public endpoint)
    - **Dependencies**: `InitRedis.js`, `info.js`, `GetHistoricalInfo.js`
    - **Data Flow**: Redis CID → IPFS fetch → Historical price data
 
 7. **`pages/api/get/pinned/getPinnedMinaInfo.js`** - Returns Mina IPFS data
+
    - **Auth**: None (public endpoint)
    - **Dependencies**: `InitRedis.js`, `info.js`, `GetMinaInfo.ts`
    - **Data Flow**: Redis CID → Mina blockchain state → IPFS data
 
 8. **`pages/api/get/price.js`** - Combined price + proof endpoint with rate limiting
+
    - **Auth**: Supabase API key validation + call counter increment
    - **Rate Limiting**: 6 requests per 60 seconds per IP
    - **Dependencies**: `InitSupabase.js`, `InitRedis.js`, `IncrementCallCounter.js`, `info.js`, `uuid`
    - **Response**: Combined price data and aggregation proof data
 
 9. **`pages/api/get/user/getKeyStatus.js`** - Validates API keys
+
    - **Auth**: Bearer token validation against Supabase
    - **Dependencies**: `InitSupabase.js`
    - **Response**: API key validity status
 
 10. **`pages/api/get/user/getUserInformation.js`** - Returns user data (signature verification)
+
     - **Auth**: Bearer token + signed message verification
     - **Dependencies**: `InitSupabase.js`, `InitSignatureClient.js` (testnet/mainnet)
     - **Signature Verification**: Mina wallet signature with timestamp validation (60min window)
@@ -540,14 +640,17 @@ No authentication → Direct data access → Cached responses
     - **Response**: Boolean - whether public key exists in database
 
 #### UPDATE Endpoints (8 files)
+
 All update endpoints require `CRON_SECRET` authentication via Bearer token.
 
 1. **`pages/api/update/core/updateAggregationProof.js`** - Generates ZK proofs for tokens
+
    - **Dependencies**: `GenerateAggregationProof.js`, `InitRedis.js`, `info.js`
    - **Process**: Cached prices → ZK proof generation → Redis storage
    - **Critical**: Creates recursive ZK proofs for price aggregation
 
 2. **`pages/api/update/core/updateAllPrices.js`** - Updates all token prices (16 providers)
+
    - **Dependencies**: `InitRedis.js`, `info.js`, `GetPriceOf.js`, `GenerateGraphData.js`, `axios`
    - **Process**: 16 provider APIs → median aggregation → outlier removal → Redis cache
    - **Data Flow**:
@@ -556,26 +659,32 @@ All update endpoints require `CRON_SECRET` authentication via Bearer token.
      ```
 
 3. **`pages/api/update/core/updateMinaPrice.js`** - Updates only MINA price
+
    - **Dependencies**: Same as updateAllPrices but MINA-only
    - **Process**: Single token price update with graph data generation
 
 4. **`pages/api/update/ipfs/updateHistorical.js`** - Updates historical IPFS data
+
    - **Dependencies**: `InitRedis.js`, `info.js`, `PinHistorical.js`
    - **Process**: All cached data → Historical object assembly → IPFS pinning → CID update
 
 5. **`pages/api/update/ipfs/updateMina.js`** - Updates Mina IPFS data
+
    - **Dependencies**: `InitRedis.js`, `info.js`, `PinMinaObject.ts`
    - **Process**: Current cache state → Mina object assembly → IPFS pinning → CID + commitment storage
 
 6. **`pages/api/update/mina/sendMinaStateTxn.js`** - Sends offchain state settlement
+
    - **Dependencies**: `SendOffchainStateSettlementTxn.ts`
    - **Process**: Offchain state proof generation → Mina L1 settlement transaction
 
 7. **`pages/api/update/mina/sendMinaTxn.js`** - Sends Mina blockchain transaction
+
    - **Dependencies**: `InitRedis.js`, `info.js`, `GetMinaInfo.ts`, `SendMinaTxn.ts`
    - **Process**: IPFS CID + commitment → Mina smart contract update transaction
 
 8. **`pages/api/update/user/initUser.js`** - Creates new API key for address
+
    - **Auth**: Bearer token with `NEXT_PUBLIC_API_INTERFACE_KEY`
    - **Dependencies**: `InitSupabase.js`, `uuid`
    - **Process**: Address validation → UUID generation → Supabase insertion
@@ -586,7 +695,9 @@ All update endpoints require `CRON_SECRET` authentication via Bearer token.
    - **Process**: Existing key validation → New UUID generation → Database update
 
 #### VERIFY Endpoints (2 files)
+
 1. **`pages/api/verify/verifyAggregated.js`** - Verifies aggregated signatures
+
    - **Dependencies**: `InitSignatureClient.js`, `info.js` (ORACLE_PUBLIC_KEY)
    - **Process**: Signature verification against oracle public key
 
@@ -595,6 +706,7 @@ All update endpoints require `CRON_SECRET` authentication via Bearer token.
    - **Process**: Multi-field signature verification (URL, price, decimals, timestamp)
 
 #### RESET Endpoints (1 file)
+
 1. **`pages/api/reset/resetEveryCache.js`** - Resets all cache and IPFS data
    - **Auth**: CRON_SECRET protected
    - **Dependencies**: `InitRedis.js`, `info.js`, `PinHistorical.js`, `PinMinaObject.ts`, `GetPriceOf.js`
@@ -603,30 +715,35 @@ All update endpoints require `CRON_SECRET` authentication via Bearer token.
 ### Core Helper Dependencies Deep Dive
 
 #### **Price Aggregation System (`utils/helper/GetPriceOf.js`)**
+
 - **16 Data Providers**: Binance, CoinGecko, CryptoCompare, CoinPaprika, Messari, CoinCap, CoinLore, CoinCodex, KuCoin, Huobi, ByBit, CexIO, SwapZone, MEXC, Gate.io, OKX, Poloniex, BTSE
 - **Statistical Processing**: Median calculation with MAD (Median Absolute Deviation) outlier removal at 2.5 threshold
 - **Signature Generation**: Each price signed with Mina signature client for provable data
 - **Dependencies**: `CallAndSignAPICalls.js`, `info.js`, `InitSignatureClient.js`, `symbols.js`
 
 #### **API Call System (`utils/helper/CallAndSignAPICalls.js`)**
+
 - **Authentication**: Handles API keys for CMC, CoinAPI, CoinRanking, SwapZone
 - **Data Processing**: Float normalization with `MULTIPLICATION_FACTOR` (10^10)
 - **Signature Chain**: URL hash + price + decimals + timestamp → Mina signature
 - **Dependencies**: `axios`, `lodash`, `o1js` (CircuitString), `InitSignatureClient.js`
 
 #### **ZK Proof System (`utils/helper/AggregationModule.ts`)**
+
 - **Proof Structure**: Recursive ZK proofs for price arrays (max 20 prices)
 - **Programs**: Base proof generation and step proof aggregation
 - **Cache System**: FileSystem cache for verification keys and compilation artifacts
 - **Dependencies**: `o1js`, `LoadCache.ts`
 
 #### **IPFS Management**
+
 - **`PinHistorical.js`**: Historical data with 1-year retention, automatic unpinning
 - **`PinMinaObject.ts`**: Current state pinning with commitment generation
 - **`GetHistoricalInfo.js`**: IPFS data fetching with timeout (10s)
 - **`GetMinaInfo.ts`**: Mina blockchain state + IPFS data correlation
 
 #### **Blockchain Integration**
+
 - **`SendMinaTxn.ts`**: Mina L1 transaction with retry logic and account fetching
 - **`SendOffchainStateSettlementTxn.ts`**: Offchain state proof settlement
 - **Smart Contract**: `utils/constants/Doot.js` with commitment, IPFS CID, owner state
@@ -634,23 +751,27 @@ All update endpoints require `CRON_SECRET` authentication via Bearer token.
 ### Complete Environment Variables Map
 
 #### **Authentication & Security**
+
 - `CRON_SECRET` - Protects all update endpoints
 - `NEXT_PUBLIC_API_INTERFACE_KEY` - Interface endpoint authentication
 - `DOOT_CALLER_KEY` - Private key for Mina transactions and signatures
 - `DOOT_KEY` - Private key for Doot smart contract
 
 #### **Database & Storage**
+
 - `SUPABASE_URL`, `SUPABASE_ANON_KEY` - Database connection
 - `SUPABASE_USER`, `SUPABASE_USER_PASS` - Service account credentials
 - `REDIS_REST_HOST`, `REDIS_REST_TOKEN` - Redis cache connection
 
 #### **Blockchain & IPFS**
+
 - `NEXT_PUBLIC_MINA_ENDPOINT` - Mina network RPC
 - `NEXT_PUBLIC_DOOT_PUBLIC_KEY` - Smart contract address
 - `PINATA_JWT` - IPFS pinning authentication
 - `NEXT_PUBLIC_PINATA_GATEWAY` - IPFS gateway URL
 
 #### **External API Keys**
+
 - `CMC_KEY` - CoinMarketCap Pro API
 - `COIN_API_KEY` - CoinAPI service
 - `COIN_RANKING_KEY` - CoinRanking API
@@ -659,21 +780,25 @@ All update endpoints require `CRON_SECRET` authentication via Bearer token.
 ### Data Flow Architecture
 
 #### **Price Update Flow (Every 10 minutes)**
+
 ```
 External APIs → GetPriceOf.js → Statistical Aggregation → Signature Generation → Redis Cache → Graph Data Generation → IPFS Pinning → Mina Transaction
 ```
 
 #### **User Authentication Flow**
+
 ```
 Wallet Signature → Timestamp Validation → Supabase Lookup → API Key Generation → Call Counter Tracking
 ```
 
 #### **ZK Proof Generation Flow**
+
 ```
 Cached Prices → Proof Compatibility → AggregationModule → Recursive Proof → Verification → Redis Storage
 ```
 
 #### **Historical Data Flow**
+
 ```
 Current Prices → Historical Assembly → 1-Year Retention → IPFS Pinning → Old Data Unpinning → CID Update
 ```
@@ -690,3 +815,108 @@ Current Prices → Historical Assembly → 1-Year Retention → IPFS Pinning →
 8. **Timestamp Validation**: 60-minute window for signature freshness
 9. **Data Consistency**: Atomic operations for cache updates and IPFS pinning
 10. **Provider Redundancy**: 16 price providers with failure tolerance
+
+## Comprehensive o1js and Zeko Development Documentation
+
+### Bootstrap Documentation (January 2025)
+
+The `bootstrap-o1js-mina-zeko/` directory contains extensive technical documentation for AI agents and developers:
+
+#### **Core Architecture Documentation**
+
+- `1_CORE_ARCHITECTURE_AND_PHILOSOPHY.md` - Mina/o1js/Zeko ecosystem overview
+- `2_O1JS_FRAMEWORK_DEEP_DIVE.md` - Complete o1js programming guide
+- `3_SMART_CONTRACT_DEVELOPMENT_PATTERNS.md` - zkApp development patterns
+- `4_ADVANCED_FEATURES_AND_RECURSION.md` - Recursive proofs and advanced features
+- `5_ZEKO_L2_ARCHITECTURE_AND_INTEGRATION.md` - Zeko L2 integration guide
+- `6_DEVELOPMENT_WORKFLOWS_AND_BEST_PRACTICES.md` - Production deployment patterns
+
+#### **Key Technical Resources**
+
+**Mina Protocol Fundamentals**:
+
+- 22KB constant blockchain size through recursive zk-SNARKs
+- Off-chain execution model with client-side proof generation
+- Kimchi + Pickles proof system architecture
+- Ouroboros Proof-of-Stake consensus mechanism
+
+**o1js Framework (v2.9.0)**:
+
+- TypeScript SDK for zk-SNARK circuit creation
+- Constraint system programming model
+- Two-phase execution (compile-time vs prove-time)
+- Advanced data types: Field, Bool, UInt64, Structs, Arrays
+- Witness patterns for efficient circuit design
+- ZkFunction API for standalone proofs (new in v2.8.0)
+- Core namespace for low-level bindings (unreleased)
+
+**Zeko L2 Integration**:
+
+- Nested ledger model with L1/L2 bridge architecture
+- 10-25 second finality vs Mina L1's 3+ minutes
+- Seamless compatibility with existing Mina tooling
+- Sequencer-based architecture for high throughput
+- Modular data availability layer
+
+#### **Development Patterns and Best Practices**
+
+- **State Management**: 8 Field limit with off-chain storage patterns
+- **Transaction Lifecycle**: Complete error handling and retry logic
+- **Network Configuration**: Local, Devnet, Mainnet, and Zeko L2 setups
+- **Testing Strategies**: Unit, integration, and network-specific testing
+- **Security Considerations**: Access control, cryptographic integrity, and audit practices
+- **Performance Optimization**: Constraint system analysis and circuit optimization
+
+#### **Smart Contract Architecture Patterns**
+
+- **SmartContract Class**: Basic structure with state management
+- **Permissions System**: Comprehensive access control patterns
+- **Off-chain State**: Scalable storage using Mina's OffchainState
+- **Actions and Reducers**: Event-driven architecture patterns
+- **Merkle Trees**: Efficient provable storage structures
+- **Token Standards**: Based on established implementations
+
+#### **Advanced Topics**
+
+- **Recursive Proof Composition**: Infinite recursion capabilities unique to Mina
+- **Foreign Field Arithmetic**: Interoperability with other cryptographic systems
+- **Runtime Tables and Lookups**: Dynamic lookup tables for complex operations
+- **Circuit Analysis Tools**: Debugging and performance monitoring
+- **Cross-Chain Integration**: Bridge patterns for multi-chain applications
+
+### Smart Contract System (Deployed)
+
+#### **Live Deployment Details**
+
+- **Complete Documentation**: `contracts_CLAUDE.md` provides comprehensive deployment guide
+- **Multi-Contract Architecture**: Doot Oracle + Registry + Aggregation system
+- **Tech Stack**: o1js 2.9.0, TypeScript 5.7.2, Jest 29.7.0, Yarn 1.22.21
+- **Current Status**: Live on Zeko L2 Devnet with 10 cryptocurrency price feeds
+
+#### **Contract Specifications**
+
+**Doot Oracle Contract** (`src/contracts/Doot.ts`):
+
+- **State Variables**: 4 Fields total (commitment, ipfsCID, owner, offchainStateCommitments)
+- **Supported Tokens**: 10 cryptocurrencies (MINA, BTC, ETH, SOL, XRP, ADA, AVAX, MATIC, LINK, DOGE)
+- **Off-chain State**: Unlimited scalability via OffchainState.Map
+- **Methods**: initBase, update, getPrices, settle, verify
+
+**Registry Contract** (`src/contracts/Registry.ts`):
+
+- **Purpose**: Source code transparency and implementation tracking
+- **State Variables**: 4 Fields (githubSourceLink, ipfsSourceLink, implementation, owner)
+- **String Storage**: MultiPackedStringFactory(2) for 64-character links
+
+**Aggregation System** (`src/contracts/Aggregation.ts`):
+
+- **Architecture**: Stateless ZkPrograms for price verification
+- **Processing**: 20/100-batch processing with mathematical proof verification
+- **Data Structures**: PriceAggregationArray20, PriceAggregationArray100
+
+#### **Deployment Performance**
+
+- **Compilation Time**: 50.37 seconds (optimized from 150s)
+- **Deployment Time**: 1.27 seconds (Zeko L2 fast finality)
+- **Settlement Proofs**: 5-6 minutes (off-chain state batching)
+- **Fee Strategy**: 0.1 MINA buffer for all operations

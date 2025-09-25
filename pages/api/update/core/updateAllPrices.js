@@ -51,9 +51,11 @@ async function startFetchAndUpdates(tokens) {
     throw new Error("PINATA_GATEWAY environment variable not set");
   }
 
+  console.log("Last known historical CID :", cid);
   const pinnedData = await axios.get(`https://${GATEWAY}/ipfs/${cid}`, {
-    timeout: 30000 // 30 second timeout
+    timeout: 30000, // 30 second timeout
   });
+
   const ipfs = pinnedData.data;
 
   const failed = [];
