@@ -75,17 +75,52 @@ async function pinHistoricalObject(previousCID, latestPrices) {
       }),
     };
 
-    // Upload to IPFS and unpin old data in parallel
-    const [response, _] = await Promise.all([
-      fetch("https://api.pinata.cloud/pinning/pinJSONToIPFS", options),
-      previousCID !== "NULL"
-        ? unpin(previousCID, "Historical")
-        : Promise.resolve(),
-    ]);
+    // SAFE PATTERN: Upload first, verify accessibility, then unpin old data
+    const response = await fetch("https://api.pinata.cloud/pinning/pinJSONToIPFS", options);
+
+    if (!response.ok) {
+      throw new Error(`IPFS upload failed: ${response.status} ${response.statusText}`);
+    }
 
     const data = await response.json();
-    console.log("Pinned Historical Data:", data);
 
+    if (!data.IpfsHash) {
+      throw new Error("No IpfsHash returned from Pinata");
+    }
+
+    // Critical: Verify the new CID returns valid data before unpinning old CID
+    const GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
+    if (!GATEWAY) {
+      throw new Error("Missing NEXT_PUBLIC_PINATA_GATEWAY environment variable");
+    }
+
+    try {
+      const verificationResponse = await axios.get(
+        `https://${GATEWAY}/ipfs/${data.IpfsHash}`,
+        { timeout: 10000, headers: { Accept: 'application/json' } }
+      );
+
+      // Validate the data structure has required top-level properties
+      if (!verificationResponse.data ||
+          !verificationResponse.data.latest ||
+          !verificationResponse.data.historical) {
+        throw new Error("Invalid data structure: missing 'latest' or 'historical' properties");
+      }
+    } catch (verifyError) {
+      throw new Error(`New IPFS CID ${data.IpfsHash} is not accessible: ${verifyError.message}`);
+    }
+
+    // Only NOW it's safe to unpin the old CID
+    if (previousCID !== "NULL") {
+      try {
+        await unpin(previousCID, "Historical");
+      } catch (unpinError) {
+        // Don't fail the entire operation if unpinning fails
+        console.warn(`Failed to unpin old CID ${previousCID}: ${unpinError.message}`);
+      }
+    }
+
+    console.log("Pinned Historical Data:", data);
     return data.IpfsHash;
   } catch (error) {
     console.error(

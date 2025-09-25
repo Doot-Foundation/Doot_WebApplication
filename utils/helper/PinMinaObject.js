@@ -1,7 +1,6 @@
 const axios = require("axios");
 const unpin = require("./Unpin");
 
-// We'll import o1js dynamically to avoid import issues
 let o1js = null;
 
 async function loadO1js() {
@@ -28,17 +27,10 @@ const ASSETS = [
 
 async function pinMinaObject(obj, previousCID) {
   try {
-    console.log("🔧 Loading o1js...");
     const { CircuitString, MerkleMap, Field } = await loadO1js();
-    console.log("✅ o1js loaded successfully");
-
-    console.log("🔧 Creating MerkleMap...");
     const Map = new MerkleMap();
 
-    console.log("🔧 Processing assets...");
-    // Process assets in parallel
     const processedAssets = ASSETS.map((asset) => {
-      console.log(`  📊 Processing ${asset}, price: ${obj[asset]?.price}`);
       return {
         name: asset,
         key: CircuitString.fromString(asset).hash(),
@@ -46,23 +38,15 @@ async function pinMinaObject(obj, previousCID) {
       };
     });
 
-    console.log("🔧 Setting MerkleMap values...");
-    // Set all values in the MerkleMap
     processedAssets.forEach((asset) => {
       Map.set(asset.key, asset.price);
     });
 
-    console.log("🔧 Getting MerkleMap root...");
     const COMMITMENT = Map.getRoot();
-
-    console.log("🔧 Getting witnesses...");
-    // Get all witnesses in parallel
     const witnesses = processedAssets.map((asset) => Map.getWitness(asset.key));
 
     const timestamp = Date.now();
 
-    console.log("🔧 Preparing upload object...");
-    // Prepare upload object
     const toUploadObject = {
       assets: obj,
       merkle_map: {
@@ -74,8 +58,6 @@ async function pinMinaObject(obj, previousCID) {
       },
     };
 
-    console.log("🔧 Preparing IPFS upload...");
-    // Prepare upload options
     const options = {
       method: "POST",
       headers: {
@@ -89,11 +71,12 @@ async function pinMinaObject(obj, previousCID) {
       }),
     };
 
-    console.log("🔧 Uploading to IPFS...");
-    // Upload to IPFS and unpin old data in parallel if it exists
+    console.log(" Uploading to IPFS...");
     const [response] = await Promise.all([
       fetch("https://api.pinata.cloud/pinning/pinJSONToIPFS", options),
-      previousCID && previousCID !== "NULL" ? unpin(previousCID, "Mina") : Promise.resolve(),
+      previousCID && previousCID !== "NULL"
+        ? unpin(previousCID, "Mina")
+        : Promise.resolve(),
     ]);
 
     const data = await response.json();

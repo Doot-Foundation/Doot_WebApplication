@@ -1,18 +1,33 @@
-const { redis } = require("@/utils/helper/init/InitRedis.js");
+import { redis } from "@/utils/helper/init/InitRedis.js";
 
-const { TOKEN_TO_CACHE, MINA_CID_CACHE } = require("@/utils/constants/info.js");
+import { TOKEN_TO_CACHE, MINA_CID_CACHE } from "@/utils/constants/info.js";
 
-const pinMinaObject = require("@/utils/helper/PinMinaObject.ts");
-const { getToPinIPFSInformation } = require("@/utils/helper/GetMinaInfo.ts");
+import pinMinaObject from "@/utils/helper/PinMinaObject";
+import axios from "axios";
 
 // Import o1js and contract utilities (from contracts_CLAUDE.md)
-const { Mina, PrivateKey, Field, fetchAccount, PublicKey } = require("o1js");
-const {
+import { Mina, PrivateKey, Field, fetchAccount, PublicKey } from "o1js";
+import {
   Doot,
   IpfsCID,
   TokenInformationArray,
-} = require("@/utils/constants/Doot.js");
-const { FileSystem, fetchDootFiles } = require("@/utils/helper/LoadCache");
+  offchainState,
+} from "@/utils/constants/Doot.js";
+import { FileSystem, fetchDootFiles } from "@/utils/helper/LoadCache";
+
+// async function zkappInit() {
+const cacheFiles = await fetchDootFiles();
+// console.log("Compiling initiated.");
+try {
+  if (offchainState && typeof offchainState.compile === "function") {
+    await offchainState.compile({ cache: FileSystem(cacheFiles) });
+  }
+  await Doot.compile({ cache: FileSystem(cacheFiles) });
+  console.log("SUCCESS! Doot contract compiled using cache.");
+} catch (err) {
+  console.log(err);
+}
+// }
 
 /**
  * Combined Doot Oracle Update Endpoint
@@ -23,6 +38,7 @@ export default async function handler(req, res) {
   let responseAlreadySent = false;
   let ipfsCID = null;
   let commitment = null;
+  // await zkappInit();
 
   try {
     const authHeader = req.headers.authorization;
@@ -33,9 +49,6 @@ export default async function handler(req, res) {
     console.log(
       "\n =============== DOOT ORACLE UPDATE STARTED =============== \n"
     );
-
-    // ===== STEP 1: COLLECT & VALIDATE TOKEN DATA =====
-    console.log(" STEP 1: Collecting token data from cache...");
 
     const tokenData = {};
     const tokenKeys = Object.keys(TOKEN_TO_CACHE);
@@ -94,9 +107,6 @@ export default async function handler(req, res) {
       Object.keys(tokenData)
     );
 
-    // ===== STEP 2: PIN TO IPFS =====
-    console.log("\n STEP 2: Pinning oracle state to IPFS...");
-
     // Get existing Mina CID for unpinning (if exists)
     let previousCID = "NULL";
     try {
@@ -107,7 +117,7 @@ export default async function handler(req, res) {
         existingMinaCacheData[0]
       ) {
         previousCID = existingMinaCacheData[0];
-        console.log(` Found previous CID for unpinning: ${previousCID}`);
+        console.log(`Found previous CID for unpinning: ${previousCID}`);
       }
     } catch (error) {
       console.log(
@@ -123,57 +133,81 @@ export default async function handler(req, res) {
     }
 
     [ipfsCID, commitment] = ipfsResults;
-    console.log(`SUCCESS! IPFS pinning successful:`);
-    console.log(`    CID: ${ipfsCID}`);
-    console.log(`    Commitment: ${commitment}`);
+    console.log(`\nSUCCESS! IPFS pinning successful:`);
+    console.log(` CID: ${ipfsCID}`);
+    console.log(` Commitment: ${commitment}`);
 
     // Verify IPFS data is accessible
-    console.log("🔍 Verifying IPFS data accessibility...");
-    await getToPinIPFSInformation(ipfsCID);
+    console.log("Verifying IPFS data accessibility...");
+    await verifyIpfsAccessibility(ipfsCID);
     console.log("SUCCESS! IPFS data verification successful");
 
-    // ===== STEP 3: PREPARE SHARED TRANSACTION DATA =====
-    console.log("\n STEP 3: Preparing shared cryptographic data...");
+    // Pre-compute shared cryptographic objects to eliminate redundancy
+    console.log("\nPre-computing shared cryptographic objects...");
 
-    // Both networks will use the same:
-    // - IPFS CID
-    // - Merkle commitment
-    // - Token information array
-    // - Caller private key (DOOT_CALLER_KEY)
-    // - Contract private key (DOOT_KEY)
+    const COMMITMENT = Field.from(commitment);
+    const IPFS_HASH = IpfsCID.fromString(ipfsCID);
+
+    // Convert token data to TokenInformationArray (exactly 10 prices)
+    const orderedTokens = [
+      "mina",
+      "bitcoin",
+      "ethereum",
+      "solana",
+      "ripple",
+      "cardano",
+      "avalanche",
+      "polygon",
+      "chainlink",
+      "dogecoin",
+    ];
+    const prices = orderedTokens.map((token) =>
+      Field.from(tokenData[token].price)
+    );
+    const TOKEN_INFO = new TokenInformationArray({ prices });
+
+    // Pre-compute keys
+    const caller = PrivateKey.fromBase58(process.env.DOOT_CALLER_KEY);
+    const callerPub = caller.toPublicKey();
 
     const sharedTxnData = {
+      // Pre-computed o1js objects (expensive to create)
+      COMMITMENT,
+      IPFS_HASH,
+      TOKEN_INFO,
+      caller,
+      callerPub,
+      // Raw data for logging
       ipfsCID,
       commitment,
-      tokenData,
-      callerPrivateKey: process.env.DOOT_CALLER_KEY,
     };
 
-    console.log("SUCCESS! Shared transaction data prepared");
+    const dootZkApp = new Doot(
+      PublicKey.fromBase58(process.env.NEXT_PUBLIC_DOOT_PUBLIC_KEY)
+    );
+    dootZkApp.offchainState.setContractInstance(dootZkApp);
 
-    // ===== STEP 4: UPDATE ZEKO L2 (PRIMARY) =====
-    console.log("\n⚡ STEP 4: Updating Zeko L2 contract...");
+    console.log("\nUpdating Zeko L2 contract...");
 
     let zekoSuccess = false;
     let zekoTxHash = null;
 
     try {
-      const zekoResult = await updateZekoL2Contract(sharedTxnData);
+      const zekoResult = await updateZekoL2Contract(dootZkApp, sharedTxnData);
       zekoSuccess = zekoResult.success;
       zekoTxHash = zekoResult.txHash;
 
       if (zekoSuccess) {
-        console.log(`SUCCESS! Zeko L2 update successful! TX: ${zekoTxHash}`);
+        console.log(`COMPLETED!`);
       } else {
-        console.log(`  Zeko L2 update failed: ${zekoResult.error}`);
+        console.log(`ERR! Zeko L2 update failed: ${zekoResult.error}`);
       }
     } catch (error) {
       console.error(`ERR! Zeko L2 update error: ${error.message}`);
       zekoSuccess = false;
     }
 
-    // ===== STEP 5: UPDATE MINA L1 (WITH TIMEOUT PROTECTION) =====
-    console.log("\n STEP 5: Starting Mina L1 update with 5:00 timeout...");
+    console.log("\nStarting Mina L1 update with 5:00 timeout...");
 
     let minaSuccess = false;
     let minaTxHash = null;
@@ -197,7 +231,7 @@ export default async function handler(req, res) {
     try {
       // Race between Mina L1 execution and timeout
       const minaResult = await Promise.race([
-        updateMinaL1Contract(sharedTxnData),
+        updateMinaL1Contract(dootZkApp, sharedTxnData),
         minaTimeout,
       ]);
 
@@ -213,9 +247,7 @@ export default async function handler(req, res) {
         minaSuccess = true;
         minaTxHash = minaResult.txHash;
         minaStatus = "SUCCESS";
-        console.log(
-          `SUCCESS! Mina L1 update completed successfully! TX: ${minaTxHash}`
-        );
+        console.log(`COMPLETED!`);
       } else {
         // Failed within timeout
         minaStatus = "FAILED";
@@ -229,8 +261,7 @@ export default async function handler(req, res) {
       console.error(`ERR! Mina L1 update unexpected error: ${error.message}`);
     }
 
-    // ===== STEP 6: UPDATE CACHE & DETERMINE SUCCESS =====
-    console.log("\n STEP 6: Updating cache and determining final status...");
+    console.log("\nUpdating redis cache.");
 
     // Update Redis cache if Zeko L2 succeeded (primary network)
     if (zekoSuccess) {
@@ -274,7 +305,6 @@ export default async function handler(req, res) {
           networks_completed: networksCompleted, // Networks that completed successfully
           networks_total: 2,
           tokens_processed: Object.keys(tokenData).length,
-          execution_time_limit: "300 seconds (5:00 for Vercel CRON safety)",
           primary_network: "Zeko L2 (fast finality)",
           secondary_network: "Mina L1 (full decentralization)",
         },
@@ -287,13 +317,17 @@ export default async function handler(req, res) {
     console.log(` Overall Status: ${overallSuccess ? "SUCCESS" : "FAILED"}`);
     console.log(` IPFS: ${ipfsCID} (${commitment.slice(0, 20)}...)`);
     console.log(
-      `⚡ Zeko L2: ${zekoSuccess ? "SUCCESS" : "FAILED"} ${
+      ` Zeko L2: ${zekoSuccess ? "SUCCESS" : "FAILED"} ${
         zekoTxHash ? `(${zekoTxHash})` : ""
       }`
     );
-    console.log(` Mina L1: BACKGROUND (fire-and-forget due to CRON timeout)`);
     console.log(
-      ` Networks Updated: ${responseData.data.summary.networks_updated}/2 (${responseData.data.summary.networks_background} background)`
+      ` Mina L1: ${minaSuccess ? "SUCCESS" : "FAILED"} ${
+        minaTxHash ? `(${minaTxHash})` : ""
+      }`
+    );
+    console.log(
+      ` Networks Completed: ${responseData.data.summary.networks_completed}/${responseData.data.summary.networks_total}`
     );
     console.log(
       "===============================================================\n"
@@ -328,53 +362,58 @@ export default async function handler(req, res) {
   }
 }
 
+// Helper function for account fetching with retry (from contracts_CLAUDE.md patterns)
+async function fetchAccountWithRetry(accountInfo, maxRetries = 3) {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      await fetchAccount(accountInfo);
+      return;
+    } catch (error) {
+      if (i === maxRetries - 1) throw error;
+      await new Promise((resolve) => setTimeout(resolve, 1000 * (i + 1))); // Exponential backoff
+    }
+  }
+}
+// Local helper: verify IPFS data availability to avoid ESM/CJS interop issues
+async function verifyIpfsAccessibility(cid) {
+  const GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
+  if (!GATEWAY) throw new Error("Missing NEXT_PUBLIC_PINATA_GATEWAY");
+  try {
+    const response = await axios.get(`https://${GATEWAY}/ipfs/${cid}`, {
+      timeout: 10000,
+      headers: { Accept: "application/json" },
+    });
+    return response.data;
+  } catch (error) {
+    const msg = error && error.message ? error.message : String(error);
+    throw new Error(`Failed to fetch IPFS data for CID ${cid}: ${msg}`);
+  }
+}
+
 /**
  * Update Zeko L2 contract with shared transaction data
  * Fast finality (~10-25 seconds)
  * Based on contracts_CLAUDE.md deployment patterns
  */
-async function updateZekoL2Contract(sharedTxnData) {
+async function updateZekoL2Contract(dootZkApp, sharedTxnData) {
   try {
-    console.log(" Configuring Zeko L2 network connection...");
+    console.log("Configuring Zeko L2 network connection...");
 
-    const { ipfsCID, commitment, tokenData, callerPrivateKey } = sharedTxnData;
+    const { COMMITMENT, IPFS_HASH, TOKEN_INFO, caller, callerPub, ipfsCID } =
+      sharedTxnData;
 
     // Environment variables for Zeko L2
     const ZEKO_ENDPOINT = process.env.NEXT_PUBLIC_ZEKO_ENDPOINT;
     const ZEKO_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_ZEKO_DOOT_PUBLIC_KEY;
 
-    if (!ZEKO_ENDPOINT || !ZEKO_CONTRACT_ADDRESS || !callerPrivateKey) {
+    if (!ZEKO_ENDPOINT || !ZEKO_CONTRACT_ADDRESS) {
       throw new Error("Missing Zeko L2 environment variables");
     }
 
     console.log(`NETWORK! Connecting to: ${ZEKO_ENDPOINT}`);
     console.log(` Contract: ${ZEKO_CONTRACT_ADDRESS}`);
 
-    // Prepare transaction data (from contracts_CLAUDE.md patterns)
-    const COMMITMENT = Field.from(commitment);
-    const IPFS_HASH = IpfsCID.fromString(ipfsCID);
-
-    // Convert token data to TokenInformationArray (exactly 10 prices)
-    const orderedTokens = [
-      "mina",
-      "bitcoin",
-      "ethereum",
-      "solana",
-      "ripple",
-      "cardano",
-      "avalanche",
-      "polygon",
-      "chainlink",
-      "dogecoin",
-    ];
-    const prices = orderedTokens.map((token) =>
-      Field.from(tokenData[token].price)
-    );
-    const TOKEN_INFO = new TokenInformationArray({ prices });
-
-    // Setup keys and network
-    const caller = PrivateKey.fromBase58(callerPrivateKey);
-    const callerPub = caller.toPublicKey();
+    // Use pre-computed objects (no redundant Field.from() calls)
     const contractPub = PublicKey.fromBase58(ZEKO_CONTRACT_ADDRESS);
 
     // Configure Zeko L2 network (from contracts_CLAUDE.md)
@@ -388,12 +427,7 @@ async function updateZekoL2Contract(sharedTxnData) {
     await fetchAccountWithRetry({ publicKey: contractPub });
     await fetchAccountWithRetry({ publicKey: callerPub });
 
-    // Compile contract (use cache if available)
-    const cacheFiles = await fetchDootFiles();
-    await Doot.compile({ cache: FileSystem(cacheFiles) });
-    const dootZkApp = new Doot(contractPub);
-
-    console.log(" Creating and proving Zeko L2 transaction...");
+    console.log("Creating and proving Zeko L2 transaction...");
 
     // Create transaction (owner-only update method)
     const txn = await Mina.transaction(
@@ -435,49 +469,26 @@ async function updateZekoL2Contract(sharedTxnData) {
  * Slower finality (~3-5 minutes) but more decentralized
  * Based on contracts_CLAUDE.md deployment patterns
  */
-async function updateMinaL1Contract(sharedTxnData) {
+async function updateMinaL1Contract(dootZkApp, sharedTxnData) {
   try {
-    console.log(" Configuring Mina L1 network connection...");
+    console.log("Configuring Mina L1 network connection...");
 
-    const { ipfsCID, commitment, tokenData, callerPrivateKey } = sharedTxnData;
+    const { COMMITMENT, IPFS_HASH, TOKEN_INFO, caller, callerPub, ipfsCID } =
+      sharedTxnData;
 
     // Environment variables for Mina L1
     const MINA_ENDPOINT = process.env.NEXT_PUBLIC_MINA_ENDPOINT;
     const MINA_ARCHIVE_ENDPOINT = process.env.NEXT_PUBLIC_MINA_ENDPOINT; // Same for devnet
     const MINA_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_DOOT_PUBLIC_KEY;
 
-    if (!MINA_ENDPOINT || !MINA_CONTRACT_ADDRESS || !callerPrivateKey) {
+    if (!MINA_ENDPOINT || !MINA_CONTRACT_ADDRESS) {
       throw new Error("Missing Mina L1 environment variables");
     }
 
     console.log(`NETWORK! Connecting to: ${MINA_ENDPOINT}`);
     console.log(` Contract: ${MINA_CONTRACT_ADDRESS}`);
 
-    // Reuse the SAME cryptographic calculations from Zeko L2 (efficiency gain!)
-    const COMMITMENT = Field.from(commitment);
-    const IPFS_HASH = IpfsCID.fromString(ipfsCID);
-
-    // Convert token data to TokenInformationArray (same order as Zeko)
-    const orderedTokens = [
-      "mina",
-      "bitcoin",
-      "ethereum",
-      "solana",
-      "ripple",
-      "cardano",
-      "avalanche",
-      "polygon",
-      "chainlink",
-      "dogecoin",
-    ];
-    const prices = orderedTokens.map((token) =>
-      Field.from(tokenData[token].price)
-    );
-    const TOKEN_INFO = new TokenInformationArray({ prices });
-
-    // Setup keys and network
-    const caller = PrivateKey.fromBase58(callerPrivateKey);
-    const callerPub = caller.toPublicKey();
+    // Use the SAME pre-computed cryptographic objects (maximum efficiency!)
     const contractPub = PublicKey.fromBase58(MINA_CONTRACT_ADDRESS);
 
     // Configure Mina L1 network (from contracts_CLAUDE.md)
@@ -491,12 +502,7 @@ async function updateMinaL1Contract(sharedTxnData) {
     await fetchAccountWithRetry({ publicKey: contractPub });
     await fetchAccountWithRetry({ publicKey: callerPub });
 
-    // REUSE compiled contract from Zeko L2 (same contract code)
-    // Only compile if not already done
-    console.log(" Reusing compiled contract for Mina L1...");
-    const dootZkApp = new Doot(contractPub);
-
-    console.log(" Creating and proving Mina L1 transaction...");
+    console.log("Creating and proving Mina L1 transaction...");
 
     // Create transaction (same update method as Zeko)
     const txn = await Mina.transaction(
@@ -506,7 +512,7 @@ async function updateMinaL1Contract(sharedTxnData) {
       }
     );
 
-    // REUSE proof from Zeko L2 if possible, or generate new one
+    // Generate proof (reuses same cryptographic objects)
     await txn.prove();
     console.log("SUCCESS! Mina L1 transaction proved successfully");
 
@@ -530,18 +536,5 @@ async function updateMinaL1Contract(sharedTxnData) {
       error: error.message,
       network: "mina_l1",
     };
-  }
-}
-
-// Helper function for account fetching with retry (from contracts_CLAUDE.md patterns)
-async function fetchAccountWithRetry(accountInfo, maxRetries = 3) {
-  for (let i = 0; i < maxRetries; i++) {
-    try {
-      await fetchAccount(accountInfo);
-      return;
-    } catch (error) {
-      if (i === maxRetries - 1) throw error;
-      await new Promise((resolve) => setTimeout(resolve, 1000 * (i + 1))); // Exponential backoff
-    }
   }
 }

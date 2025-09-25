@@ -88,15 +88,61 @@ async function pinMinaObject(
       }),
     };
 
-    // Upload to IPFS and unpin old data in parallel if it exists
-    const [response] = await Promise.all([
-      fetch("https://api.pinata.cloud/pinning/pinJSONToIPFS", options),
-      previousCID ? unpin(previousCID, "Mina") : Promise.resolve(),
-    ]);
+    // SAFE PATTERN: Upload first, verify accessibility, then unpin old data
+    const response = await fetch("https://api.pinata.cloud/pinning/pinJSONToIPFS", options);
+
+    if (!response.ok) {
+      throw new Error(`IPFS upload failed: ${response.status} ${response.statusText}`);
+    }
 
     const data = await response.json();
-    console.log("Pinned Mina Object:", data);
 
+    if (!data.IpfsHash) {
+      throw new Error("No IpfsHash returned from Pinata");
+    }
+
+    // Critical: Verify the new CID returns valid data before unpinning old CID
+    const GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
+    if (!GATEWAY) {
+      throw new Error("Missing NEXT_PUBLIC_PINATA_GATEWAY environment variable");
+    }
+
+    try {
+      const verificationResponse = await fetch(
+        `https://${GATEWAY}/ipfs/${data.IpfsHash}`,
+        {
+          method: 'GET',
+          headers: { Accept: 'application/json' },
+        }
+      );
+
+      if (!verificationResponse.ok) {
+        throw new Error(`HTTP ${verificationResponse.status}: ${verificationResponse.statusText}`);
+      }
+
+      const verificationData = await verificationResponse.json();
+
+      // Validate the data structure has required top-level properties
+      if (!verificationData ||
+          !verificationData.assets ||
+          !verificationData.merkle_map) {
+        throw new Error("Invalid data structure: missing 'assets' or 'merkle_map' properties");
+      }
+    } catch (verifyError) {
+      throw new Error(`New IPFS CID ${data.IpfsHash} is not accessible: ${verifyError instanceof Error ? verifyError.message : String(verifyError)}`);
+    }
+
+    // Only NOW it's safe to unpin the old CID
+    if (previousCID && previousCID !== "NULL") {
+      try {
+        await unpin(previousCID, "Mina");
+      } catch (unpinError) {
+        // Don't fail the entire operation if unpinning fails
+        console.warn(`Failed to unpin old CID ${previousCID}: ${unpinError instanceof Error ? unpinError.message : String(unpinError)}`);
+      }
+    }
+
+    console.log("Pinned Mina Object:", data);
     return [data.IpfsHash, COMMITMENT.toString()];
   } catch (error) {
     console.error(
