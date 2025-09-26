@@ -9,7 +9,7 @@ const {
 } = require("@/utils/constants/info.js");
 
 const pinHistoricalObject = require("@/utils/helper/PinHistorical.js");
-const pinMinaObject = require("@/utils/helper/PinMinaObject.js");
+const pinMinaObject = require("@/utils/helper/PinMinaObject");
 const getPriceOf = require("@/utils/helper/GetPriceOf.js");
 
 async function PriceOf(key) {
@@ -37,7 +37,9 @@ async function clearAllCaches() {
 
     // Clear aggregation proof cache
     await redis.del(TOKEN_TO_AGGREGATION_PROOF_CACHE[tokenKey]);
-    console.log(`  ✅ Cleared aggregation cache: ${TOKEN_TO_AGGREGATION_PROOF_CACHE[tokenKey]}`);
+    console.log(
+      `  ✅ Cleared aggregation cache: ${TOKEN_TO_AGGREGATION_PROOF_CACHE[tokenKey]}`
+    );
   }
 
   // Clear IPFS CID caches
@@ -102,8 +104,13 @@ async function initializeAggregationCaches(keys) {
       proof: "",
     };
 
-    await redis.set(TOKEN_TO_AGGREGATION_PROOF_CACHE[key], defaultProofStructure);
-    console.log(`  ✅ Initialized aggregation cache: ${TOKEN_TO_AGGREGATION_PROOF_CACHE[key]}`);
+    await redis.set(
+      TOKEN_TO_AGGREGATION_PROOF_CACHE[key],
+      defaultProofStructure
+    );
+    console.log(
+      `  ✅ Initialized aggregation cache: ${TOKEN_TO_AGGREGATION_PROOF_CACHE[key]}`
+    );
   }
 
   console.log("🔐 AGGREGATION PROOF CACHES INITIALIZED!\n");
@@ -134,13 +141,17 @@ async function initializeIPFSCaches(keys) {
     console.log("  ⛓️  Creating fresh Mina IPFS data...");
     console.log("  🔍 pinMinaObject type:", typeof pinMinaObject);
     console.log("  🔍 ipfsDataObject keys:", Object.keys(ipfsDataObject));
-    console.log("  🔍 Sample data:", JSON.stringify(ipfsDataObject.mina?.price || "NO MINA DATA"));
+    console.log(
+      "  🔍 Sample data:",
+      JSON.stringify(ipfsDataObject.mina?.price || "NO MINA DATA")
+    );
 
     const minaResult = await pinMinaObject(ipfsDataObject, "NULL");
     // minaResult returns [ipfsHash, commitment]
     await redis.set(MINA_CID_CACHE, minaResult);
-    console.log(`  ✅ Initialized Mina CID: ${minaResult[0]}, Commitment: ${minaResult[1]}`);
-
+    console.log(
+      `  ✅ Initialized Mina CID: ${minaResult[0]}, Commitment: ${minaResult[1]}`
+    );
   } catch (error) {
     console.error("  ❌ Failed to initialize IPFS caches:", error.message);
     throw error;
@@ -160,7 +171,9 @@ export default async function handler(req, res) {
     }
 
     const keys = Object.keys(TOKEN_TO_CACHE);
-    console.log("\n🚀 =============== COMPLETE CACHE RESET & INITIALIZATION =============== 🚀\n");
+    console.log(
+      "\n🚀 =============== COMPLETE CACHE RESET & INITIALIZATION =============== 🚀\n"
+    );
 
     // Step 1: Clear all existing caches
     await clearAllCaches();
@@ -177,13 +190,33 @@ export default async function handler(req, res) {
     // Step 5: Initialize IPFS caches with fresh pinned data
     await initializeIPFSCaches(keys);
 
-    console.log("🎉 =============== CACHE RESET COMPLETED SUCCESSFULLY! =============== 🎉\n");
+    console.log(
+      "🎉 =============== CACHE RESET COMPLETED SUCCESSFULLY! =============== 🎉\n"
+    );
     console.log("📋 SUMMARY:");
-    console.log(`   • Price Caches: ${Object.keys(TOKEN_TO_CACHE).length} tokens initialized`);
-    console.log(`   • Graph Caches: ${Object.keys(TOKEN_TO_GRAPH_DATA).length} tokens initialized`);
-    console.log(`   • Aggregation Caches: ${Object.keys(TOKEN_TO_AGGREGATION_PROOF_CACHE).length} tokens initialized`);
-    console.log(`   • IPFS Caches: 2 CID caches (historical + mina) initialized`);
-    console.log(`   • Total Cache Keys Managed: ${Object.keys(TOKEN_TO_CACHE).length * 3 + 2}`);
+    console.log(
+      `   • Price Caches: ${
+        Object.keys(TOKEN_TO_CACHE).length
+      } tokens initialized`
+    );
+    console.log(
+      `   • Graph Caches: ${
+        Object.keys(TOKEN_TO_GRAPH_DATA).length
+      } tokens initialized`
+    );
+    console.log(
+      `   • Aggregation Caches: ${
+        Object.keys(TOKEN_TO_AGGREGATION_PROOF_CACHE).length
+      } tokens initialized`
+    );
+    console.log(
+      `   • IPFS Caches: 2 CID caches (historical + mina) initialized`
+    );
+    console.log(
+      `   • Total Cache Keys Managed: ${
+        Object.keys(TOKEN_TO_CACHE).length * 3 + 2
+      }`
+    );
     console.log("\n✅ System is ready for normal cron operations!");
 
     if (!responseAlreadySent) {
@@ -193,7 +226,12 @@ export default async function handler(req, res) {
         message: "Complete cache reset and initialization successful!",
         data: {
           tokensInitialized: Object.keys(TOKEN_TO_CACHE).length,
-          cacheTypesInitialized: ["prices", "graphs", "aggregation_proofs", "ipfs_cids"],
+          cacheTypesInitialized: [
+            "prices",
+            "graphs",
+            "aggregation_proofs",
+            "ipfs_cids",
+          ],
           totalCacheKeys: Object.keys(TOKEN_TO_CACHE).length * 3 + 2,
           readyForCrons: true,
         },
