@@ -21,13 +21,22 @@ import { FileSystem, fetchDootFiles } from "@/utils/helper/LoadCache";
  * Optimized for fast finality (~10-25 seconds)
  */
 export default async function handler(req, res) {
+  const startTime = Date.now();
+  const GLOBAL_TIMEOUT_MS = 795 * 1000; // 795 seconds
+  let globalTimeoutReached = false;
   let responseAlreadySent = false;
   let ipfsCID = null;
   let commitment = null;
 
+  // Set up global timeout
+  const globalTimeout = setTimeout(() => {
+    globalTimeoutReached = true;
+  }, GLOBAL_TIMEOUT_MS);
+
   try {
     const authHeader = req.headers.authorization;
     if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+      clearTimeout(globalTimeout);
       return res.status(401).json("Unauthorized");
     }
 
@@ -190,6 +199,8 @@ export default async function handler(req, res) {
 
     let zekoSuccess = false;
     let zekoTxHash = null;
+    let zekoStatus = "PENDING";
+    let zekoError = null;
     let zekoResult = {
       success: false,
       confirmed: false,
@@ -197,24 +208,41 @@ export default async function handler(req, res) {
     };
 
     try {
-      zekoResult = await updateZekoL2Contract(dootZkApp, sharedTxnData);
-      zekoSuccess = zekoResult.success;
-      zekoTxHash = zekoResult.txHash;
-
-      if (zekoSuccess) {
-        console.log(`COMPLETED!`);
+      // Check global timeout before starting blockchain operations
+      if (globalTimeoutReached) {
+        zekoStatus = "PENDING";
+        zekoError = "Global timeout reached before blockchain operations";
+        console.log(`TIME! Global timeout reached before Zeko L2 operations`);
       } else {
-        console.log(`ERR! Zeko L2 update failed: ${zekoResult.error}`);
+        const result = await updateZekoL2ContractWithPolling(dootZkApp, sharedTxnData, () => globalTimeoutReached);
+
+        if (result.timeout) {
+          zekoStatus = "PENDING";
+          zekoError = result.message;
+          console.log(`TIME! Zeko L2 update timed out: ${result.message}`);
+        } else if (result.success) {
+          zekoSuccess = true;
+          zekoTxHash = result.txHash;
+          zekoStatus = "SUCCESS";
+          zekoResult = result;
+          console.log(`COMPLETED!`);
+        } else {
+          zekoStatus = "FAILED";
+          zekoError = result.error;
+          zekoResult = result;
+          console.log(`ERR! Zeko L2 update failed: ${result.error}`);
+        }
       }
     } catch (error) {
-      console.error(`ERR! Zeko L2 update error: ${error.message}`);
-      zekoSuccess = false;
+      zekoStatus = "ERROR";
+      zekoError = error.message;
       zekoResult = {
         success: false,
         confirmed: false,
         settlementTxHash: null,
         error: error.message,
       };
+      console.error(`ERR! Zeko L2 update unexpected error: ${error.message}`);
     }
 
     console.log("\nUpdating redis cache.");
@@ -225,10 +253,16 @@ export default async function handler(req, res) {
       console.log("SUCCESS! Redis cache updated with new IPFS data");
     }
 
+    // Clear global timeout
+    clearTimeout(globalTimeout);
+
+    const elapsed = Math.round((Date.now() - startTime) / 1000);
     const responseData = {
       status: zekoSuccess,
       message: zekoSuccess
         ? "Zeko L2 Doot oracle update completed!"
+        : zekoStatus === "PENDING"
+        ? "Zeko L2 update partially completed (timeout reached)"
         : "Zeko L2 update failed",
       data: {
         ipfs: {
@@ -236,14 +270,17 @@ export default async function handler(req, res) {
           commitment,
         },
         network: {
-          status: zekoSuccess ? "SUCCESS" : "FAILED",
+          status: zekoStatus, // "SUCCESS" | "FAILED" | "PENDING" | "ERROR"
           success: zekoSuccess,
           tx_hash: zekoTxHash || null,
           confirmed: zekoResult?.confirmed || false,
           settlement_tx_hash: zekoResult?.settlementTxHash || null,
           endpoint: process.env.NEXT_PUBLIC_ZEKO_ENDPOINT,
           contract: process.env.NEXT_PUBLIC_ZEKO_DOOT_PUBLIC_KEY,
-          error: zekoSuccess ? null : "Zeko L2 transaction failed",
+          error: zekoError || null,
+          elapsed_seconds: elapsed,
+          global_timeout_seconds: 795,
+          timeout_reached: globalTimeoutReached,
           finality: "10-25 seconds",
           network_type: "zeko_l2",
         },
@@ -251,7 +288,7 @@ export default async function handler(req, res) {
           tokens_processed: Object.keys(tokenData).length,
           operations: "update + confirmation + settlement",
           confirmation: zekoResult?.confirmed || false,
-          settlement: zekoResult?.settlementTxHash ? "SUCCESS" : "SKIPPED",
+          settlement: zekoResult?.settlementTxHash ? "SUCCESS" : zekoStatus === "PENDING" ? "PENDING" : "SKIPPED",
           primary_network: "Zeko L2 (fast finality)",
         },
       },
@@ -265,7 +302,7 @@ export default async function handler(req, res) {
     console.log(
       ` Zeko L2: ${zekoSuccess ? "SUCCESS" : "FAILED"} ${
         zekoTxHash ? `(${zekoTxHash})` : ""
-      } ${zekoResult?.confirmed ? "✅" : "⏱️"} ${
+      } ${zekoResult?.confirmed ? "CONFIRMED" : "PENDING"} ${
         zekoResult?.settlementTxHash
           ? `[Settlement: ${zekoResult.settlementTxHash}]`
           : ""
@@ -293,7 +330,9 @@ export default async function handler(req, res) {
         console.warn("CLEANUP! GC failed:", gcError.message);
       }
 
-      return res.status(zekoSuccess ? 200 : 500).json(responseData);
+      // Always return 200 for timeout/pending states to provide vital info
+      const statusCode = zekoSuccess || zekoStatus === "PENDING" ? 200 : 500;
+      return res.status(statusCode).json(responseData);
     }
   } catch (error) {
     console.error(
@@ -308,6 +347,9 @@ export default async function handler(req, res) {
     if (!responseAlreadySent) {
       responseAlreadySent = true;
 
+      // Clear global timeout
+      clearTimeout(globalTimeout);
+
       // CRITICAL: Force garbage collection to prevent WASM aliasing between requests
       try {
         if (global.gc) {
@@ -320,6 +362,7 @@ export default async function handler(req, res) {
         console.warn("CLEANUP! GC failed:", gcError.message);
       }
 
+      const elapsed = Math.round((Date.now() - startTime) / 1000);
       return res.status(500).json({
         status: false,
         message: "Zeko L2 Doot oracle update failed",
@@ -328,6 +371,9 @@ export default async function handler(req, res) {
           ipfs: ipfsCID ? { cid: ipfsCID, commitment } : null,
           stage_failed: ipfsCID ? "blockchain_update" : "ipfs_pinning",
           network_type: "zeko_l2",
+          elapsed_seconds: elapsed,
+          global_timeout_seconds: 795,
+          timeout_reached: globalTimeoutReached,
         },
       });
     }
@@ -347,76 +393,6 @@ async function fetchAccountWithRetry(accountInfo, maxRetries = 3) {
   }
 }
 
-// Helper function for transaction confirmation (devnet/testnet optimized)
-// Avoids GraphQL issues with bestChain queries on Zeko devnet
-async function waitForTransactionConfirmation(
-  pendingTransaction,
-  timeoutMinutes,
-  networkName
-) {
-  console.log(
-    `⏳ Waiting for ${networkName} confirmation (${timeoutMinutes}:00 timeout)...`
-  );
-
-  if (pendingTransaction.status !== "pending") {
-    console.error(
-      `❌ ${networkName} transaction not accepted by daemon:`,
-      pendingTransaction.status
-    );
-    return false;
-  }
-
-  console.log(
-    `✅ ${networkName} transaction accepted for processing by daemon`
-  );
-
-  try {
-    // For devnet/testnet: Use timeout-based confirmation to avoid GraphQL issues
-    const timeoutMs = timeoutMinutes * 60 * 1000;
-
-    // Try pendingTransaction.wait() but fallback to timeout if GraphQL fails
-    try {
-      const timeout = new Promise((_, reject) =>
-        setTimeout(
-          () =>
-            reject(
-              new Error(`Confirmation timeout after ${timeoutMinutes}:00`)
-            ),
-          timeoutMs
-        )
-      );
-
-      await Promise.race([pendingTransaction.wait(), timeout]);
-
-      console.log(
-        `✅ ${networkName} transaction successfully included in block: ${pendingTransaction.hash}`
-      );
-      return true;
-    } catch (waitError) {
-      if (
-        waitError.message.includes("bestChain") ||
-        waitError.message.includes("GraphQL")
-      ) {
-        console.log(` GraphQL issue detected, using time-based confirmation.`);
-        await new Promise((resolve) => setTimeout(resolve, timeoutMs));
-        console.log(
-          `✅ ${networkName} time-based confirmation completed: ${pendingTransaction.hash}`
-        );
-        return true;
-      } else if (waitError.message.includes("timeout")) {
-        console.log(
-          `⏱️ ${networkName} confirmation timed out (${timeoutMinutes}:00): ${pendingTransaction.hash}`
-        );
-        return false;
-      } else {
-        throw waitError; // Re-throw other errors
-      }
-    }
-  } catch (error) {
-    console.error(`❌ ${networkName} transaction failed:`, error.message);
-    return false;
-  }
-}
 
 // Local helper: verify IPFS data availability to avoid ESM/CJS interop issues
 async function verifyIpfsAccessibility(cid) {
@@ -435,16 +411,14 @@ async function verifyIpfsAccessibility(cid) {
 }
 
 /**
- * Update Zeko L2 contract with shared transaction data
- * Fast finality (~10-25 seconds)
- * Based on contracts_CLAUDE.md deployment patterns
+ * Update Zeko L2 contract with polling and global timeout awareness
+ * Polls every 10 seconds, respects global timeout, waits for full confirmation
  */
-async function updateZekoL2Contract(dootZkApp, sharedTxnData) {
+async function updateZekoL2ContractWithPolling(dootZkApp, sharedTxnData, isGlobalTimeoutReached) {
   try {
     console.log("Configuring Zeko L2 network connection...");
 
-    const { COMMITMENT, IPFS_HASH, TOKEN_INFO, caller, callerPub } =
-      sharedTxnData;
+    const { COMMITMENT, IPFS_HASH, TOKEN_INFO, caller, callerPub } = sharedTxnData;
 
     // Environment variables for Zeko L2
     const ZEKO_ENDPOINT = process.env.NEXT_PUBLIC_ZEKO_ENDPOINT;
@@ -458,13 +432,17 @@ async function updateZekoL2Contract(dootZkApp, sharedTxnData) {
     console.log(` Archive: ${ZEKO_ENDPOINT}`);
     console.log(` Contract: ${ZEKO_CONTRACT_ADDRESS}`);
 
-    // Use pre-computed objects (no redundant Field.from() calls)
+    // Check timeout before expensive operations
+    if (isGlobalTimeoutReached()) {
+      return { success: false, timeout: true, message: "Global timeout reached before network setup" };
+    }
+
     const contractPub = PublicKey.fromBase58(ZEKO_CONTRACT_ADDRESS);
 
-    // Configure Zeko L2 network (from contracts_CLAUDE.md)
+    // Configure Zeko L2 network
     const ZekoNetwork = Mina.Network({
       mina: ZEKO_ENDPOINT,
-      archive: ZEKO_ENDPOINT, // Zeko uses same endpoint for both
+      archive: ZEKO_ENDPOINT,
     });
     Mina.setActiveInstance(ZekoNetwork);
 
@@ -472,11 +450,16 @@ async function updateZekoL2Contract(dootZkApp, sharedTxnData) {
     await fetchAccountWithRetry({ publicKey: contractPub });
     await fetchAccountWithRetry({ publicKey: callerPub });
 
+    // Check timeout before proving
+    if (isGlobalTimeoutReached()) {
+      return { success: false, timeout: true, message: "Global timeout reached before transaction creation" };
+    }
+
     console.log("Creating and proving Zeko L2 transaction...");
 
-    // Create transaction (owner-only update method)
+    // Create transaction
     const txn = await Mina.transaction(
-      { sender: callerPub, fee: 0.1 * 5e9 }, // 0.1 MINA fee buffer for Zeko L2
+      { sender: callerPub, fee: 0.1 * 5e9 },
       async () => {
         await dootZkApp.update(COMMITMENT, IPFS_HASH, TOKEN_INFO);
       }
@@ -486,61 +469,75 @@ async function updateZekoL2Contract(dootZkApp, sharedTxnData) {
     await txn.prove();
     console.log("SUCCESS! Zeko L2 transaction proved successfully");
 
+    // Check timeout before sending
+    if (isGlobalTimeoutReached()) {
+      return { success: false, timeout: true, message: "Global timeout reached before sending transaction" };
+    }
+
     // Sign and send
     const signedTxn = txn.sign([caller]);
     const pendingTxn = await signedTxn.send();
 
     console.log(`SUCCESS! Zeko L2 transaction sent: ${pendingTxn.hash}`);
 
-    // Wait for Zeko L2 transaction confirmation (fast finality)
-    const zekoConfirmed = await waitForTransactionConfirmation(
+    // Wait for confirmation with polling every 10 seconds
+    const zekoConfirmed = await waitForTransactionConfirmationWithPolling(
       pendingTxn,
-      1,
-      "Zeko L2"
-    ); // 1 minute timeout
+      "Zeko L2",
+      isGlobalTimeoutReached
+    );
+
+    if (isGlobalTimeoutReached()) {
+      return {
+        success: false,
+        timeout: true,
+        message: "Global timeout reached during transaction confirmation",
+        txHash: pendingTxn.hash,
+        confirmed: false
+      };
+    }
 
     let settlementTxHash = null;
     if (zekoConfirmed) {
-      // Fire-and-forget settlement - send but don't wait
-      console.log("Zeko L2 confirmed! Sending settlement (fire-and-forget)...");
+      // Settlement process with timeout awareness
+      console.log("Zeko L2 confirmed! Sending settlement...");
       try {
-        // Create fresh contract instance to avoid WASM aliasing
-        const freshContractPub = PublicKey.fromBase58(ZEKO_CONTRACT_ADDRESS);
-        const freshDootZkApp = new Doot(freshContractPub);
-        freshDootZkApp.offchainState.setContractInstance(freshDootZkApp);
+        if (isGlobalTimeoutReached()) {
+          console.log("WARN! Global timeout reached before settlement");
+        } else {
+          // Create fresh contract instance to avoid WASM aliasing
+          const freshContractPub = PublicKey.fromBase58(ZEKO_CONTRACT_ADDRESS);
+          const freshDootZkApp = new Doot(freshContractPub);
+          freshDootZkApp.offchainState.setContractInstance(freshDootZkApp);
 
-        console.log("Creating settlement proof...");
-        const settlementProof =
-          await freshDootZkApp.offchainState.createSettlementProof();
+          console.log("Creating settlement proof...");
+          const settlementProof = await freshDootZkApp.offchainState.createSettlementProof();
 
-        console.log("Building settlement transaction...");
-        const settleTxn = await Mina.transaction(
-          { sender: callerPub, fee: 0.1 * 5e9 },
-          async () => {
-            await freshDootZkApp.settle(settlementProof);
+          if (!isGlobalTimeoutReached()) {
+            console.log("Building settlement transaction...");
+            const settleTxn = await Mina.transaction(
+              { sender: callerPub, fee: 0.1 * 5e9 },
+              async () => {
+                await freshDootZkApp.settle(settlementProof);
+              }
+            );
+
+            console.log("Proving settlement transaction...");
+            await settleTxn.prove();
+
+            if (!isGlobalTimeoutReached()) {
+              console.log("Sending settlement transaction...");
+              const settlementPending = await settleTxn.sign([caller]).send();
+              settlementTxHash = settlementPending.hash;
+
+              console.log(`SUCCESS! Zeko L2 settlement sent: ${settlementTxHash}`);
+            }
           }
-        );
-
-        console.log("Proving settlement transaction...");
-        await settleTxn.prove();
-
-        console.log("Sending settlement transaction...");
-        const settlementPending = await settleTxn.sign([caller]).send();
-        settlementTxHash = settlementPending.hash;
-
-        console.log(
-          `SUCCESS! Zeko L2 settlement sent (fire-and-forget): ${settlementTxHash}`
-        );
+        }
       } catch (settlementError) {
-        console.warn(
-          `WARN! Zeko L2 settlement failed: ${settlementError.message}`
-        );
+        console.warn(`WARN! Zeko L2 settlement failed: ${settlementError.message}`);
         console.warn(`Settlement error stack:`, settlementError.stack);
       }
-    } else {
-      console.log(
-        "WARN! Zeko L2 transaction not confirmed - skipping settlement"
-      );
     }
 
     return {
@@ -559,5 +556,59 @@ async function updateZekoL2Contract(dootZkApp, sharedTxnData) {
       error: error.message,
       network: "zeko_l2",
     };
+  }
+}
+
+/**
+ * Wait for transaction confirmation with 10-second polling and global timeout awareness
+ */
+async function waitForTransactionConfirmationWithPolling(pendingTransaction, networkName, isGlobalTimeoutReached) {
+  console.log(`Waiting for ${networkName} confirmation with 10s polling...`);
+
+  if (pendingTransaction.status !== "pending") {
+    console.error(`ERR! ${networkName} transaction not accepted by daemon:`, pendingTransaction.status);
+    return false;
+  }
+
+  console.log(`SUCCESS! ${networkName} transaction accepted for processing by daemon`);
+
+  try {
+    let attempts = 0;
+    const maxAttempts = 1000; // Safety limit
+
+    while (attempts < maxAttempts) {
+      // Check global timeout
+      if (isGlobalTimeoutReached()) {
+        console.log(`WARN! ${networkName} confirmation stopped due to global timeout`);
+        return false;
+      }
+
+      try {
+        // Try to get transaction status
+        await pendingTransaction.wait({ maxAttempts: 1 });
+        console.log(`SUCCESS! ${networkName} transaction successfully confirmed: ${pendingTransaction.hash}`);
+        return true;
+      } catch (waitError) {
+        if (waitError.message.includes("pending") || waitError.message.includes("not found")) {
+          // Transaction still pending, continue polling
+          attempts++;
+          console.log(`${networkName} still pending... (attempt ${attempts})`);
+
+          // Wait 10 seconds before next poll
+          await new Promise(resolve => setTimeout(resolve, 10000));
+          continue;
+        } else {
+          // Other error, assume confirmed or failed
+          console.log(`SUCCESS! ${networkName} confirmation completed (via error): ${pendingTransaction.hash}`);
+          return true;
+        }
+      }
+    }
+
+    console.log(`WARN! ${networkName} confirmation max attempts reached`);
+    return false;
+  } catch (error) {
+    console.error(`ERR! ${networkName} transaction failed:`, error.message);
+    return false;
   }
 }

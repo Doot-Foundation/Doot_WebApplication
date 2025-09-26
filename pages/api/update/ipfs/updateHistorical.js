@@ -1,6 +1,9 @@
 const { redis } = require("@/utils/helper/init/InitRedis.js");
 
-const { HISTORICAL_CID_CACHE } = require("@/utils/constants/info.js");
+const {
+  HISTORICAL_CID_CACHE,
+  TOKEN_TO_CACHE,
+} = require("@/utils/constants/info.js");
 const pinHistoricalObject = require("@/utils/helper/PinHistorical.js");
 
 export default async function handler(req, res) {
@@ -12,15 +15,13 @@ export default async function handler(req, res) {
 
     const obj = {};
 
-    // Get all token cache keys and fetch their data
-    const { TOKEN_TO_CACHE } = require("@/utils/constants/info.js");
     const tokenKeys = Object.keys(TOKEN_TO_CACHE);
 
     // Fix Redis pipeline issue by validating cache keys and handling them properly
     const validCacheKeys = [];
     for (const tokenKey of tokenKeys) {
       const cacheKey = TOKEN_TO_CACHE[tokenKey];
-      if (cacheKey && typeof cacheKey === 'string' && cacheKey.trim() !== '') {
+      if (cacheKey && typeof cacheKey === "string" && cacheKey.trim() !== "") {
         validCacheKeys.push({ tokenKey, cacheKey });
       } else {
         console.warn(`Invalid cache key for token ${tokenKey}:`, cacheKey);
@@ -35,13 +36,16 @@ export default async function handler(req, res) {
           obj[tokenKey] = data;
         }
       } catch (error) {
-        console.error(`Failed to get cache for ${tokenKey} (${cacheKey}):`, error.message);
+        console.error(
+          `Failed to get cache for ${tokenKey} (${cacheKey}):`,
+          error.message
+        );
         // Continue with other tokens instead of failing completely
       }
     }
 
     // Validate HISTORICAL_CID_CACHE key before using it
-    if (!HISTORICAL_CID_CACHE || typeof HISTORICAL_CID_CACHE !== 'string') {
+    if (!HISTORICAL_CID_CACHE || typeof HISTORICAL_CID_CACHE !== "string") {
       throw new Error("Invalid HISTORICAL_CID_CACHE key");
     }
 
@@ -52,7 +56,10 @@ export default async function handler(req, res) {
     }
 
     console.log(`Updating historical IPFS with previous CID: ${cid}`);
-    console.log(`Collected data for ${Object.keys(obj).length} tokens:`, Object.keys(obj));
+    console.log(
+      `Collected data for ${Object.keys(obj).length} tokens:`,
+      Object.keys(obj)
+    );
 
     const updatedCID = await pinHistoricalObject(cid, obj);
 
@@ -76,7 +83,7 @@ export default async function handler(req, res) {
     return res.status(500).json({
       status: false,
       message: "Failed to update historical data",
-      error: error.message
+      error: error.message,
     });
   }
 }

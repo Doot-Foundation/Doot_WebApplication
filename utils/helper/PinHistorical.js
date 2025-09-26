@@ -1,9 +1,7 @@
-const JWT = process.env.PINATA_JWT;
-const GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
 const axios = require("axios");
 const unpin = require("./Unpin");
 
-const ONE_DAY_MS = 24 * 60 * 60 * 1000 * 365; // One year in milliseconds
+const ONE_YEAR = 60 * 60 * 24 * 365 * 1000; // One year in milliseconds
 
 /**
  * Removes timestamps older than 1 year
@@ -11,7 +9,7 @@ const ONE_DAY_MS = 24 * 60 * 60 * 1000 * 365; // One year in milliseconds
 function removeOldTimestamps(obj) {
   const currentTime = Date.now();
   Object.keys(obj.historical).forEach((key) => {
-    if (currentTime - Number(key) > ONE_DAY_MS) {
+    if (currentTime - Number(key) > ONE_YEAR) {
       delete obj.historical[key];
     }
   });
@@ -35,7 +33,7 @@ async function pinHistoricalObject(previousCID, latestPrices) {
         historical: {},
       };
     } else {
-      // Fetch and process previous data
+      const GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
       const { data: previousObject } = await axios.get(
         `https://${GATEWAY}/ipfs/${previousCID}`
       );
@@ -59,6 +57,7 @@ async function pinHistoricalObject(previousCID, latestPrices) {
     removeOldTimestamps(toUploadObject);
     console.log("Removed Historical Data > 1Y(if any).");
 
+    const JWT = process.env.PINATA_JWT;
     // Prepare upload options
     const options = {
       method: "POST",
@@ -76,10 +75,15 @@ async function pinHistoricalObject(previousCID, latestPrices) {
     };
 
     // SAFE PATTERN: Upload first, verify accessibility, then unpin old data
-    const response = await fetch("https://api.pinata.cloud/pinning/pinJSONToIPFS", options);
+    const response = await fetch(
+      "https://api.pinata.cloud/pinning/pinJSONToIPFS",
+      options
+    );
 
     if (!response.ok) {
-      throw new Error(`IPFS upload failed: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `IPFS upload failed: ${response.status} ${response.statusText}`
+      );
     }
 
     const data = await response.json();
@@ -91,23 +95,31 @@ async function pinHistoricalObject(previousCID, latestPrices) {
     // Critical: Verify the new CID returns valid data before unpinning old CID
     const GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
     if (!GATEWAY) {
-      throw new Error("Missing NEXT_PUBLIC_PINATA_GATEWAY environment variable");
+      throw new Error(
+        "Missing NEXT_PUBLIC_PINATA_GATEWAY environment variable"
+      );
     }
 
     try {
       const verificationResponse = await axios.get(
         `https://${GATEWAY}/ipfs/${data.IpfsHash}`,
-        { timeout: 10000, headers: { Accept: 'application/json' } }
+        { timeout: 10000, headers: { Accept: "application/json" } }
       );
 
       // Validate the data structure has required top-level properties
-      if (!verificationResponse.data ||
-          !verificationResponse.data.latest ||
-          !verificationResponse.data.historical) {
-        throw new Error("Invalid data structure: missing 'latest' or 'historical' properties");
+      if (
+        !verificationResponse.data ||
+        !verificationResponse.data.latest ||
+        !verificationResponse.data.historical
+      ) {
+        throw new Error(
+          "Invalid data structure: missing 'latest' or 'historical' properties"
+        );
       }
     } catch (verifyError) {
-      throw new Error(`New IPFS CID ${data.IpfsHash} is not accessible: ${verifyError.message}`);
+      throw new Error(
+        `New IPFS CID ${data.IpfsHash} is not accessible: ${verifyError.message}`
+      );
     }
 
     // Only NOW it's safe to unpin the old CID
@@ -116,7 +128,9 @@ async function pinHistoricalObject(previousCID, latestPrices) {
         await unpin(previousCID, "Historical");
       } catch (unpinError) {
         // Don't fail the entire operation if unpinning fails
-        console.warn(`Failed to unpin old CID ${previousCID}: ${unpinError.message}`);
+        console.warn(
+          `Failed to unpin old CID ${previousCID}: ${unpinError.message}`
+        );
       }
     }
 
