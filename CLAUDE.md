@@ -101,7 +101,7 @@ Located in `pages/api/` with organized endpoints:
 
 - `NEXT_PUBLIC_PINATA_GATEWAY` - IPFS gateway URL
 - `NEXT_PUBLIC_MINA_ENDPOINT` - Mina network endpoint
-- `NEXT_PUBLIC_DOOT_PUBLIC_KEY` - Doot contract public key
+- `NEXT_PUBLIC_MINA_DOOT_PUBLIC_KEY` - Mina L1 Doot contract public key
 - `CRON_SECRET` - Secret for protected cron endpoints
 - Redis configuration for caching
 
@@ -766,7 +766,7 @@ All update endpoints require `CRON_SECRET` authentication via Bearer token.
 #### **Blockchain & IPFS**
 
 - `NEXT_PUBLIC_MINA_ENDPOINT` - Mina network RPC
-- `NEXT_PUBLIC_DOOT_PUBLIC_KEY` - Smart contract address
+- `NEXT_PUBLIC_MINA_DOOT_PUBLIC_KEY` - Mina L1 smart contract address
 - `PINATA_JWT` - IPFS pinning authentication
 - `NEXT_PUBLIC_PINATA_GATEWAY` - IPFS gateway URL
 
