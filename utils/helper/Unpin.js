@@ -1,5 +1,3 @@
-const JWT = process.env.PINATA_JWT;
-
 /**
  * Unpins a file from Pinata IPFS
  * @param {string} cid - Content identifier to unpin
@@ -15,6 +13,7 @@ async function unpin(cid, functionName) {
       return;
     }
 
+    const JWT = process.env.PINATA_JWT;
     const options = {
       method: "DELETE",
       headers: {
