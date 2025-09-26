@@ -38,7 +38,8 @@ const ASSETS = [
 
 async function pinMinaObject(
   obj: AssetObject,
-  previousCID: string
+  previousCID: string,
+  networkPrefix: string = "mina"
 ): Promise<[string, string]> {
   try {
     const Map = new MerkleMap();
@@ -84,7 +85,7 @@ async function pinMinaObject(
       },
       body: JSON.stringify({
         pinataContent: toUploadObject,
-        pinataMetadata: { name: `mina_${timestamp}.json` },
+        pinataMetadata: { name: `${networkPrefix}_${timestamp}.json` },
       }),
     };
 
@@ -135,7 +136,7 @@ async function pinMinaObject(
     // Only NOW it's safe to unpin the old CID
     if (previousCID && previousCID !== "NULL") {
       try {
-        await unpin(previousCID, "Mina");
+        await unpin(previousCID, networkPrefix.charAt(0).toUpperCase() + networkPrefix.slice(1));
       } catch (unpinError) {
         // Don't fail the entire operation if unpinning fails
         console.warn(`Failed to unpin old CID ${previousCID}: ${unpinError instanceof Error ? unpinError.message : String(unpinError)}`);

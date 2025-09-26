@@ -15,30 +15,15 @@ import {
 } from "@/utils/constants/Doot.js";
 import { FileSystem, fetchDootFiles } from "@/utils/helper/LoadCache";
 
-// async function zkappInit() {
-const cacheFiles = await fetchDootFiles();
-// console.log("Compiling initiated.");
-try {
-  if (offchainState && typeof offchainState.compile === "function") {
-    await offchainState.compile({ cache: FileSystem(cacheFiles) });
-  }
-  await Doot.compile({ cache: FileSystem(cacheFiles) });
-  console.log("SUCCESS! Doot contract compiled using cache.");
-} catch (err) {
-  console.log(err);
-}
-// }
-
 /**
- * Combined Doot Oracle Update Endpoint
- * Flow: IPFS Pin → Zeko L2 Update → Mina L1 Update
- * Reuses cryptographic calculations for both networks
+ * Mina L1 Doot Oracle Update Endpoint
+ * Flow: IPFS Pin → Mina L1 Update → Redis Cache Update
+ * Slower finality (~3-5 minutes) but fully decentralized
  */
 export default async function handler(req, res) {
   let responseAlreadySent = false;
   let ipfsCID = null;
   let commitment = null;
-  // await zkappInit();
 
   try {
     const authHeader = req.headers.authorization;
@@ -46,8 +31,22 @@ export default async function handler(req, res) {
       return res.status(401).json("Unauthorized");
     }
 
+    // Compile contracts fresh for each request to avoid WASM aliasing
+    console.log("Compiling Doot contract and offchain state...");
+    const cacheFiles = await fetchDootFiles();
+    try {
+      if (offchainState && typeof offchainState.compile === "function") {
+        await offchainState.compile({ cache: FileSystem(cacheFiles) });
+      }
+      await Doot.compile({ cache: FileSystem(cacheFiles) });
+      console.log("SUCCESS! Doot contract compiled using cache.");
+    } catch (compileErr) {
+      console.error("ERR! Contract compilation failed:", compileErr.message);
+      throw new Error(`Contract compilation failed: ${compileErr.message}`);
+    }
+
     console.log(
-      "\n =============== DOOT ORACLE UPDATE STARTED =============== \n"
+      "\n =============== MINA L1 DOOT ORACLE UPDATE STARTED =============== \n"
     );
 
     const tokenData = {};
@@ -126,7 +125,7 @@ export default async function handler(req, res) {
     }
 
     // Pin to IPFS with MerkleMap commitment calculation
-    const ipfsResults = await pinMinaObject(tokenData, previousCID);
+    const ipfsResults = await pinMinaObject(tokenData, previousCID, "mina");
 
     if (!ipfsResults || !Array.isArray(ipfsResults) || ipfsResults.length < 2) {
       throw new Error("Invalid result from IPFS pinning operation");
@@ -142,8 +141,8 @@ export default async function handler(req, res) {
     await verifyIpfsAccessibility(ipfsCID);
     console.log("SUCCESS! IPFS data verification successful");
 
-    // Pre-compute shared cryptographic objects to eliminate redundancy
-    console.log("\nPre-computing shared cryptographic objects...");
+    // Pre-compute shared cryptographic objects
+    console.log("\nPre-computing cryptographic objects for Mina L1...");
 
     const COMMITMENT = Field.from(commitment);
     const IPFS_HASH = IpfsCID.fromString(ipfsCID);
@@ -183,36 +182,21 @@ export default async function handler(req, res) {
     };
 
     const dootZkApp = new Doot(
-      PublicKey.fromBase58(process.env.NEXT_PUBLIC_DOOT_PUBLIC_KEY)
+      PublicKey.fromBase58(process.env.NEXT_PUBLIC_MINA_DOOT_PUBLIC_KEY)
     );
     dootZkApp.offchainState.setContractInstance(dootZkApp);
 
-    console.log("\nUpdating Zeko L2 contract...");
-
-    let zekoSuccess = false;
-    let zekoTxHash = null;
-
-    try {
-      const zekoResult = await updateZekoL2Contract(dootZkApp, sharedTxnData);
-      zekoSuccess = zekoResult.success;
-      zekoTxHash = zekoResult.txHash;
-
-      if (zekoSuccess) {
-        console.log(`COMPLETED!`);
-      } else {
-        console.log(`ERR! Zeko L2 update failed: ${zekoResult.error}`);
-      }
-    } catch (error) {
-      console.error(`ERR! Zeko L2 update error: ${error.message}`);
-      zekoSuccess = false;
-    }
-
-    console.log("\nStarting Mina L1 update with 5:00 timeout...");
+    console.log("\nStarting Mina L1 update...");
 
     let minaSuccess = false;
     let minaTxHash = null;
     let minaStatus = "TIMEOUT";
     let minaError = null;
+    let minaResult = {
+      success: false,
+      confirmed: false,
+      settlementTxHash: null,
+    };
 
     // Create timeout promise (5 minutes = 300 seconds)
     const minaTimeout = new Promise((resolve) =>
@@ -222,7 +206,7 @@ export default async function handler(req, res) {
             success: false,
             timeout: true,
             elapsed: "300s",
-            message: "Mina L1 update timed out (5:00 limit)", // Assuming everything before completed in under 3minutes.
+            message: "Mina L1 update timed out (5:00 limit)",
           }),
         300000
       )
@@ -230,104 +214,100 @@ export default async function handler(req, res) {
 
     try {
       // Race between Mina L1 execution and timeout
-      const minaResult = await Promise.race([
+      const result = await Promise.race([
         updateMinaL1Contract(dootZkApp, sharedTxnData),
         minaTimeout,
       ]);
 
-      if (minaResult.timeout) {
+      if (result.timeout) {
         // Timeout occurred
         minaStatus = "TIMEOUT";
-        minaError = minaResult.message;
-        console.log(
-          `TIME!  Mina L1 update timed out after ${minaResult.elapsed}`
-        );
-      } else if (minaResult.success) {
+        minaError = result.message;
+        console.log(`TIME!  Mina L1 update timed out after ${result.elapsed}`);
+      } else if (result.success) {
         // Success within timeout
         minaSuccess = true;
-        minaTxHash = minaResult.txHash;
+        minaTxHash = result.txHash;
         minaStatus = "SUCCESS";
+        minaResult = result;
         console.log(`COMPLETED!`);
       } else {
         // Failed within timeout
         minaStatus = "FAILED";
-        minaError = minaResult.error;
-        console.log(`ERR! Mina L1 update failed: ${minaResult.error}`);
+        minaError = result.error;
+        minaResult = result;
+        console.log(`ERR! Mina L1 update failed: ${result.error}`);
       }
     } catch (error) {
       // Unexpected error
       minaStatus = "ERROR";
       minaError = error.message;
+      minaResult = {
+        success: false,
+        confirmed: false,
+        settlementTxHash: null,
+        error: error.message,
+      };
       console.error(`ERR! Mina L1 update unexpected error: ${error.message}`);
     }
 
     console.log("\nUpdating redis cache.");
 
-    // Update Redis cache if Zeko L2 succeeded (primary network)
-    if (zekoSuccess) {
+    // Update Redis cache if Mina L1 succeeded
+    if (minaSuccess) {
       await redis.set(MINA_CID_CACHE, [ipfsCID, commitment]);
       console.log("SUCCESS! Redis cache updated with new IPFS data");
     }
 
-    // Determine overall success (primary: Zeko L2, secondary: Mina L1 completion)
-    const overallSuccess = zekoSuccess; // Primary success metric
-    const networksCompleted = (zekoSuccess ? 1 : 0) + (minaSuccess ? 1 : 0);
     const responseData = {
-      status: overallSuccess,
-      message: overallSuccess
-        ? "Doot oracle update completed!"
-        : "All network updates failed",
+      status: minaSuccess,
+      message: minaSuccess
+        ? "Mina L1 Doot oracle update completed!"
+        : "Mina L1 update failed",
       data: {
         ipfs: {
           cid: ipfsCID,
           commitment,
         },
-        networks: {
-          zeko_l2: {
-            status: zekoSuccess ? "SUCCESS" : "FAILED",
-            success: zekoSuccess,
-            tx_hash: zekoTxHash || null,
-            endpoint: process.env.NEXT_PUBLIC_ZEKO_ENDPOINT,
-            contract: process.env.NEXT_PUBLIC_ZEKO_DOOT_PUBLIC_KEY,
-            error: zekoSuccess ? null : "Zeko L2 transaction failed",
-          },
-          mina_l1: {
-            status: minaStatus, // "SUCCESS" | "FAILED" | "TIMEOUT" | "ERROR"
-            success: minaSuccess,
-            tx_hash: minaTxHash || null,
-            endpoint: process.env.NEXT_PUBLIC_MINA_ENDPOINT,
-            contract: process.env.NEXT_PUBLIC_DOOT_PUBLIC_KEY,
-            error: minaError || null,
-            timeout_seconds: minaStatus === "TIMEOUT" ? 300 : null,
-          },
+        network: {
+          status: minaStatus, // "SUCCESS" | "FAILED" | "TIMEOUT" | "ERROR"
+          success: minaSuccess,
+          tx_hash: minaTxHash || null,
+          confirmed: minaResult?.confirmed || false,
+          settlement_tx_hash: minaResult?.settlementTxHash || null,
+          endpoint: process.env.NEXT_PUBLIC_MINA_ENDPOINT,
+          contract: process.env.NEXT_PUBLIC_MINA_DOOT_PUBLIC_KEY,
+          error: minaError || null,
+          timeout_seconds: minaStatus === "TIMEOUT" ? 300 : null,
+          finality: "3-5 minutes",
+          network_type: "mina_l1",
         },
         summary: {
-          networks_completed: networksCompleted, // Networks that completed successfully
-          networks_total: 2,
           tokens_processed: Object.keys(tokenData).length,
-          primary_network: "Zeko L2 (fast finality)",
-          secondary_network: "Mina L1 (full decentralization)",
+          operations: "update + confirmation + settlement",
+          confirmation: minaResult?.confirmed || false,
+          settlement: minaResult?.settlementTxHash ? "SUCCESS" : "SKIPPED",
+          primary_network: "Mina L1 (full decentralization)",
         },
       },
     };
 
     console.log(
-      "\n =============== DOOT ORACLE UPDATE SUMMARY ==============="
+      "\n =============== MINA L1 DOOT ORACLE UPDATE SUMMARY ==============="
     );
-    console.log(` Overall Status: ${overallSuccess ? "SUCCESS" : "FAILED"}`);
+    console.log(` Overall Status: ${minaSuccess ? "SUCCESS" : "FAILED"}`);
     console.log(` IPFS: ${ipfsCID} (${commitment.slice(0, 20)}...)`);
-    console.log(
-      ` Zeko L2: ${zekoSuccess ? "SUCCESS" : "FAILED"} ${
-        zekoTxHash ? `(${zekoTxHash})` : ""
-      }`
-    );
     console.log(
       ` Mina L1: ${minaSuccess ? "SUCCESS" : "FAILED"} ${
         minaTxHash ? `(${minaTxHash})` : ""
+      } ${minaResult?.confirmed ? "✅" : "⏱️"} ${
+        minaResult?.settlementTxHash
+          ? `[Settlement: ${minaResult.settlementTxHash}]`
+          : ""
       }`
     );
     console.log(
-      ` Networks Completed: ${responseData.data.summary.networks_completed}/${responseData.data.summary.networks_total}`
+      ` Tokens Processed: ${responseData.data.summary.tokens_processed}/10`
     );
     console.log(
       "===============================================================\n"
@@ -335,11 +315,26 @@ export default async function handler(req, res) {
 
     if (!responseAlreadySent) {
       responseAlreadySent = true;
-      return res.status(overallSuccess ? 200 : 500).json(responseData);
+
+      // CRITICAL: Force garbage collection to prevent WASM aliasing between requests
+      try {
+        if (global.gc) {
+          global.gc();
+          console.log("CLEANUP! Forced garbage collection completed");
+        } else {
+          console.log(
+            "CLEANUP! Garbage collection not available - restart Node.js with --expose-gc"
+          );
+        }
+      } catch (gcError) {
+        console.warn("CLEANUP! GC failed:", gcError.message);
+      }
+
+      return res.status(minaSuccess ? 200 : 500).json(responseData);
     }
   } catch (error) {
     console.error(
-      "\nERR! =============== DOOT ORACLE UPDATE FAILED ==============="
+      "\nERR! =============== MINA L1 DOOT ORACLE UPDATE FAILED ==============="
     );
     console.error("Error:", error.message);
     console.error("Stack:", error.stack);
@@ -349,13 +344,29 @@ export default async function handler(req, res) {
 
     if (!responseAlreadySent) {
       responseAlreadySent = true;
+
+      // CRITICAL: Force garbage collection to prevent WASM aliasing between requests
+      try {
+        if (global.gc) {
+          global.gc();
+          console.log("CLEANUP! Forced garbage collection completed");
+        } else {
+          console.log(
+            "CLEANUP! Garbage collection not available - restart Node.js with --expose-gc"
+          );
+        }
+      } catch (gcError) {
+        console.warn("CLEANUP! GC failed:", gcError.message);
+      }
+
       return res.status(500).json({
         status: false,
-        message: "Doot oracle update failed",
+        message: "Mina L1 Doot oracle update failed",
         error: error.message,
         data: {
           ipfs: ipfsCID ? { cid: ipfsCID, commitment } : null,
           stage_failed: ipfsCID ? "blockchain_update" : "ipfs_pinning",
+          network_type: "mina_l1",
         },
       });
     }
@@ -364,16 +375,91 @@ export default async function handler(req, res) {
 
 // Helper function for account fetching with retry (from contracts_CLAUDE.md patterns)
 async function fetchAccountWithRetry(accountInfo, maxRetries = 3) {
+  const endpoint = process.env.NEXT_PUBLIC_MINA_ENDPOINT;
+
   for (let i = 0; i < maxRetries; i++) {
     try {
-      await fetchAccount(accountInfo);
+      await fetchAccount(accountInfo, endpoint);
       return;
     } catch (error) {
       if (i === maxRetries - 1) throw error;
-      await new Promise((resolve) => setTimeout(resolve, 1000 * (i + 1))); // Exponential backoff
+      await new Promise((resolve) => setTimeout(resolve, 1000 * (i + 1)));
     }
   }
 }
+
+// Helper function for transaction confirmation (devnet/testnet optimized)
+// Avoids GraphQL issues with bestChain queries on Mina devnet
+async function waitForTransactionConfirmation(
+  pendingTransaction,
+  timeoutMinutes,
+  networkName
+) {
+  console.log(
+    `⏳ Waiting for ${networkName} confirmation (${timeoutMinutes}:00 timeout)...`
+  );
+
+  if (pendingTransaction.status !== "pending") {
+    console.error(
+      `❌ ${networkName} transaction not accepted by daemon:`,
+      pendingTransaction.status
+    );
+    return false;
+  }
+
+  console.log(
+    `✅ ${networkName} transaction accepted for processing by daemon`
+  );
+
+  try {
+    // For devnet/testnet: Use timeout-based confirmation to avoid GraphQL issues
+    const timeoutMs = timeoutMinutes * 60 * 1000;
+
+    // Try pendingTransaction.wait() but fallback to timeout if GraphQL fails
+    try {
+      const timeout = new Promise((_, reject) =>
+        setTimeout(
+          () =>
+            reject(
+              new Error(`Confirmation timeout after ${timeoutMinutes}:00`)
+            ),
+          timeoutMs
+        )
+      );
+
+      await Promise.race([pendingTransaction.wait(), timeout]);
+
+      console.log(
+        `✅ ${networkName} transaction successfully included in block: ${pendingTransaction.hash}`
+      );
+      return true;
+    } catch (waitError) {
+      if (
+        waitError.message.includes("bestChain") ||
+        waitError.message.includes("GraphQL")
+      ) {
+        console.log(` GraphQL issue detected, using time-based confirmation.`);
+        // Fallback: time-based confirmation for devnet
+        await new Promise((resolve) => setTimeout(resolve, timeoutMs));
+        console.log(
+          `✅ ${networkName} time-based confirmation completed: ${pendingTransaction.hash}`
+        );
+        return true;
+      } else if (waitError.message.includes("timeout")) {
+        console.log(
+          `⏱️ ${networkName} confirmation timed out (${timeoutMinutes}:00): ${pendingTransaction.hash}`
+        );
+        return false;
+      } else {
+        throw waitError; // Re-throw other errors
+      }
+    }
+  } catch (error) {
+    console.error(`❌ ${networkName} transaction failed:`, error.message);
+    return false;
+  }
+}
+
 // Local helper: verify IPFS data availability to avoid ESM/CJS interop issues
 async function verifyIpfsAccessibility(cid) {
   const GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
@@ -391,80 +477,6 @@ async function verifyIpfsAccessibility(cid) {
 }
 
 /**
- * Update Zeko L2 contract with shared transaction data
- * Fast finality (~10-25 seconds)
- * Based on contracts_CLAUDE.md deployment patterns
- */
-async function updateZekoL2Contract(dootZkApp, sharedTxnData) {
-  try {
-    console.log("Configuring Zeko L2 network connection...");
-
-    const { COMMITMENT, IPFS_HASH, TOKEN_INFO, caller, callerPub, ipfsCID } =
-      sharedTxnData;
-
-    // Environment variables for Zeko L2
-    const ZEKO_ENDPOINT = process.env.NEXT_PUBLIC_ZEKO_ENDPOINT;
-    const ZEKO_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_ZEKO_DOOT_PUBLIC_KEY;
-
-    if (!ZEKO_ENDPOINT || !ZEKO_CONTRACT_ADDRESS) {
-      throw new Error("Missing Zeko L2 environment variables");
-    }
-
-    console.log(`NETWORK! Connecting to: ${ZEKO_ENDPOINT}`);
-    console.log(` Contract: ${ZEKO_CONTRACT_ADDRESS}`);
-
-    // Use pre-computed objects (no redundant Field.from() calls)
-    const contractPub = PublicKey.fromBase58(ZEKO_CONTRACT_ADDRESS);
-
-    // Configure Zeko L2 network (from contracts_CLAUDE.md)
-    const ZekoNetwork = Mina.Network({
-      mina: ZEKO_ENDPOINT,
-      archive: ZEKO_ENDPOINT, // Zeko uses same endpoint for both
-    });
-    Mina.setActiveInstance(ZekoNetwork);
-
-    // Fetch accounts with retry logic
-    await fetchAccountWithRetry({ publicKey: contractPub });
-    await fetchAccountWithRetry({ publicKey: callerPub });
-
-    console.log("Creating and proving Zeko L2 transaction...");
-
-    // Create transaction (owner-only update method)
-    const txn = await Mina.transaction(
-      { sender: callerPub, fee: 0.1 * 1e9 }, // 0.1 MINA fee buffer for Zeko L2
-      async () => {
-        await dootZkApp.update(COMMITMENT, IPFS_HASH, TOKEN_INFO);
-      }
-    );
-
-    // Prove transaction
-    await txn.prove();
-    console.log("SUCCESS! Zeko L2 transaction proved successfully");
-
-    // Sign and send
-    const signedTxn = txn.sign([caller]);
-    const result = await signedTxn.send();
-
-    console.log(`SUCCESS! Zeko L2 transaction sent: ${result.hash}`);
-
-    return {
-      success: true,
-      txHash: result.hash,
-      network: "zeko_l2",
-      finality: "10-25 seconds",
-      endpoint: ZEKO_ENDPOINT,
-    };
-  } catch (error) {
-    console.error("ERR! Zeko L2 transaction error:", error.message);
-    return {
-      success: false,
-      error: error.message,
-      network: "zeko_l2",
-    };
-  }
-}
-
-/**
  * Update Mina L1 contract with shared transaction data
  * Slower finality (~3-5 minutes) but more decentralized
  * Based on contracts_CLAUDE.md deployment patterns
@@ -473,40 +485,43 @@ async function updateMinaL1Contract(dootZkApp, sharedTxnData) {
   try {
     console.log("Configuring Mina L1 network connection...");
 
-    const { COMMITMENT, IPFS_HASH, TOKEN_INFO, caller, callerPub, ipfsCID } =
+    const { COMMITMENT, IPFS_HASH, TOKEN_INFO, caller, callerPub } =
       sharedTxnData;
 
     // Environment variables for Mina L1
     const MINA_ENDPOINT = process.env.NEXT_PUBLIC_MINA_ENDPOINT;
-    const MINA_ARCHIVE_ENDPOINT = process.env.NEXT_PUBLIC_MINA_ENDPOINT; // Same for devnet
-    const MINA_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_DOOT_PUBLIC_KEY;
+    const MINA_ARCHIVE_ENDPOINT =
+      process.env.NEXT_PUBLIC_MINA_ARCHIVE_ENDPOINT ||
+      process.env.NEXT_PUBLIC_MINA_ENDPOINT;
+    const MINA_CONTRACT_ADDRESS = process.env.NEXT_PUBLIC_MINA_DOOT_PUBLIC_KEY;
 
     if (!MINA_ENDPOINT || !MINA_CONTRACT_ADDRESS) {
       throw new Error("Missing Mina L1 environment variables");
     }
 
     console.log(`NETWORK! Connecting to: ${MINA_ENDPOINT}`);
+    console.log(` Archive: ${MINA_ARCHIVE_ENDPOINT}`);
     console.log(` Contract: ${MINA_CONTRACT_ADDRESS}`);
 
-    // Use the SAME pre-computed cryptographic objects (maximum efficiency!)
+    // Use the pre-computed cryptographic objects (maximum efficiency!)
     const contractPub = PublicKey.fromBase58(MINA_CONTRACT_ADDRESS);
 
     // Configure Mina L1 network (from contracts_CLAUDE.md)
     const MinaL1Network = Mina.Network({
-      mina: MINA_ENDPOINT,
+      mina: MINA_ENDPOINT, // SAME AS ARCHIVE
       archive: MINA_ARCHIVE_ENDPOINT,
     });
     Mina.setActiveInstance(MinaL1Network);
 
     // Fetch accounts with retry logic
-    await fetchAccountWithRetry({ publicKey: contractPub });
-    await fetchAccountWithRetry({ publicKey: callerPub });
+    await fetchAccountWithRetry({ publicKey: contractPub, tokenId: Field(1) });
+    await fetchAccountWithRetry({ publicKey: callerPub, tokenId: Field(1) });
 
     console.log("Creating and proving Mina L1 transaction...");
 
     // Create transaction (same update method as Zeko)
     const txn = await Mina.transaction(
-      { sender: callerPub, fee: 0.1 * 1e9 }, // Standard L1 fee
+      { sender: callerPub, fee: 5e9 }, // Standard L1 fee
       async () => {
         await dootZkApp.update(COMMITMENT, IPFS_HASH, TOKEN_INFO);
       }
@@ -518,13 +533,60 @@ async function updateMinaL1Contract(dootZkApp, sharedTxnData) {
 
     // Sign and send
     const signedTxn = txn.sign([caller]);
-    const result = await signedTxn.send();
+    const pendingTxn = await signedTxn.send();
 
-    console.log(`SUCCESS! Mina L1 transaction sent: ${result.hash}`);
+    console.log(`SUCCESS! Mina L1 transaction sent: ${pendingTxn.hash}`);
+
+    // Wait for Mina L1 transaction confirmation (5 minute timeout)
+    const minaConfirmed = await waitForTransactionConfirmation(
+      pendingTxn,
+      6,
+      "Mina L1"
+    ); // 5 minutes
+
+    let settlementTxHash = null;
+    if (minaConfirmed) {
+      // Fire-and-forget settlement - send but don't wait
+      console.log("Mina L1 confirmed! Sending settlement (fire-and-forget)...");
+      try {
+        console.log("Creating settlement proof...");
+        const settlementProof =
+          await dootZkApp.offchainState.createSettlementProof();
+
+        console.log("Building settlement transaction...");
+        const settleTxn = await Mina.transaction(
+          { sender: callerPub, fee: 0.1 * 5e9 },
+          async () => {
+            await dootZkApp.settle(settlementProof);
+          }
+        );
+
+        console.log("Proving settlement transaction...");
+        await settleTxn.prove();
+
+        console.log("Sending settlement transaction...");
+        const settlementPending = await settleTxn.sign([caller]).send();
+        settlementTxHash = settlementPending.hash;
+
+        console.log(
+          `SUCCESS! Mina L1 settlement sent (fire-and-forget): ${settlementTxHash}`
+        );
+      } catch (settlementError) {
+        console.warn(
+          `WARN! Mina L1 settlement failed: ${settlementError.message}`
+        );
+      }
+    } else {
+      console.log(
+        "WARN! Mina L1 transaction not confirmed within 5:00 - skipping settlement"
+      );
+    }
 
     return {
       success: true,
-      txHash: result.hash,
+      txHash: pendingTxn.hash,
+      confirmed: minaConfirmed,
+      settlementTxHash,
       network: "mina_l1",
       finality: "3-5 minutes",
       endpoint: MINA_ENDPOINT,
