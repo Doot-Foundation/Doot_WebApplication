@@ -21,13 +21,22 @@ import { FileSystem, fetchDootFiles } from "@/utils/helper/LoadCache";
  * Slower finality (~3-5 minutes) but fully decentralized
  */
 export default async function handler(req, res) {
+  const startTime = Date.now();
+  const GLOBAL_TIMEOUT_MS = 795 * 1000; // 795 seconds
+  let globalTimeoutReached = false;
   let responseAlreadySent = false;
   let ipfsCID = null;
   let commitment = null;
 
+  // Set up global timeout
+  const globalTimeout = setTimeout(() => {
+    globalTimeoutReached = true;
+  }, GLOBAL_TIMEOUT_MS);
+
   try {
     const authHeader = req.headers.authorization;
     if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+      clearTimeout(globalTimeout);
       return res.status(401).json("Unauthorized");
     }
 
@@ -190,7 +199,7 @@ export default async function handler(req, res) {
 
     let minaSuccess = false;
     let minaTxHash = null;
-    let minaStatus = "TIMEOUT";
+    let minaStatus = "PENDING";
     let minaError = null;
     let minaResult = {
       success: false,
@@ -198,48 +207,33 @@ export default async function handler(req, res) {
       settlementTxHash: null,
     };
 
-    // Create timeout promise (5 minutes = 300 seconds)
-    const minaTimeout = new Promise((resolve) =>
-      setTimeout(
-        () =>
-          resolve({
-            success: false,
-            timeout: true,
-            elapsed: "300s",
-            message: "Mina L1 update timed out (5:00 limit)",
-          }),
-        300000
-      )
-    );
-
     try {
-      // Race between Mina L1 execution and timeout
-      const result = await Promise.race([
-        updateMinaL1Contract(dootZkApp, sharedTxnData),
-        minaTimeout,
-      ]);
-
-      if (result.timeout) {
-        // Timeout occurred
-        minaStatus = "TIMEOUT";
-        minaError = result.message;
-        console.log(`TIME!  Mina L1 update timed out after ${result.elapsed}`);
-      } else if (result.success) {
-        // Success within timeout
-        minaSuccess = true;
-        minaTxHash = result.txHash;
-        minaStatus = "SUCCESS";
-        minaResult = result;
-        console.log(`COMPLETED!`);
+      // Check global timeout before starting blockchain operations
+      if (globalTimeoutReached) {
+        minaStatus = "PENDING";
+        minaError = "Global timeout reached before blockchain operations";
+        console.log(`TIME! Global timeout reached before Mina L1 operations`);
       } else {
-        // Failed within timeout
-        minaStatus = "FAILED";
-        minaError = result.error;
-        minaResult = result;
-        console.log(`ERR! Mina L1 update failed: ${result.error}`);
+        const result = await updateMinaL1ContractWithPolling(dootZkApp, sharedTxnData, () => globalTimeoutReached);
+
+        if (result.timeout) {
+          minaStatus = "PENDING";
+          minaError = result.message;
+          console.log(`TIME! Mina L1 update timed out: ${result.message}`);
+        } else if (result.success) {
+          minaSuccess = true;
+          minaTxHash = result.txHash;
+          minaStatus = "SUCCESS";
+          minaResult = result;
+          console.log(`COMPLETED!`);
+        } else {
+          minaStatus = "FAILED";
+          minaError = result.error;
+          minaResult = result;
+          console.log(`ERR! Mina L1 update failed: ${result.error}`);
+        }
       }
     } catch (error) {
-      // Unexpected error
       minaStatus = "ERROR";
       minaError = error.message;
       minaResult = {
@@ -259,10 +253,16 @@ export default async function handler(req, res) {
       console.log("SUCCESS! Redis cache updated with new IPFS data");
     }
 
+    // Clear global timeout
+    clearTimeout(globalTimeout);
+
+    const elapsed = Math.round((Date.now() - startTime) / 1000);
     const responseData = {
       status: minaSuccess,
       message: minaSuccess
         ? "Mina L1 Doot oracle update completed!"
+        : minaStatus === "PENDING"
+        ? "Mina L1 update partially completed (timeout reached)"
         : "Mina L1 update failed",
       data: {
         ipfs: {
@@ -270,7 +270,7 @@ export default async function handler(req, res) {
           commitment,
         },
         network: {
-          status: minaStatus, // "SUCCESS" | "FAILED" | "TIMEOUT" | "ERROR"
+          status: minaStatus, // "SUCCESS" | "FAILED" | "PENDING" | "ERROR"
           success: minaSuccess,
           tx_hash: minaTxHash || null,
           confirmed: minaResult?.confirmed || false,
@@ -278,7 +278,9 @@ export default async function handler(req, res) {
           endpoint: process.env.NEXT_PUBLIC_MINA_ENDPOINT,
           contract: process.env.NEXT_PUBLIC_MINA_DOOT_PUBLIC_KEY,
           error: minaError || null,
-          timeout_seconds: minaStatus === "TIMEOUT" ? 300 : null,
+          elapsed_seconds: elapsed,
+          global_timeout_seconds: 795,
+          timeout_reached: globalTimeoutReached,
           finality: "3-5 minutes",
           network_type: "mina_l1",
         },
@@ -286,7 +288,7 @@ export default async function handler(req, res) {
           tokens_processed: Object.keys(tokenData).length,
           operations: "update + confirmation + settlement",
           confirmation: minaResult?.confirmed || false,
-          settlement: minaResult?.settlementTxHash ? "SUCCESS" : "SKIPPED",
+          settlement: minaResult?.settlementTxHash ? "SUCCESS" : minaStatus === "PENDING" ? "PENDING" : "SKIPPED",
           primary_network: "Mina L1 (full decentralization)",
         },
       },
@@ -300,7 +302,7 @@ export default async function handler(req, res) {
     console.log(
       ` Mina L1: ${minaSuccess ? "SUCCESS" : "FAILED"} ${
         minaTxHash ? `(${minaTxHash})` : ""
-      } ${minaResult?.confirmed ? "✅" : "⏱️"} ${
+      } ${minaResult?.confirmed ? "CONFIRMED" : "PENDING"} ${
         minaResult?.settlementTxHash
           ? `[Settlement: ${minaResult.settlementTxHash}]`
           : ""
@@ -330,7 +332,9 @@ export default async function handler(req, res) {
         console.warn("CLEANUP! GC failed:", gcError.message);
       }
 
-      return res.status(minaSuccess ? 200 : 500).json(responseData);
+      // Always return 200 for timeout/pending states to provide vital info
+      const statusCode = minaSuccess || minaStatus === "PENDING" ? 200 : 500;
+      return res.status(statusCode).json(responseData);
     }
   } catch (error) {
     console.error(
@@ -344,6 +348,9 @@ export default async function handler(req, res) {
 
     if (!responseAlreadySent) {
       responseAlreadySent = true;
+
+      // Clear global timeout
+      clearTimeout(globalTimeout);
 
       // CRITICAL: Force garbage collection to prevent WASM aliasing between requests
       try {
@@ -359,6 +366,7 @@ export default async function handler(req, res) {
         console.warn("CLEANUP! GC failed:", gcError.message);
       }
 
+      const elapsed = Math.round((Date.now() - startTime) / 1000);
       return res.status(500).json({
         status: false,
         message: "Mina L1 Doot oracle update failed",
@@ -367,6 +375,9 @@ export default async function handler(req, res) {
           ipfs: ipfsCID ? { cid: ipfsCID, commitment } : null,
           stage_failed: ipfsCID ? "blockchain_update" : "ipfs_pinning",
           network_type: "mina_l1",
+          elapsed_seconds: elapsed,
+          global_timeout_seconds: 795,
+          timeout_reached: globalTimeoutReached,
         },
       });
     }
@@ -388,77 +399,6 @@ async function fetchAccountWithRetry(accountInfo, maxRetries = 3) {
   }
 }
 
-// Helper function for transaction confirmation (devnet/testnet optimized)
-// Avoids GraphQL issues with bestChain queries on Mina devnet
-async function waitForTransactionConfirmation(
-  pendingTransaction,
-  timeoutMinutes,
-  networkName
-) {
-  console.log(
-    `⏳ Waiting for ${networkName} confirmation (${timeoutMinutes}:00 timeout)...`
-  );
-
-  if (pendingTransaction.status !== "pending") {
-    console.error(
-      `❌ ${networkName} transaction not accepted by daemon:`,
-      pendingTransaction.status
-    );
-    return false;
-  }
-
-  console.log(
-    `✅ ${networkName} transaction accepted for processing by daemon`
-  );
-
-  try {
-    // For devnet/testnet: Use timeout-based confirmation to avoid GraphQL issues
-    const timeoutMs = timeoutMinutes * 60 * 1000;
-
-    // Try pendingTransaction.wait() but fallback to timeout if GraphQL fails
-    try {
-      const timeout = new Promise((_, reject) =>
-        setTimeout(
-          () =>
-            reject(
-              new Error(`Confirmation timeout after ${timeoutMinutes}:00`)
-            ),
-          timeoutMs
-        )
-      );
-
-      await Promise.race([pendingTransaction.wait(), timeout]);
-
-      console.log(
-        `✅ ${networkName} transaction successfully included in block: ${pendingTransaction.hash}`
-      );
-      return true;
-    } catch (waitError) {
-      if (
-        waitError.message.includes("bestChain") ||
-        waitError.message.includes("GraphQL")
-      ) {
-        console.log(` GraphQL issue detected, using time-based confirmation.`);
-        // Fallback: time-based confirmation for devnet
-        await new Promise((resolve) => setTimeout(resolve, timeoutMs));
-        console.log(
-          `✅ ${networkName} time-based confirmation completed: ${pendingTransaction.hash}`
-        );
-        return true;
-      } else if (waitError.message.includes("timeout")) {
-        console.log(
-          `⏱️ ${networkName} confirmation timed out (${timeoutMinutes}:00): ${pendingTransaction.hash}`
-        );
-        return false;
-      } else {
-        throw waitError; // Re-throw other errors
-      }
-    }
-  } catch (error) {
-    console.error(`❌ ${networkName} transaction failed:`, error.message);
-    return false;
-  }
-}
 
 // Local helper: verify IPFS data availability to avoid ESM/CJS interop issues
 async function verifyIpfsAccessibility(cid) {
@@ -477,16 +417,14 @@ async function verifyIpfsAccessibility(cid) {
 }
 
 /**
- * Update Mina L1 contract with shared transaction data
- * Slower finality (~3-5 minutes) but more decentralized
- * Based on contracts_CLAUDE.md deployment patterns
+ * Update Mina L1 contract with polling and global timeout awareness
+ * Polls every 10 seconds, respects global timeout, waits for full confirmation
  */
-async function updateMinaL1Contract(dootZkApp, sharedTxnData) {
+async function updateMinaL1ContractWithPolling(dootZkApp, sharedTxnData, isGlobalTimeoutReached) {
   try {
     console.log("Configuring Mina L1 network connection...");
 
-    const { COMMITMENT, IPFS_HASH, TOKEN_INFO, caller, callerPub } =
-      sharedTxnData;
+    const { COMMITMENT, IPFS_HASH, TOKEN_INFO, caller, callerPub } = sharedTxnData;
 
     // Environment variables for Mina L1
     const MINA_ENDPOINT = process.env.NEXT_PUBLIC_MINA_ENDPOINT;
@@ -503,12 +441,16 @@ async function updateMinaL1Contract(dootZkApp, sharedTxnData) {
     console.log(` Archive: ${MINA_ARCHIVE_ENDPOINT}`);
     console.log(` Contract: ${MINA_CONTRACT_ADDRESS}`);
 
-    // Use the pre-computed cryptographic objects (maximum efficiency!)
+    // Check timeout before expensive operations
+    if (isGlobalTimeoutReached()) {
+      return { success: false, timeout: true, message: "Global timeout reached before network setup" };
+    }
+
     const contractPub = PublicKey.fromBase58(MINA_CONTRACT_ADDRESS);
 
-    // Configure Mina L1 network (from contracts_CLAUDE.md)
+    // Configure Mina L1 network
     const MinaL1Network = Mina.Network({
-      mina: MINA_ENDPOINT, // SAME AS ARCHIVE
+      mina: MINA_ENDPOINT,
       archive: MINA_ARCHIVE_ENDPOINT,
     });
     Mina.setActiveInstance(MinaL1Network);
@@ -517,19 +459,29 @@ async function updateMinaL1Contract(dootZkApp, sharedTxnData) {
     await fetchAccountWithRetry({ publicKey: contractPub, tokenId: Field(1) });
     await fetchAccountWithRetry({ publicKey: callerPub, tokenId: Field(1) });
 
+    // Check timeout before proving
+    if (isGlobalTimeoutReached()) {
+      return { success: false, timeout: true, message: "Global timeout reached before transaction creation" };
+    }
+
     console.log("Creating and proving Mina L1 transaction...");
 
-    // Create transaction (same update method as Zeko)
+    // Create transaction
     const txn = await Mina.transaction(
-      { sender: callerPub, fee: 5e9 }, // Standard L1 fee
+      { sender: callerPub, fee: 5e9 },
       async () => {
         await dootZkApp.update(COMMITMENT, IPFS_HASH, TOKEN_INFO);
       }
     );
 
-    // Generate proof (reuses same cryptographic objects)
+    // Generate proof
     await txn.prove();
     console.log("SUCCESS! Mina L1 transaction proved successfully");
+
+    // Check timeout before sending
+    if (isGlobalTimeoutReached()) {
+      return { success: false, timeout: true, message: "Global timeout reached before sending transaction" };
+    }
 
     // Sign and send
     const signedTxn = txn.sign([caller]);
@@ -537,49 +489,58 @@ async function updateMinaL1Contract(dootZkApp, sharedTxnData) {
 
     console.log(`SUCCESS! Mina L1 transaction sent: ${pendingTxn.hash}`);
 
-    // Wait for Mina L1 transaction confirmation (5 minute timeout)
-    const minaConfirmed = await waitForTransactionConfirmation(
+    // Wait for confirmation with polling every 10 seconds
+    const minaConfirmed = await waitForTransactionConfirmationWithPolling(
       pendingTxn,
-      6,
-      "Mina L1"
-    ); // 5 minutes
+      "Mina L1",
+      isGlobalTimeoutReached
+    );
+
+    if (isGlobalTimeoutReached()) {
+      return {
+        success: false,
+        timeout: true,
+        message: "Global timeout reached during transaction confirmation",
+        txHash: pendingTxn.hash,
+        confirmed: false
+      };
+    }
 
     let settlementTxHash = null;
     if (minaConfirmed) {
-      // Fire-and-forget settlement - send but don't wait
-      console.log("Mina L1 confirmed! Sending settlement (fire-and-forget)...");
+      // Settlement process with timeout awareness
+      console.log("Mina L1 confirmed! Sending settlement...");
       try {
-        console.log("Creating settlement proof...");
-        const settlementProof =
-          await dootZkApp.offchainState.createSettlementProof();
+        if (isGlobalTimeoutReached()) {
+          console.log("WARN! Global timeout reached before settlement");
+        } else {
+          console.log("Creating settlement proof...");
+          const settlementProof = await dootZkApp.offchainState.createSettlementProof();
 
-        console.log("Building settlement transaction...");
-        const settleTxn = await Mina.transaction(
-          { sender: callerPub, fee: 0.1 * 5e9 },
-          async () => {
-            await dootZkApp.settle(settlementProof);
+          if (!isGlobalTimeoutReached()) {
+            console.log("Building settlement transaction...");
+            const settleTxn = await Mina.transaction(
+              { sender: callerPub, fee: 0.1 * 5e9 },
+              async () => {
+                await dootZkApp.settle(settlementProof);
+              }
+            );
+
+            console.log("Proving settlement transaction...");
+            await settleTxn.prove();
+
+            if (!isGlobalTimeoutReached()) {
+              console.log("Sending settlement transaction...");
+              const settlementPending = await settleTxn.sign([caller]).send();
+              settlementTxHash = settlementPending.hash;
+
+              console.log(`SUCCESS! Mina L1 settlement sent: ${settlementTxHash}`);
+            }
           }
-        );
-
-        console.log("Proving settlement transaction...");
-        await settleTxn.prove();
-
-        console.log("Sending settlement transaction...");
-        const settlementPending = await settleTxn.sign([caller]).send();
-        settlementTxHash = settlementPending.hash;
-
-        console.log(
-          `SUCCESS! Mina L1 settlement sent (fire-and-forget): ${settlementTxHash}`
-        );
+        }
       } catch (settlementError) {
-        console.warn(
-          `WARN! Mina L1 settlement failed: ${settlementError.message}`
-        );
+        console.warn(`WARN! Mina L1 settlement failed: ${settlementError.message}`);
       }
-    } else {
-      console.log(
-        "WARN! Mina L1 transaction not confirmed within 5:00 - skipping settlement"
-      );
     }
 
     return {
@@ -598,5 +559,59 @@ async function updateMinaL1Contract(dootZkApp, sharedTxnData) {
       error: error.message,
       network: "mina_l1",
     };
+  }
+}
+
+/**
+ * Wait for transaction confirmation with 10-second polling and global timeout awareness
+ */
+async function waitForTransactionConfirmationWithPolling(pendingTransaction, networkName, isGlobalTimeoutReached) {
+  console.log(`Waiting for ${networkName} confirmation with 10s polling...`);
+
+  if (pendingTransaction.status !== "pending") {
+    console.error(`ERR! ${networkName} transaction not accepted by daemon:`, pendingTransaction.status);
+    return false;
+  }
+
+  console.log(`SUCCESS! ${networkName} transaction accepted for processing by daemon`);
+
+  try {
+    let attempts = 0;
+    const maxAttempts = 1000; // Safety limit
+
+    while (attempts < maxAttempts) {
+      // Check global timeout
+      if (isGlobalTimeoutReached()) {
+        console.log(`WARN! ${networkName} confirmation stopped due to global timeout`);
+        return false;
+      }
+
+      try {
+        // Try to get transaction status
+        await pendingTransaction.wait({ maxAttempts: 1 });
+        console.log(`SUCCESS! ${networkName} transaction successfully confirmed: ${pendingTransaction.hash}`);
+        return true;
+      } catch (waitError) {
+        if (waitError.message.includes("pending") || waitError.message.includes("not found")) {
+          // Transaction still pending, continue polling
+          attempts++;
+          console.log(`${networkName} still pending... (attempt ${attempts})`);
+
+          // Wait 10 seconds before next poll
+          await new Promise(resolve => setTimeout(resolve, 10000));
+          continue;
+        } else {
+          // Other error, assume confirmed or failed
+          console.log(`SUCCESS! ${networkName} confirmation completed (via error): ${pendingTransaction.hash}`);
+          return true;
+        }
+      }
+    }
+
+    console.log(`WARN! ${networkName} confirmation max attempts reached`);
+    return false;
+  } catch (error) {
+    console.error(`ERR! ${networkName} transaction failed:`, error.message);
+    return false;
   }
 }
