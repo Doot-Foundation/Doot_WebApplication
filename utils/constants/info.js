@@ -28,6 +28,7 @@ const HISTORICAL_CID_CACHE = "historical_cid";
 // const HISTORICAL_MAX_SIGNED_SLOT_CACHE = "historical_signed_max";
 
 const MINA_CID_CACHE = "mina_cid";
+const ZEKO_CID_CACHE = "zeko_cid";
 // const MINA_MAX_SIGNED_SLOT_CACHE = "mina_signed_max";
 
 const TOKEN_TO_AGGREGATION_PROOF_CACHE = {
@@ -258,6 +259,7 @@ module.exports = {
   SYMBOL_TO_TOKEN,
   SUPPORTED_TOKENS,
   PROVIDERS,
+  ZEKO_CID_CACHE,
   ENDPOINT_TO_DATA_PROVIDER,
   DATA_PROVIDER_TO_ENDPOINT,
   ENDPOINT_KEY_TO_IMAGE_NAME,

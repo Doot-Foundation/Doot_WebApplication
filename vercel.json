@@ -1,12 +1,21 @@
 {
   "functions": {
     "pages/api/update/**/*": {
-      "memory": 3009,
-      "maxDuration": 300
+      "memory": 4096,
+      "maxDuration": 800
     }
   },
   "crons": [
     { "path": "/api/update/core/updateAllPrices", "schedule": "*/10 * * * *" },
+
+    {
+      "path": "/api/update/core/updateDootZeko",
+      "schedule": "1-59/10 * * * *"
+    },
+    {
+      "path": "/api/update/core/updateDootMina",
+      "schedule": "3-59/10 * * * *"
+    },
     {
       "path": "/api/update/ipfs/updateHistorical",
       "schedule": "5-59/10 * * * *"

@@ -4,7 +4,7 @@ import axios from "axios";
 
 const GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
 const ENDPOINT = process.env.NEXT_PUBLIC_MINA_ENDPOINT;
-const DOOT_PUBLIC_KEY = process.env.NEXT_PUBLIC_DOOT_PUBLIC_KEY;
+const DOOT_PUBLIC_KEY = process.env.NEXT_PUBLIC_MINA_DOOT_PUBLIC_KEY;
 
 interface MinaDetails {
   IpfsHash: string;

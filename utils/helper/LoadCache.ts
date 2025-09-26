@@ -27,6 +27,8 @@ const aggregationCacheFiles: CacheFile[] = [
 ];
 
 const cacheFiles: CacheFile[] = [
+  { name: "lagrange-basis-fp-8192", type: "string" },
+  { name: "lagrange-basis-fp-16384", type: "string" },
   { name: "step-vk-doot-getprices", type: "string" },
   { name: "step-vk-doot-initbase", type: "string" },
   { name: "step-vk-doot-settle", type: "string" },
