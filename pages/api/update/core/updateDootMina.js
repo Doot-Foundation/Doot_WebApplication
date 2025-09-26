@@ -13,7 +13,6 @@ import {
   TokenInformationArray,
   offchainState,
 } from "@/utils/constants/Doot.js";
-import { FileSystem, fetchDootFiles } from "@/utils/helper/LoadCache";
 
 /**
  * Mina L1 Doot Oracle Update Endpoint
@@ -40,15 +39,17 @@ export default async function handler(req, res) {
       return res.status(401).json("Unauthorized");
     }
 
-    // Compile contracts fresh for each request to avoid WASM aliasing
+    // Compile contracts fresh for each request following o1js server-side best practices
     console.log("Compiling Doot contract and offchain state...");
-    const cacheFiles = await fetchDootFiles();
     try {
+      // Compile offchain state first if it exists
       if (offchainState && typeof offchainState.compile === "function") {
-        await offchainState.compile({ cache: FileSystem(cacheFiles) });
+        await offchainState.compile();
       }
-      await Doot.compile({ cache: FileSystem(cacheFiles) });
-      console.log("SUCCESS! Doot contract compiled using cache.");
+
+      // Compile the main Doot contract without cache for server-side reliability
+      await Doot.compile();
+      console.log("SUCCESS! Doot contract compiled successfully (server-side).");
     } catch (compileErr) {
       console.error("ERR! Contract compilation failed:", compileErr.message);
       throw new Error(`Contract compilation failed: ${compileErr.message}`);
