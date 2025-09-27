@@ -23,7 +23,8 @@
     "next-env.d.ts",
     "pages/**/*",
     "utils/**/*",
-    "lib/**/*"
+    "lib/**/*",
+    "cron-orchestrator/*"
   ],
   "exclude": ["node_modules"]
 }
