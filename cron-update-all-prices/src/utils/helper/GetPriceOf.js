@@ -1,4 +1,7 @@
-const { callSignAPICall, processFloatString } = require("./CallAndSignAPICalls");
+const {
+  callSignAPICall,
+  processFloatString,
+} = require("./CallAndSignAPICalls");
 const { MULTIPLICATION_FACTOR } = require("../constants/info");
 const { testnetSignatureClient } = require("./init/InitSignatureClient");
 const {
@@ -102,7 +105,7 @@ async function getPriceCoinAPI(token) {
     callSignAPICall(
       `https://rest.coinapi.io/v1/exchangerate/${id}/USD`,
       `data.rate`,
-      "X-CoinAPI-Key`
+      "X-CoinAPI-Key"
     )
   );
 }
@@ -129,7 +132,7 @@ async function getPriceMessari(token) {
     callSignAPICall(
       `https://api.messari.io/metrics/v2/assets/details?slugs=${slug}`,
       `data.data[0].marketData.priceUsd`,
-      "x-messari-api-key`
+      "x-messari-api-key"
     )
   );
 }

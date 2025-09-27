@@ -102,7 +102,7 @@ async function getPriceCoinAPI(token) {
     callSignAPICall(
       `https://rest.coinapi.io/v1/exchangerate/${id}/USD`,
       `data.rate`,
-      "X-CoinAPI-Key`
+      "X-CoinAPI-Key"
     )
   );
 }

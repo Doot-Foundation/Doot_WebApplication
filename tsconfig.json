@@ -19,12 +19,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": [
-    "next-env.d.ts",
-    "pages/**/*",
-    "utils/**/*",
-    "lib/**/*",
-    "cron-orchestrator/*"
-  ],
+  "include": ["next-env.d.ts", "pages/**/*", "utils/**/*", "lib/**/*"],
   "exclude": ["node_modules"]
 }

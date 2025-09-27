@@ -1,5 +1,4 @@
 const { Redis } = require("@upstash/redis");
-const { Ratelimit } = require("@upstash/ratelimit");
 
 const HOST = process.env.REDIS_REST_HOST;
 const PASSWORD = process.env.REDIS_REST_TOKEN;
@@ -13,10 +12,4 @@ const redis = new Redis({
   token: PASSWORD,
 });
 
-const ratelimit = new Ratelimit({
-  redis,
-  limiter: Ratelimit.fixedWindow(6, "60s"),
-  prefix: "@upstash/ratelimit",
-});
-
-module.exports = { redis, ratelimit };
+module.exports = { redis };
