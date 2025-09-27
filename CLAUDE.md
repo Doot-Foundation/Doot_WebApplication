@@ -2,6 +2,229 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Directory structure - 27/09
+
+```
+📁 /home/botvenom/Desktop/work/web3/mina/projects/professional/Doot/protocol/ui
+├── bootstrap-o1js-mina-zeko
+│   ├── 1_CORE_ARCHITECTURE_AND_PHILOSOPHY.md
+│   ├── 2_O1JS_FRAMEWORK_DEEP_DIVE.md
+│   ├── 3_SMART_CONTRACT_DEVELOPMENT_PATTERNS.md
+│   ├── 4_ADVANCED_FEATURES_AND_RECURSION.md
+│   ├── 5_ZEKO_L2_ARCHITECTURE_AND_INTEGRATION.md
+│   ├── 6_DEVELOPMENT_WORKFLOWS_AND_BEST_PRACTICES.md
+│   └── README.md
+├── lib
+│   └── redux
+│       ├── slice.js
+│       └── store.js
+├── pages
+│   ├── api
+│   │   ├── get
+│   │   │   ├── interface
+│   │   │   │   ├── getGraphData.js
+│   │   │   │   └── getPrice.js
+│   │   │   ├── pinned
+│   │   │   │   ├── getLatestHistoricalPinCID.js
+│   │   │   │   ├── getLatestMinaPinCID.js
+│   │   │   │   ├── getPinnedHistoricalInfo.js
+│   │   │   │   └── getPinnedMinaInfo.js
+│   │   │   ├── user
+│   │   │   │   ├── getKeyStatus.js
+│   │   │   │   ├── getUserInformation.js
+│   │   │   │   └── getUserStatus.js
+│   │   │   ├── aggregation_proof.js
+│   │   │   └── price.js
+│   │   ├── reset
+│   │   │   └── resetEveryCache.js
+│   │   ├── update
+│   │   │   ├── core
+│   │   │   │   ├── updateAggregationProof.js
+│   │   │   │   ├── updateAllPrices.js
+│   │   │   │   ├── updateDootMina.js
+│   │   │   │   └── updateDootZeko.js
+│   │   │   ├── ipfs
+│   │   │   │   └── updateHistorical.js
+│   │   │   └── user
+│   │   │       ├── initUser.js
+│   │   │       └── updateAPIKey.js
+│   │   └── verify
+│   │       ├── verifyAggregated.js
+│   │       └── verifyIndividual.js
+│   ├── components
+│   │   ├── common
+│   │   │   ├── BackgroundImageComponent.js
+│   │   │   ├── ConnectButton.js
+│   │   │   ├── Footer.js
+│   │   │   ├── Header.js
+│   │   │   ├── MobileViewUnavailable.js
+│   │   │   └── ScaleFadeBox.js
+│   │   ├── dashboard
+│   │   │   ├── DashboardHero.js
+│   │   │   ├── DashboardLayout.js
+│   │   │   ├── GradientLineChart.js
+│   │   │   ├── Profile.js
+│   │   │   └── WalletNotConnected.js
+│   │   ├── feeds
+│   │   │   ├── FeedsHeader.js
+│   │   │   ├── FeedsHero.js
+│   │   │   ├── FeedsLayout.js
+│   │   │   ├── HistoricalTable.js
+│   │   │   ├── IndividualAsset.js
+│   │   │   ├── MarqueeDataProviders.js
+│   │   │   ├── MiniChart.js
+│   │   │   ├── MiniChartDescriptionBox.js
+│   │   │   ├── PriceGraph.js
+│   │   │   ├── TokenDescriptionBox.js
+│   │   │   └── TokenNotSupported.js
+│   │   ├── home
+│   │   │   ├── Features.js
+│   │   │   ├── HeroAnimatedText.js
+│   │   │   ├── HomeHero.js
+│   │   │   ├── HomeLayout.js
+│   │   │   └── InformationCard.js
+│   │   └── verify
+│   │       ├── VerifyHero.js
+│   │       └── VerifyLayout.js
+│   ├── feeds
+│   │   └── [token].js
+│   ├── _app.js
+│   ├── _document.js
+│   ├── dashboard.js
+│   ├── feeds.js
+│   ├── index.js
+│   └── verify.js
+├── public
+│   ├── static
+│   │   ├── animation
+│   │   │   ├── box_bg.gif
+│   │   │   ├── dots.gif
+│   │   │   ├── loading.gif
+│   │   │   └── stars.gif
+│   │   ├── color
+│   │   │   └── pallete.txt
+│   │   ├── data_providers
+│   │   │   ├── binance.png
+│   │   │   ├── btse.png
+│   │   │   ├── bybit.png
+│   │   │   ├── cex.io.png
+│   │   │   ├── coinapi.png
+│   │   │   ├── coincap.png
+│   │   │   ├── coincodex.png
+│   │   │   ├── coingecko.png
+│   │   │   ├── coinlore.png
+│   │   │   ├── coinmarketcap.png
+│   │   │   ├── coinpaprika.png
+│   │   │   ├── coinranking.png
+│   │   │   ├── cryptocompare.png
+│   │   │   ├── gate.io.png
+│   │   │   ├── huobi.png
+│   │   │   ├── kucoin.png
+│   │   │   ├── messari.png
+│   │   │   ├── mexc.png
+│   │   │   ├── okx.png
+│   │   │   ├── poloniex.png
+│   │   │   └── swapzone.png
+│   │   ├── images
+│   │   │   ├── Background_Lines.svg
+│   │   │   ├── Background_Lines2.svg
+│   │   │   ├── bgUniverse.jpg
+│   │   │   ├── data_feeds.png
+│   │   │   ├── Doot.png
+│   │   │   ├── Doot_monochrome.png
+│   │   │   ├── DootDot.png
+│   │   │   ├── DootMonochrome.png
+│   │   │   ├── DootWhite.png
+│   │   │   ├── filtered.png
+│   │   │   ├── Link_Discord.png
+│   │   │   ├── Link_GitHub.png
+│   │   │   ├── Link_Mail.png
+│   │   │   ├── Link_Twitter.png
+│   │   │   ├── magnifying.png
+│   │   │   ├── mina.png
+│   │   │   ├── not_available.png
+│   │   │   ├── stars.png
+│   │   │   ├── trustless.png
+│   │   │   ├── verification.png
+│   │   │   └── wallet.png
+│   │   └── slot_token
+│   │       ├── avalanche.png
+│   │       ├── bitcoin.png
+│   │       ├── cardano.png
+│   │       ├── chainlink.png
+│   │       ├── dogecoin.png
+│   │       ├── ethereum.png
+│   │       ├── mina.png
+│   │       ├── polygon.png
+│   │       ├── ripple.png
+│   │       └── solana.png
+│   └── favicon.ico
+├── utils
+│   ├── constants
+│   │   ├── aggregation_cache
+│   │   │   ├── step-vk-doot-prices-aggregation-program20-base
+│   │   │   ├── step-vk-doot-prices-aggregation-program20-base.header
+│   │   │   ├── step-vk-doot-prices-aggregation-program20-step
+│   │   │   ├── step-vk-doot-prices-aggregation-program20-step.header
+│   │   │   ├── wrap-vk-doot-prices-aggregation-program20
+│   │   │   └── wrap-vk-doot-prices-aggregation-program20.header
+│   │   ├── doot_cache
+│   │   │   ├── lagrange-basis-fp-16384
+│   │   │   ├── lagrange-basis-fp-16384.header
+│   │   │   ├── lagrange-basis-fp-8192
+│   │   │   ├── lagrange-basis-fp-8192.header
+│   │   │   ├── step-vk-doot-getprices
+│   │   │   ├── step-vk-doot-getprices.header
+│   │   │   ├── step-vk-doot-initbase
+│   │   │   ├── step-vk-doot-initbase.header
+│   │   │   ├── step-vk-doot-settle
+│   │   │   ├── step-vk-doot-settle.header
+│   │   │   ├── step-vk-doot-update
+│   │   │   ├── step-vk-doot-update.header
+│   │   │   ├── step-vk-doot-verify
+│   │   │   ├── step-vk-doot-verify.header
+│   │   │   ├── wrap-vk-doot
+│   │   │   └── wrap-vk-doot.header
+│   │   ├── Aggregation.js
+│   │   ├── Doot.js
+│   │   ├── info.js
+│   │   └── symbols.js
+│   └── helper
+│       ├── init
+│       │   ├── InitRedis.js
+│       │   ├── InitSignatureClient.js
+│       │   └── InitSupabase.js
+│       ├── AggregateTimeframeData.js
+│       ├── AggregationModule.ts
+│       ├── CallAndSignAPICalls.js
+│       ├── GenerateAggregationProof.js
+│       ├── GenerateGraphData.js
+│       ├── GetHistoricalInfo.js
+│       ├── GetMinaInfo.ts
+│       ├── GetPriceOf.js
+│       ├── IncrementCallCounter.js
+│       ├── LoadCache.ts
+│       ├── PinHistorical.js
+│       ├── PinMinaObject.ts
+│       ├── TimeAxisFormatter.js
+│       ├── TimeframeConfig.js
+│       ├── TimeframeConfig.js.old
+│       ├── TimeWindowFilter.js
+│       └── Unpin.js
+├── CLAUDE.md
+├── contracts_CLAUDE.md
+├── jsconfig.json
+├── next-env.d.ts
+├── next.config.js
+├── package-lock.json
+├── package.json
+├── README.md
+├── tsconfig.json
+├── tsconfig.tsbuildinfo
+├── turbo.json
+└── vercel.json
+```
+
 ## Project Overview
 
 Doot is a data feed oracle for Mina Protocol that provides price updates every 10 minutes with aggregation proofs. The application tracks 10 cryptocurrency tokens (MINA, BTC, ETH, SOL, XRP, ADA, AVAX, MATIC, LINK, DOGE) and is built as a Next.js web application with blockchain integration.
