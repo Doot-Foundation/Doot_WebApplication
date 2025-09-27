@@ -10,11 +10,11 @@
 
     {
       "path": "/api/update/core/updateDootZeko",
-      "schedule": "1-59/10 * * * *"
+      "schedule": "1-59/20 * * * *"
     },
     {
       "path": "/api/update/core/updateDootMina",
-      "schedule": "3-59/10 * * * *"
+      "schedule": "11-59/20 * * * *"
     },
     {
       "path": "/api/update/ipfs/updateHistorical",

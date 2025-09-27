@@ -20,397 +20,415 @@ import {
  * Optimized for fast finality (~10-25 seconds)
  */
 export default async function handler(req, res) {
-  const startTime = Date.now();
-  const GLOBAL_TIMEOUT_MS = 795 * 1000; // 795 seconds
-  let globalTimeoutReached = false;
-  let responseAlreadySent = false;
-  let ipfsCID = null;
-  let commitment = null;
-
-  // Set up global timeout
-  const globalTimeout = setTimeout(() => {
-    globalTimeoutReached = true;
-  }, GLOBAL_TIMEOUT_MS);
-
   try {
-    const authHeader = req.headers.authorization;
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-      clearTimeout(globalTimeout);
-      return res.status(401).json("Unauthorized");
-    }
+    const startTime = Date.now();
+    const GLOBAL_TIMEOUT_MS = 795 * 1000; // 795 seconds
+    let globalTimeoutReached = false;
+    let responseAlreadySent = false;
+    let ipfsCID = null;
+    let commitment = null;
 
-    // Compile contracts fresh for each request following o1js server-side best practices
-    console.log("Compiling Doot contract and offchain state...");
+    // Set up global timeout
+    const globalTimeout = setTimeout(() => {
+      globalTimeoutReached = true;
+    }, GLOBAL_TIMEOUT_MS);
+
     try {
-      // Compile offchain state first if it exists
-      if (offchainState && typeof offchainState.compile === "function") {
+      const authHeader = req.headers.authorization;
+      if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+        clearTimeout(globalTimeout);
+        return res.status(401).json("Unauthorized");
+      }
+
+      // Compile contracts fresh for each request following o1js server-side best practices
+      console.log("Compiling Doot contract and offchain state...");
+      try {
+        // Compile offchain state first if it exists
+        if (offchainState && typeof offchainState.compile === "function") {
+          try {
+            await offchainState.compile();
+          } catch (error) {
+            console.error(
+              "offchainState compilation failed with :",
+              error,
+              error.message
+            );
+            throw new Error(
+              `FATAL ERR! Contract compilation failed: ${error.message}`
+            );
+          }
+        }
+
+        // Compile the main Doot contract without cache for server-side reliability
         try {
-          await offchainState.compile();
+          await Doot.compile();
         } catch (error) {
-          console.error(
-            "offchainState compilation failed with :",
-            error,
-            error.message
-          );
+          console.error("Doot compilation failed with :", error, error.message);
           throw new Error(
             `FATAL ERR! Contract compilation failed: ${error.message}`
           );
         }
-      }
 
-      // Compile the main Doot contract without cache for server-side reliability
-      try {
-        await Doot.compile();
-      } catch (error) {
-        console.error("Doot compilation failed with :", error, error.message);
-        throw new Error(
-          `FATAL ERR! Contract compilation failed: ${error.message}`
+        console.log(
+          "SUCCESS! Doot offchainState + contract compiled successfully."
         );
+      } catch (compileErr) {
+        console.error("ERR! Contract compilation failed:", compileErr.message);
+        throw new Error(`Contract compilation failed: ${compileErr.message}`);
       }
 
       console.log(
-        "SUCCESS! Doot offchainState + contract compiled successfully."
+        "\n =============== ZEKO L2 DOOT ORACLE UPDATE STARTED =============== \n"
       );
-    } catch (compileErr) {
-      console.error("ERR! Contract compilation failed:", compileErr.message);
-      throw new Error(`Contract compilation failed: ${compileErr.message}`);
-    }
 
-    console.log(
-      "\n =============== ZEKO L2 DOOT ORACLE UPDATE STARTED =============== \n"
-    );
+      const tokenData = {};
+      const tokenKeys = Object.keys(TOKEN_TO_CACHE);
 
-    const tokenData = {};
-    const tokenKeys = Object.keys(TOKEN_TO_CACHE);
+      // Required assets for PinMinaObject (must match exactly)
+      const requiredAssets = [
+        "mina",
+        "bitcoin",
+        "ethereum",
+        "solana",
+        "ripple",
+        "cardano",
+        "avalanche",
+        "polygon",
+        "chainlink",
+        "dogecoin",
+      ];
 
-    // Required assets for PinMinaObject (must match exactly)
-    const requiredAssets = [
-      "mina",
-      "bitcoin",
-      "ethereum",
-      "solana",
-      "ripple",
-      "cardano",
-      "avalanche",
-      "polygon",
-      "chainlink",
-      "dogecoin",
-    ];
-
-    // Collect data with validation
-    const validCacheKeys = [];
-    for (const tokenKey of tokenKeys) {
-      const cacheKey = TOKEN_TO_CACHE[tokenKey];
-      if (cacheKey && typeof cacheKey === "string" && cacheKey.trim() !== "") {
-        validCacheKeys.push({ tokenKey, cacheKey });
-      } else {
-        console.warn(`  Invalid cache key for token ${tokenKey}:`, cacheKey);
-      }
-    }
-
-    // Sequential cache retrieval to avoid pipeline issues
-    for (const { tokenKey, cacheKey } of validCacheKeys) {
-      try {
-        const data = await redis.get(cacheKey);
-        if (data) {
-          tokenData[tokenKey] = data;
-        }
-      } catch (error) {
-        console.error(
-          `ERR! Failed to get cache for ${tokenKey} (${cacheKey}):`,
-          error.message
-        );
-        // Continue with other tokens instead of failing completely
-      }
-    }
-
-    // Validate all required assets are present
-    const missingAssets = requiredAssets.filter((asset) => !tokenData[asset]);
-    if (missingAssets.length > 0) {
-      throw new Error(
-        `Missing required assets for IPFS pinning: ${missingAssets.join(", ")}`
-      );
-    }
-
-    console.log(
-      `SUCCESS! Collected data for ${Object.keys(tokenData).length} tokens:`,
-      Object.keys(tokenData)
-    );
-
-    // Get existing Mina CID for unpinning (if exists)
-    let previousCID = "NULL";
-    try {
-      const existingMinaCacheData = await redis.get(ZEKO_CID_CACHE);
-      if (
-        existingMinaCacheData &&
-        Array.isArray(existingMinaCacheData) &&
-        existingMinaCacheData[0]
-      ) {
-        previousCID = existingMinaCacheData[0];
-        console.log(`Found previous CID for unpinning: ${previousCID}`);
-      }
-    } catch (error) {
-      console.log(
-        `INFO!  No previous CID found (fresh start): ${error.message}`
-      );
-    }
-
-    // Pin to IPFS with MerkleMap commitment calculation
-    const ipfsResults = await pinMinaObject(tokenData, previousCID, "zeko");
-
-    if (!ipfsResults || !Array.isArray(ipfsResults) || ipfsResults.length < 2) {
-      throw new Error("Invalid result from IPFS pinning operation");
-    }
-
-    [ipfsCID, commitment] = ipfsResults;
-    console.log(`\nSUCCESS! IPFS pinning successful:`);
-    console.log(` CID: ${ipfsCID}`);
-    console.log(` Commitment: ${commitment}`);
-
-    // Verify IPFS data is accessible
-    console.log("Verifying IPFS data accessibility...");
-    await verifyIpfsAccessibility(ipfsCID);
-    console.log("SUCCESS! IPFS data verification successful");
-
-    // Pre-compute shared cryptographic objects
-    console.log("\nPre-computing cryptographic objects for Zeko L2...");
-
-    const COMMITMENT = Field.from(commitment);
-    const IPFS_HASH = IpfsCID.fromString(ipfsCID);
-
-    // Convert token data to TokenInformationArray (exactly 10 prices)
-    const orderedTokens = [
-      "mina",
-      "bitcoin",
-      "ethereum",
-      "solana",
-      "ripple",
-      "cardano",
-      "avalanche",
-      "polygon",
-      "chainlink",
-      "dogecoin",
-    ];
-    const prices = orderedTokens.map((token) =>
-      Field.from(tokenData[token].price)
-    );
-    const TOKEN_INFO = new TokenInformationArray({ prices });
-
-    // Pre-compute keys
-    const caller = PrivateKey.fromBase58(process.env.DOOT_CALLER_KEY);
-    const callerPub = caller.toPublicKey();
-
-    const sharedTxnData = {
-      // Pre-computed o1js objects (expensive to create)
-      COMMITMENT,
-      IPFS_HASH,
-      TOKEN_INFO,
-      caller,
-      callerPub,
-      // Raw data for logging
-      ipfsCID,
-      commitment,
-    };
-
-    const dootZkApp = new Doot(
-      PublicKey.fromBase58(process.env.NEXT_PUBLIC_ZEKO_DOOT_PUBLIC_KEY)
-    );
-    dootZkApp.offchainState.setContractInstance(dootZkApp);
-
-    console.log("\nStarting Zeko L2 update...");
-
-    let zekoSuccess = false;
-    let zekoTxHash = null;
-    let zekoStatus = "PENDING";
-    let zekoError = null;
-    let zekoResult = {
-      success: false,
-      confirmed: false,
-      settlementTxHash: null,
-    };
-
-    try {
-      // Check global timeout before starting blockchain operations
-      if (globalTimeoutReached) {
-        zekoStatus = "PENDING";
-        zekoError = "Global timeout reached before blockchain operations";
-        console.log(`TIME! Global timeout reached before Zeko L2 operations`);
-      } else {
-        const result = await updateZekoL2ContractWithPolling(
-          dootZkApp,
-          sharedTxnData,
-          () => globalTimeoutReached
-        );
-
-        if (result.timeout) {
-          zekoStatus = "PENDING";
-          zekoError = result.message;
-          console.log(`TIME! Zeko L2 update timed out: ${result.message}`);
-        } else if (result.success) {
-          zekoSuccess = true;
-          zekoTxHash = result.txHash;
-          zekoStatus = "SUCCESS";
-          zekoResult = result;
-          console.log(`COMPLETED!`);
+      // Collect data with validation
+      const validCacheKeys = [];
+      for (const tokenKey of tokenKeys) {
+        const cacheKey = TOKEN_TO_CACHE[tokenKey];
+        if (
+          cacheKey &&
+          typeof cacheKey === "string" &&
+          cacheKey.trim() !== ""
+        ) {
+          validCacheKeys.push({ tokenKey, cacheKey });
         } else {
-          zekoStatus = "FAILED";
-          zekoError = result.error;
-          zekoResult = result;
-          console.log(`ERR! Zeko L2 update failed: ${result.error}`);
+          console.warn(`  Invalid cache key for token ${tokenKey}:`, cacheKey);
         }
       }
-    } catch (error) {
-      zekoStatus = "ERROR";
-      zekoError = error.message;
-      zekoResult = {
+
+      // Sequential cache retrieval to avoid pipeline issues
+      for (const { tokenKey, cacheKey } of validCacheKeys) {
+        try {
+          const data = await redis.get(cacheKey);
+          if (data) {
+            tokenData[tokenKey] = data;
+          }
+        } catch (error) {
+          console.error(
+            `ERR! Failed to get cache for ${tokenKey} (${cacheKey}):`,
+            error.message
+          );
+          // Continue with other tokens instead of failing completely
+        }
+      }
+
+      // Validate all required assets are present
+      const missingAssets = requiredAssets.filter((asset) => !tokenData[asset]);
+      if (missingAssets.length > 0) {
+        throw new Error(
+          `Missing required assets for IPFS pinning: ${missingAssets.join(
+            ", "
+          )}`
+        );
+      }
+
+      console.log(
+        `SUCCESS! Collected data for ${Object.keys(tokenData).length} tokens:`,
+        Object.keys(tokenData)
+      );
+
+      // Get existing Mina CID for unpinning (if exists)
+      let previousCID = "NULL";
+      try {
+        const existingMinaCacheData = await redis.get(ZEKO_CID_CACHE);
+        if (
+          existingMinaCacheData &&
+          Array.isArray(existingMinaCacheData) &&
+          existingMinaCacheData[0]
+        ) {
+          previousCID = existingMinaCacheData[0];
+          console.log(`Found previous CID for unpinning: ${previousCID}`);
+        }
+      } catch (error) {
+        console.log(
+          `INFO!  No previous CID found (fresh start): ${error.message}`
+        );
+      }
+
+      // Pin to IPFS with MerkleMap commitment calculation
+      const ipfsResults = await pinMinaObject(tokenData, previousCID, "zeko");
+
+      if (
+        !ipfsResults ||
+        !Array.isArray(ipfsResults) ||
+        ipfsResults.length < 2
+      ) {
+        throw new Error("Invalid result from IPFS pinning operation");
+      }
+
+      [ipfsCID, commitment] = ipfsResults;
+      console.log(`\nSUCCESS! IPFS pinning successful:`);
+      console.log(` CID: ${ipfsCID}`);
+      console.log(` Commitment: ${commitment}`);
+
+      // Verify IPFS data is accessible
+      console.log("Verifying IPFS data accessibility...");
+      await verifyIpfsAccessibility(ipfsCID);
+      console.log("SUCCESS! IPFS data verification successful");
+
+      // Pre-compute shared cryptographic objects
+      console.log("\nPre-computing cryptographic objects for Zeko L2...");
+
+      const COMMITMENT = Field.from(commitment);
+      const IPFS_HASH = IpfsCID.fromString(ipfsCID);
+
+      // Convert token data to TokenInformationArray (exactly 10 prices)
+      const orderedTokens = [
+        "mina",
+        "bitcoin",
+        "ethereum",
+        "solana",
+        "ripple",
+        "cardano",
+        "avalanche",
+        "polygon",
+        "chainlink",
+        "dogecoin",
+      ];
+      const prices = orderedTokens.map((token) =>
+        Field.from(tokenData[token].price)
+      );
+      const TOKEN_INFO = new TokenInformationArray({ prices });
+
+      // Pre-compute keys
+      const caller = PrivateKey.fromBase58(process.env.DOOT_CALLER_KEY);
+      const callerPub = caller.toPublicKey();
+
+      const sharedTxnData = {
+        // Pre-computed o1js objects (expensive to create)
+        COMMITMENT,
+        IPFS_HASH,
+        TOKEN_INFO,
+        caller,
+        callerPub,
+        // Raw data for logging
+        ipfsCID,
+        commitment,
+      };
+
+      const dootZkApp = new Doot(
+        PublicKey.fromBase58(process.env.NEXT_PUBLIC_ZEKO_DOOT_PUBLIC_KEY)
+      );
+      dootZkApp.offchainState.setContractInstance(dootZkApp);
+
+      console.log("\nStarting Zeko L2 update...");
+
+      let zekoSuccess = false;
+      let zekoTxHash = null;
+      let zekoStatus = "PENDING";
+      let zekoError = null;
+      let zekoResult = {
         success: false,
         confirmed: false,
         settlementTxHash: null,
-        error: error.message,
       };
-      console.error(`ERR! Zeko L2 update unexpected error: ${error.message}`);
-    }
 
-    console.log("\nUpdating redis cache.");
-
-    // Update Redis cache if Zeko L2 succeeded
-    if (zekoSuccess) {
-      await redis.set(ZEKO_CID_CACHE, [ipfsCID, commitment]);
-      console.log("SUCCESS! Redis cache updated with new IPFS data");
-    }
-
-    // Clear global timeout
-    clearTimeout(globalTimeout);
-
-    const elapsed = Math.round((Date.now() - startTime) / 1000);
-    const responseData = {
-      status: zekoSuccess,
-      message: zekoSuccess
-        ? "Zeko L2 Doot oracle update completed!"
-        : zekoStatus === "PENDING"
-        ? "Zeko L2 update partially completed (timeout reached)"
-        : "Zeko L2 update failed",
-      data: {
-        ipfs: {
-          cid: ipfsCID,
-          commitment,
-        },
-        network: {
-          status: zekoStatus, // "SUCCESS" | "FAILED" | "PENDING" | "ERROR"
-          success: zekoSuccess,
-          tx_hash: zekoTxHash || null,
-          confirmed: zekoResult?.confirmed || false,
-          settlement_tx_hash: zekoResult?.settlementTxHash || null,
-          endpoint: process.env.NEXT_PUBLIC_ZEKO_ENDPOINT,
-          contract: process.env.NEXT_PUBLIC_ZEKO_DOOT_PUBLIC_KEY,
-          error: zekoError || null,
-          elapsed_seconds: elapsed,
-          global_timeout_seconds: 795,
-          timeout_reached: globalTimeoutReached,
-          finality: "10-25 seconds",
-          network_type: "zeko_l2",
-        },
-        summary: {
-          tokens_processed: Object.keys(tokenData).length,
-          operations: "update + confirmation + settlement",
-          confirmation: zekoResult?.confirmed || false,
-          settlement: zekoResult?.settlementTxHash
-            ? "SUCCESS"
-            : zekoStatus === "PENDING"
-            ? "PENDING"
-            : "SKIPPED",
-          primary_network: "Zeko L2 (fast finality)",
-        },
-      },
-    };
-
-    console.log(
-      "\n=============== ZEKO L2 DOOT ORACLE UPDATE SUMMARY ==============="
-    );
-    console.log(` Overall Status: ${zekoSuccess ? "SUCCESS" : "FAILED"}`);
-    console.log(` IPFS: ${ipfsCID} (${commitment.slice(0, 20)}...)`);
-    console.log(
-      ` Zeko L2: ${zekoSuccess ? "SUCCESS" : "FAILED"} ${
-        zekoTxHash ? `(${zekoTxHash})` : ""
-      } ${zekoResult?.confirmed ? "CONFIRMED" : "PENDING"} ${
-        zekoResult?.settlementTxHash
-          ? `[Settlement: ${zekoResult.settlementTxHash}]`
-          : ""
-      }`
-    );
-    console.log(
-      ` Tokens Processed: ${responseData.data.summary.tokens_processed}/10`
-    );
-    console.log(
-      "===============================================================\n"
-    );
-
-    if (!responseAlreadySent) {
-      responseAlreadySent = true;
-
-      // CRITICAL: Force garbage collection to prevent WASM aliasing between requests
       try {
-        if (global.gc) {
-          global.gc();
-          console.log("CLEANUP! Forced garbage collection completed");
+        // Check global timeout before starting blockchain operations
+        if (globalTimeoutReached) {
+          zekoStatus = "PENDING";
+          zekoError = "Global timeout reached before blockchain operations";
+          console.log(`TIME! Global timeout reached before Zeko L2 operations`);
         } else {
-          console.log(
-            "CLEANUP! Garbage collection not available - restart Node.js with --expose-gc"
+          const result = await updateZekoL2ContractWithPolling(
+            dootZkApp,
+            sharedTxnData,
+            () => globalTimeoutReached
           );
+
+          if (result.timeout) {
+            zekoStatus = "PENDING";
+            zekoError = result.message;
+            console.log(`TIME! Zeko L2 update timed out: ${result.message}`);
+          } else if (result.success) {
+            zekoSuccess = true;
+            zekoTxHash = result.txHash;
+            zekoStatus = "SUCCESS";
+            zekoResult = result;
+            console.log(`COMPLETED!`);
+          } else {
+            zekoStatus = "FAILED";
+            zekoError = result.error;
+            zekoResult = result;
+            console.log(`ERR! Zeko L2 update failed: ${result.error}`);
+          }
         }
-      } catch (gcError) {
-        console.warn("CLEANUP! GC failed:", gcError.message);
+      } catch (error) {
+        zekoStatus = "ERROR";
+        zekoError = error.message;
+        zekoResult = {
+          success: false,
+          confirmed: false,
+          settlementTxHash: null,
+          error: error.message,
+        };
+        console.error(`ERR! Zeko L2 update unexpected error: ${error.message}`);
       }
 
-      // Always return 200 for timeout/pending states to provide vital info
-      const statusCode = zekoSuccess || zekoStatus === "PENDING" ? 200 : 500;
-      return res.status(statusCode).json(responseData);
-    }
-  } catch (error) {
-    console.error(
-      "\nERR! =============== ZEKO L2 DOOT ORACLE UPDATE FAILED ==============="
-    );
-    console.error("Error:", error.message);
-    console.error("Stack:", error.stack);
-    console.error(
-      "================================================================\n"
-    );
+      console.log("\nUpdating redis cache.");
 
-    if (!responseAlreadySent) {
-      responseAlreadySent = true;
+      // Update Redis cache if Zeko L2 succeeded
+      if (zekoSuccess) {
+        await redis.set(ZEKO_CID_CACHE, [ipfsCID, commitment]);
+        console.log("SUCCESS! Redis cache updated with new IPFS data");
+      }
 
       // Clear global timeout
       clearTimeout(globalTimeout);
 
-      // CRITICAL: Force garbage collection to prevent WASM aliasing between requests
-      try {
-        if (global.gc) {
-          global.gc();
-          console.log("CLEANUP! Forced garbage collection completed");
-        } else {
-          console.log(
-            "CLEANUP! Garbage collection not available - restart Node.js with --expose-gc"
-          );
-        }
-      } catch (gcError) {
-        console.warn("CLEANUP! GC failed:", gcError.message);
-      }
-
       const elapsed = Math.round((Date.now() - startTime) / 1000);
-      return res.status(500).json({
-        status: false,
-        message: "Zeko L2 Doot oracle update failed",
-        error: error.message,
+      const responseData = {
+        status: zekoSuccess,
+        message: zekoSuccess
+          ? "Zeko L2 Doot oracle update completed!"
+          : zekoStatus === "PENDING"
+          ? "Zeko L2 update partially completed (timeout reached)"
+          : "Zeko L2 update failed",
         data: {
-          ipfs: ipfsCID ? { cid: ipfsCID, commitment } : null,
-          stage_failed: ipfsCID ? "blockchain_update" : "ipfs_pinning",
-          network_type: "zeko_l2",
-          elapsed_seconds: elapsed,
-          global_timeout_seconds: 795,
-          timeout_reached: globalTimeoutReached,
+          ipfs: {
+            cid: ipfsCID,
+            commitment,
+          },
+          network: {
+            status: zekoStatus, // "SUCCESS" | "FAILED" | "PENDING" | "ERROR"
+            success: zekoSuccess,
+            tx_hash: zekoTxHash || null,
+            confirmed: zekoResult?.confirmed || false,
+            settlement_tx_hash: zekoResult?.settlementTxHash || null,
+            endpoint: process.env.NEXT_PUBLIC_ZEKO_ENDPOINT,
+            contract: process.env.NEXT_PUBLIC_ZEKO_DOOT_PUBLIC_KEY,
+            error: zekoError || null,
+            elapsed_seconds: elapsed,
+            global_timeout_seconds: 795,
+            timeout_reached: globalTimeoutReached,
+            finality: "10-25 seconds",
+            network_type: "zeko_l2",
+          },
+          summary: {
+            tokens_processed: Object.keys(tokenData).length,
+            operations: "update + confirmation + settlement",
+            confirmation: zekoResult?.confirmed || false,
+            settlement: zekoResult?.settlementTxHash
+              ? "SUCCESS"
+              : zekoStatus === "PENDING"
+              ? "PENDING"
+              : "SKIPPED",
+            primary_network: "Zeko L2 (fast finality)",
+          },
         },
-      });
+      };
+
+      console.log(
+        "\n=============== ZEKO L2 DOOT ORACLE UPDATE SUMMARY ==============="
+      );
+      console.log(` Overall Status: ${zekoSuccess ? "SUCCESS" : "FAILED"}`);
+      console.log(` IPFS: ${ipfsCID} (${commitment.slice(0, 20)}...)`);
+      console.log(
+        ` Zeko L2: ${zekoSuccess ? "SUCCESS" : "FAILED"} ${
+          zekoTxHash ? `(${zekoTxHash})` : ""
+        } ${zekoResult?.confirmed ? "CONFIRMED" : "PENDING"} ${
+          zekoResult?.settlementTxHash
+            ? `[Settlement: ${zekoResult.settlementTxHash}]`
+            : ""
+        }`
+      );
+      console.log(
+        ` Tokens Processed: ${responseData.data.summary.tokens_processed}/10`
+      );
+      console.log(
+        "===============================================================\n"
+      );
+
+      if (!responseAlreadySent) {
+        responseAlreadySent = true;
+
+        // CRITICAL: Force garbage collection to prevent WASM aliasing between requests
+        try {
+          if (global.gc) {
+            global.gc();
+            console.log("CLEANUP! Forced garbage collection completed");
+          } else {
+            console.log(
+              "CLEANUP! Garbage collection not available - restart Node.js with --expose-gc"
+            );
+          }
+        } catch (gcError) {
+          console.warn("CLEANUP! GC failed:", gcError.message);
+        }
+
+        // Always return 200 for timeout/pending states to provide vital info
+        const statusCode = zekoSuccess || zekoStatus === "PENDING" ? 200 : 500;
+        return res.status(statusCode).json(responseData);
+      }
+    } catch (error) {
+      console.error(
+        "\nERR! =============== ZEKO L2 DOOT ORACLE UPDATE FAILED ==============="
+      );
+      console.error("Error:", error.message);
+      console.error("Stack:", error.stack);
+      console.error(
+        "================================================================\n"
+      );
+
+      if (!responseAlreadySent) {
+        responseAlreadySent = true;
+
+        // Clear global timeout
+        clearTimeout(globalTimeout);
+
+        // CRITICAL: Force garbage collection to prevent WASM aliasing between requests
+        try {
+          if (global.gc) {
+            global.gc();
+            console.log("CLEANUP! Forced garbage collection completed");
+          } else {
+            console.log(
+              "CLEANUP! Garbage collection not available - restart Node.js with --expose-gc"
+            );
+          }
+        } catch (gcError) {
+          console.warn("CLEANUP! GC failed:", gcError.message);
+        }
+
+        const elapsed = Math.round((Date.now() - startTime) / 1000);
+        return res.status(500).json({
+          status: false,
+          message: "Zeko L2 Doot oracle update failed",
+          error: error.message,
+          data: {
+            ipfs: ipfsCID ? { cid: ipfsCID, commitment } : null,
+            stage_failed: ipfsCID ? "blockchain_update" : "ipfs_pinning",
+            network_type: "zeko_l2",
+            elapsed_seconds: elapsed,
+            global_timeout_seconds: 795,
+            timeout_reached: globalTimeoutReached,
+          },
+        });
+      }
     }
+  } catch (error) {
+    console.log("FATAL ERR! Something went wrong!!", error, error.message);
+    return res.status(500).json({
+      message: "Zeko L2 Doot oracle update failed.",
+      error: error.message,
+    });
   }
 }
 
