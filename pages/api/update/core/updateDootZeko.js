@@ -22,7 +22,7 @@ import {
 export default async function handler(req, res) {
   try {
     const startTime = Date.now();
-    const GLOBAL_TIMEOUT_MS = 795 * 1000; // 795 seconds
+    const GLOBAL_TIMEOUT_MS = 600 * 1000; // 600 seconds // 10 minutes
     let globalTimeoutReached = false;
     let responseAlreadySent = false;
     let ipfsCID = null;
@@ -359,20 +359,6 @@ export default async function handler(req, res) {
       if (!responseAlreadySent) {
         responseAlreadySent = true;
 
-        // CRITICAL: Force garbage collection to prevent WASM aliasing between requests
-        try {
-          if (global.gc) {
-            global.gc();
-            console.log("CLEANUP! Forced garbage collection completed");
-          } else {
-            console.log(
-              "CLEANUP! Garbage collection not available - restart Node.js with --expose-gc"
-            );
-          }
-        } catch (gcError) {
-          console.warn("CLEANUP! GC failed:", gcError.message);
-        }
-
         // Always return 200 for timeout/pending states to provide vital info
         const statusCode = zekoSuccess || zekoStatus === "PENDING" ? 200 : 500;
         return res.status(statusCode).json(responseData);
@@ -390,22 +376,7 @@ export default async function handler(req, res) {
       if (!responseAlreadySent) {
         responseAlreadySent = true;
 
-        // Clear global timeout
         clearTimeout(globalTimeout);
-
-        // CRITICAL: Force garbage collection to prevent WASM aliasing between requests
-        try {
-          if (global.gc) {
-            global.gc();
-            console.log("CLEANUP! Forced garbage collection completed");
-          } else {
-            console.log(
-              "CLEANUP! Garbage collection not available - restart Node.js with --expose-gc"
-            );
-          }
-        } catch (gcError) {
-          console.warn("CLEANUP! GC failed:", gcError.message);
-        }
 
         const elapsed = Math.round((Date.now() - startTime) / 1000);
         return res.status(500).json({
@@ -656,10 +627,9 @@ async function waitForTransactionConfirmationWithPolling(
 
   try {
     let attempts = 0;
-    const maxAttempts = 1000; // Safety limit
+    const maxAttempts = 20;
 
     while (attempts < maxAttempts) {
-      // Check global timeout
       if (isGlobalTimeoutReached()) {
         console.log(
           `WARN! ${networkName} confirmation stopped due to global timeout`
@@ -668,31 +638,17 @@ async function waitForTransactionConfirmationWithPolling(
       }
 
       try {
-        // Try to get transaction status
-        await pendingTransaction.wait({ maxAttempts: 1 });
+        await pendingTransaction.wait();
         console.log(
           `SUCCESS! ${networkName} transaction successfully confirmed: ${pendingTransaction.hash}`
         );
         return true;
       } catch (waitError) {
-        if (
-          waitError.message.includes("pending") ||
-          waitError.message.includes("not found")
-        ) {
-          // Transaction still pending, continue polling
-          attempts++;
-          console.log(`${networkName} still pending... (attempt ${attempts})`);
+        attempts++;
+        console.log(`${networkName} still pending... (attempt ${attempts})`);
 
-          // Wait 10 seconds before next poll
-          await new Promise((resolve) => setTimeout(resolve, 10000));
-          continue;
-        } else {
-          // Other error, assume confirmed or failed
-          console.log(
-            `SUCCESS! ${networkName} confirmation completed (via error): ${pendingTransaction.hash}`
-          );
-          return true;
-        }
+        await new Promise((resolve) => setTimeout(resolve, 10000));
+        continue;
       }
     }
 
