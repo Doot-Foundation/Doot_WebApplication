@@ -23,6 +23,10 @@ interface UploadObject {
 
 // Constants
 const JWT = process.env.PINATA_JWT;
+
+if (!JWT) {
+  throw new Error("Missing PINATA_JWT environment variable");
+}
 const ASSETS = [
   "Mina",
   "Bitcoin",

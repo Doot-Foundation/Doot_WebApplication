@@ -14,17 +14,14 @@ import {
   offchainState,
 } from "@/utils/constants/Doot.js";
 
-/**
- * Zeko L2 Doot Oracle Update Endpoint
- * Flow: IPFS Pin → Zeko L2 Update → Redis Cache Update
- * Optimized for fast finality (~10-25 seconds)
- */
-export default async function handler(req, res) {
+// Export the actual logic for direct function calls
+export async function updateDootZekoLogic() {
+  console.log("UpdateDootZeko: Starting Zeko L2 oracle update...");
+
   try {
     const startTime = Date.now();
     const GLOBAL_TIMEOUT_MS = 600 * 1000; // 600 seconds // 10 minutes
     let globalTimeoutReached = false;
-    let responseAlreadySent = false;
     let ipfsCID = null;
     let commitment = null;
 
@@ -34,12 +31,6 @@ export default async function handler(req, res) {
     }, GLOBAL_TIMEOUT_MS);
 
     try {
-      const authHeader = req.headers.authorization;
-      if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-        clearTimeout(globalTimeout);
-        return res.status(401).json("Unauthorized");
-      }
-
       // Compile contracts fresh for each request following o1js server-side best practices
       console.log("Compiling Doot contract and offchain state...");
       try {
@@ -294,7 +285,27 @@ export default async function handler(req, res) {
       clearTimeout(globalTimeout);
 
       const elapsed = Math.round((Date.now() - startTime) / 1000);
-      const responseData = {
+
+      console.log(
+        "\n=============== ZEKO L2 DOOT ORACLE UPDATE SUMMARY ==============="
+      );
+      console.log(` Overall Status: ${zekoSuccess ? "SUCCESS" : "FAILED"}`);
+      console.log(` IPFS: ${ipfsCID} (${commitment.slice(0, 20)}...)`);
+      console.log(
+        ` Zeko L2: ${zekoSuccess ? "SUCCESS" : "FAILED"} ${
+          zekoTxHash ? `(${zekoTxHash})` : ""
+        } ${zekoResult?.confirmed ? "CONFIRMED" : "PENDING"} ${
+          zekoResult?.settlementTxHash
+            ? `[Settlement: ${zekoResult.settlementTxHash}]`
+            : ""
+        }`
+      );
+      console.log(` Tokens Processed: ${Object.keys(tokenData).length}/10`);
+      console.log(
+        "===============================================================\n"
+      );
+
+      return {
         status: zekoSuccess,
         message: zekoSuccess
           ? "Zeko L2 Doot oracle update completed!"
@@ -333,36 +344,8 @@ export default async function handler(req, res) {
             primary_network: "Zeko L2 (fast finality)",
           },
         },
+        updated: Date.now(),
       };
-
-      console.log(
-        "\n=============== ZEKO L2 DOOT ORACLE UPDATE SUMMARY ==============="
-      );
-      console.log(` Overall Status: ${zekoSuccess ? "SUCCESS" : "FAILED"}`);
-      console.log(` IPFS: ${ipfsCID} (${commitment.slice(0, 20)}...)`);
-      console.log(
-        ` Zeko L2: ${zekoSuccess ? "SUCCESS" : "FAILED"} ${
-          zekoTxHash ? `(${zekoTxHash})` : ""
-        } ${zekoResult?.confirmed ? "CONFIRMED" : "PENDING"} ${
-          zekoResult?.settlementTxHash
-            ? `[Settlement: ${zekoResult.settlementTxHash}]`
-            : ""
-        }`
-      );
-      console.log(
-        ` Tokens Processed: ${responseData.data.summary.tokens_processed}/10`
-      );
-      console.log(
-        "===============================================================\n"
-      );
-
-      if (!responseAlreadySent) {
-        responseAlreadySent = true;
-
-        // Always return 200 for timeout/pending states to provide vital info
-        const statusCode = zekoSuccess || zekoStatus === "PENDING" ? 200 : 500;
-        return res.status(statusCode).json(responseData);
-      }
     } catch (error) {
       console.error(
         "\nERR! =============== ZEKO L2 DOOT ORACLE UPDATE FAILED ==============="
@@ -373,33 +356,48 @@ export default async function handler(req, res) {
         "================================================================\n"
       );
 
-      if (!responseAlreadySent) {
-        responseAlreadySent = true;
+      clearTimeout(globalTimeout);
 
-        clearTimeout(globalTimeout);
-
-        const elapsed = Math.round((Date.now() - startTime) / 1000);
-        return res.status(500).json({
-          status: false,
-          message: "Zeko L2 Doot oracle update failed",
-          error: error.message,
-          data: {
-            ipfs: ipfsCID ? { cid: ipfsCID, commitment } : null,
-            stage_failed: ipfsCID ? "blockchain_update" : "ipfs_pinning",
-            network_type: "zeko_l2",
-            elapsed_seconds: elapsed,
-            global_timeout_seconds: 795,
-            timeout_reached: globalTimeoutReached,
-          },
-        });
-      }
+      const elapsed = Math.round((Date.now() - startTime) / 1000);
+      throw new Error(`Zeko L2 oracle update failed: ${error.message}`);
     }
   } catch (error) {
-    console.log("FATAL ERR! Something went wrong!!", error, error.message);
-    return res.status(500).json({
-      message: "Zeko L2 Doot oracle update failed.",
-      error: error.message,
-    });
+    console.error("UpdateDootZeko failed:", error);
+    throw error;
+  }
+}
+
+/**
+ * Zeko L2 Doot Oracle Update Endpoint
+ * Flow: IPFS Pin → Zeko L2 Update → Redis Cache Update
+ * Optimized for fast finality (~10-25 seconds)
+ */
+export default async function handler(req, res) {
+  let responseAlreadySent = false;
+  try {
+    const authHeader = req.headers.authorization;
+    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+      return res.status(401).json("Unauthorized");
+    }
+
+    const result = await updateDootZekoLogic();
+
+    if (!responseAlreadySent) {
+      responseAlreadySent = true;
+      // Always return 200 for timeout/pending states to provide vital info
+      const statusCode =
+        result.status || result.data?.network?.status === "PENDING" ? 200 : 500;
+      return res.status(statusCode).json(result);
+    }
+  } catch (error) {
+    if (!responseAlreadySent) {
+      responseAlreadySent = true;
+      return res.status(500).json({
+        status: false,
+        message: "Zeko L2 Doot oracle update failed",
+        error: error.message,
+      });
+    }
   }
 }
 
@@ -611,49 +609,30 @@ async function waitForTransactionConfirmationWithPolling(
   networkName,
   isGlobalTimeoutReached
 ) {
-  console.log(`Waiting for ${networkName} confirmation with 10s polling...`);
-
-  if (pendingTransaction.status !== "pending") {
-    console.error(
-      `ERR! ${networkName} transaction not accepted by daemon:`,
-      pendingTransaction.status
-    );
-    return false;
-  }
-
-  console.log(
-    `SUCCESS! ${networkName} transaction accepted for processing by daemon`
-  );
-
   try {
-    let attempts = 0;
-    const maxAttempts = 20;
+    console.log(`Waiting for ${networkName} confirmation with 20s polling...`);
 
-    while (attempts < maxAttempts) {
-      if (isGlobalTimeoutReached()) {
-        console.log(
-          `WARN! ${networkName} confirmation stopped due to global timeout`
-        );
-        return false;
-      }
-
-      try {
-        await pendingTransaction.wait();
-        console.log(
-          `SUCCESS! ${networkName} transaction successfully confirmed: ${pendingTransaction.hash}`
-        );
-        return true;
-      } catch (waitError) {
-        attempts++;
-        console.log(`${networkName} still pending... (attempt ${attempts})`);
-
-        await new Promise((resolve) => setTimeout(resolve, 10000));
-        continue;
-      }
+    if (pendingTransaction.status !== "pending") {
+      console.error(
+        `ERR! ${networkName} transaction not accepted by daemon:`,
+        pendingTransaction.status
+      );
+      return false;
     }
 
-    console.log(`WARN! ${networkName} confirmation max attempts reached`);
-    return false;
+    if (isGlobalTimeoutReached()) {
+      console.log(
+        `WARN! ${networkName} confirmation stopped due to global timeout`
+      );
+      return false;
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, 20000));
+    console.log(
+      `SUCCESS! ${networkName} transaction accepted for processing by daemon`
+    );
+
+    return true;
   } catch (error) {
     console.error(`ERR! ${networkName} transaction failed:`, error.message);
     return false;

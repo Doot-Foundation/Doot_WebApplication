@@ -6,13 +6,11 @@ const {
 } = require("@/utils/constants/info.js");
 const pinHistoricalObject = require("@/utils/helper/PinHistorical.js");
 
-export default async function handler(req, res) {
-  try {
-    const authHeader = req.headers.authorization;
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-      return res.status(401).json("Unauthorized");
-    }
+// Export the actual logic for direct function calls
+export async function updateHistoricalLogic() {
+  console.log('UpdateHistorical: Starting historical IPFS data update...');
 
+  try {
     const obj = {};
 
     const tokenKeys = Object.keys(TOKEN_TO_CACHE);
@@ -71,13 +69,29 @@ export default async function handler(req, res) {
     await redis.set(HISTORICAL_CID_CACHE, updatedCID);
     console.log(`Historical IPFS updated successfully. New CID: ${updatedCID}`);
 
-    return res.status(200).json({
+    return {
       status: true,
       message: "Updated historical data successfully.",
       data: {
         cid: updatedCID,
       },
-    });
+      updated: Date.now()
+    };
+  } catch (error) {
+    console.error("UpdateHistorical failed:", error);
+    throw error;
+  }
+}
+
+export default async function handler(req, res) {
+  try {
+    const authHeader = req.headers.authorization;
+    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+      return res.status(401).json("Unauthorized");
+    }
+
+    const result = await updateHistoricalLogic();
+    return res.status(200).json(result);
   } catch (error) {
     console.error("Error in updateHistorical handler:", error.message);
     return res.status(500).json({
