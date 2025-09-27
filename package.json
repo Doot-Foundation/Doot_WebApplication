@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "build:fast": "FAST_BUILD=1 next build",
-    "start": "next start",
+    "start": "next start -p ${PORT:-3000}",
     "lint": "next lint",
     "check-types": "tsc --noEmit"
   },
