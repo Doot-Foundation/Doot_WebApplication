@@ -5,6 +5,7 @@ const nextConfig = {
   reactStrictMode: false,
   swcMinify: true,
   experimental: {
+    instrumentationHook: true,
     esmExternals: true,
   },
   // Speed up local builds when FAST_BUILD=1
