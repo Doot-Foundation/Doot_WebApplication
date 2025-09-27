@@ -1143,3 +1143,302 @@ The `bootstrap-o1js-mina-zeko/` directory contains extensive technical documenta
 - **Deployment Time**: 1.27 seconds (Zeko L2 fast finality)
 - **Settlement Proofs**: 5-6 minutes (off-chain state batching)
 - **Fee Strategy**: 0.1 MINA buffer for all operations
+
+## Critical Technical Discoveries (January 2025 DFS Analysis)
+
+### **DISCOVERED: Advanced Time Window Filtering System**
+
+The application uses **TWO DISTINCT** chart data filtering strategies that were not fully documented:
+
+#### **1. Time Window Filtering (`utils/helper/TimeWindowFilter.js`)**
+
+**CRITICAL DISCOVERY**: This is the ACTUAL filtering system used in production, not mathematical aggregation!
+
+- **Implementation**: Smart time-based data filtering from latest data point backwards
+- **Strategy**: Fixed data points for short timeframes, time windows for long timeframes
+- **Fixed Data Points System**:
+  ```javascript
+  const FIXED_DATA_POINTS = {
+    '10min': 2,   // 2 points (10 min window)
+    '30min': 4,   // 4 points (30 min window)
+    '1h': 7,      // 7 points (1 hour window)
+    '3h': 19,     // 19 points (3 hour window)
+    '6h': 37,     // 37 points (6 hour window)
+    '12h': 73,    // 73 points (12 hour window)
+    '24h': 145,   // 145 points (24 hour window)
+  };
+  ```
+
+- **Sliding Window Navigation**: Multi-directional time navigation with smart step sizes
+- **Mobile/Desktop Timeframes**: Different sets for responsive design
+- **Price Difference Calculation**: Real-time price change calculation within time windows
+
+#### **2. Mathematical Aggregation (`utils/helper/AggregateTimeframeData.js`)**
+
+**DEPRECATED**: This system exists but is NOT used in the main IndividualAsset.js component!
+
+### **DISCOVERED: Comprehensive Frontend Architecture**
+
+#### **Professional Chart Navigation System**
+
+**`pages/components/feeds/IndividualAsset.js`** - The main asset detail page contains:
+
+- **Advanced Sliding Controls**: Left/right arrows with "Jump to Present" functionality
+- **Smart Step Navigation**: Different step sizes based on timeframe complexity
+- **Responsive Timeframe Selection**:
+  - **Mobile**: `['10min', '1h', '12h', '24h', '1m']`
+  - **Desktop**: `['10min', '30min', '1h', '3h', '6h', '12h', '24h', '7d', '15d', '1m', '3m', '6m', 'all']`
+
+#### **Multi-layered Price Display System**
+
+```javascript
+// DISCOVERED: Triple data source architecture
+const latest = priceResponse.data.data;           // Real-time API data
+const ipfsLatest = ipfsData.latest.prices[token]; // IPFS latest
+const ipfsHistorical = ipfsData.historical;       // IPFS historical archive
+```
+
+#### **Provider Signature Verification Integration**
+
+**DISCOVERED**: Each individual provider signature is accessible in the UI:
+- **Provider Count Display**: Shows "X / 19" providers (note: actual count varies)
+- **Signature Copying**: Click-to-copy functionality for oracle signatures
+- **Public Key Display**: Oracle public key with clipboard integration
+
+### **DISCOVERED: Complex Multi-Network Architecture**
+
+#### **Dual Blockchain Integration (Mina L1 + Zeko L2)**
+
+**`pages/api/update/core/updateDootMina.js`** - FOUND: Complete Mina L1 integration:
+
+- **795-second Global Timeout**: Sophisticated timeout management
+- **Account Fetching with Retry**: `fetchAccountWithRetry()` with exponential backoff
+- **Settlement Proof System**: Automatic off-chain state settlement
+- **Garbage Collection**: Forced GC to prevent WASM memory aliasing
+- **Comprehensive Status Tracking**:
+  ```javascript
+  // DISCOVERED: Detailed transaction lifecycle tracking
+  const responseData = {
+    ipfs: { cid: ipfsCID, commitment },
+    network: {
+      status: minaStatus, // "SUCCESS" | "FAILED" | "PENDING" | "ERROR"
+      confirmed: minaResult?.confirmed || false,
+      settlement_tx_hash: minaResult?.settlementTxHash || null,
+      timeout_reached: globalTimeoutReached,
+      finality: "3-5 minutes",
+      network_type: "mina_l1"
+    }
+  };
+  ```
+
+#### **Advanced IPFS Lifecycle Management**
+
+**`utils/helper/PinMinaObject.ts`** - DISCOVERED: Sophisticated IPFS patterns:
+
+- **Safety-First Pattern**: Upload → Verify → Unpin old data
+- **MerkleMap Integration**: 10 assets with commitment root calculation
+- **Parallel Witness Generation**: Efficient proof generation for all assets
+- **Verification Before Unpinning**: Critical data integrity check
+- **Network-Specific Naming**: `${networkPrefix}_${timestamp}.json`
+
+### **DISCOVERED: Advanced Statistical Processing**
+
+#### **Median Absolute Deviation (MAD) Outlier Detection**
+
+**`utils/helper/GetPriceOf.js`** - FOUND: Professional-grade statistical filtering:
+
+```javascript
+// DISCOVERED: Advanced outlier removal algorithm
+function removeOutliers(prices, timestamps, signatures, urls, threshold) {
+  const median = getMedian(prices);
+  const mad = getMAD(prices);
+  // Uses 2.5σ threshold: |value - median| <= 2.5 * MAD(array)
+}
+```
+
+#### **19 Provider Integration (Not 16!)**
+
+**CORRECTION**: The system actually supports 19 providers, not 16:
+- **Active**: 18 providers (SwapZone commented out)
+- **Configured**: 19 total including SwapZone
+- **Parallel Processing**: Promise.all() for concurrent API calls
+- **Graceful Degradation**: "0" fallback for failed providers
+
+### **DISCOVERED: Sophisticated Authentication Patterns**
+
+#### **Multi-Level Authentication Architecture**
+
+**FOUND**: 5 distinct authentication patterns across 22 endpoints:
+
+1. **CRON Protection** (8 endpoints): `Bearer ${process.env.CRON_SECRET}`
+2. **API Key Validation** (2 endpoints): Supabase UUID validation + call counting
+3. **Interface Authentication** (4 endpoints): `NEXT_PUBLIC_API_INTERFACE_KEY`
+4. **Signature Verification** (1 endpoint): Mina wallet signature + 60min timestamp window
+5. **Public Access** (7 endpoints): No authentication required
+
+#### **Advanced Rate Limiting**
+
+**`utils/helper/init/InitRedis.js`** - DISCOVERED: Upstash rate limiting:
+```javascript
+const ratelimit = new Ratelimit({
+  redis: redis,
+  limiter: Ratelimit.fixedWindow(6, "60s"), // 6 requests per 60 seconds
+  prefix: "@upstash/ratelimit",
+});
+```
+
+### **DISCOVERED: Call Counter System**
+
+**`utils/helper/IncrementCallCounter.js`** - FOUND: Monthly API usage tracking:
+```javascript
+// DISCOVERED: Sophisticated monthly usage tracking
+async function incrementCallCounter(obj) {
+  const currentMonth = new Date().getMonth();
+  const monthKey = Object.keys(obj)[currentMonth];
+  obj[monthKey]++; // Increments current month counter
+  return obj;
+}
+```
+
+### **DISCOVERED: Complete Provider Symbol Mappings**
+
+**`utils/constants/symbols.js`** - FOUND: Comprehensive exchange symbol mappings:
+
+- **22 Provider Symbol Maps**: Each with 10 cryptocurrency mappings
+- **Exchange-Specific Formats**: Different ID formats per provider
+- **Special Cases**: CoinLore uses numeric IDs, others use strings
+- **Token Consistency**: All 10 tokens supported across all providers
+
+### **DISCOVERED: Advanced Environment Variable Architecture**
+
+**FOUND**: Complex environment variable dependency tree:
+
+#### **Blockchain Integration Variables**
+```javascript
+// DISCOVERED: Multi-network configuration
+NEXT_PUBLIC_MINA_ENDPOINT              // Mina L1 RPC
+NEXT_PUBLIC_MINA_ARCHIVE_ENDPOINT      // Archive node (optional)
+NEXT_PUBLIC_MINA_DOOT_PUBLIC_KEY       // L1 contract address
+DOOT_CALLER_KEY                        // Transaction signing key
+DOOT_KEY                               // Contract private key
+```
+
+#### **External API Integration**
+```javascript
+// DISCOVERED: Provider-specific API keys
+CMC_KEY              // CoinMarketCap Pro
+COIN_API_KEY         // CoinAPI service
+COIN_RANKING_KEY     // CoinRanking API
+SWAP_ZONE_KEY        // SwapZone (commented out)
+MESSARI_KEY          // Messari (optional)
+COIN_CAP_KEY         // CoinCap (optional)
+```
+
+### **DISCOVERED: Advanced Data Processing Pipeline**
+
+#### **Graph Data Generation with Precision Handling**
+
+**`utils/helper/GenerateGraphData.js`** - FOUND: Sophisticated price normalization:
+
+```javascript
+// DISCOVERED: Dynamic precision based on price range
+function normalizePrice(subone, str) {
+  const num = parseFloat(str) / Math.pow(10, 10);
+  const precision = num < 1 ? 10000 : (subone ? 1000 : 100);
+  return Math.round(num * precision) / precision;
+}
+```
+
+#### **24-Hour Price Change Calculation**
+
+**DISCOVERED**: Smart 24h percentage calculation with fallback logic:
+- **Primary**: Find closest price to exactly 24h ago
+- **Fallback**: Use oldest available price if no 24h data
+- **Timestamp Handling**: Auto-detect milliseconds vs seconds
+- **Error Handling**: Comprehensive validation with graceful defaults
+
+### **DISCOVERED: Smart Contract Integration Patterns**
+
+#### **Doot Contract Architecture (`utils/constants/Doot.js`)**
+
+**FOUND**: Advanced o1js patterns:
+- **Off-chain State Integration**: `OffchainState.Map(Field, TokenInformationArray)`
+- **Multi-Packed String Storage**: `MultiPackedStringFactory(2)` for IPFS CIDs
+- **Action Batching**: `maxActionsPerUpdate: 2`
+- **TypeScript Decorator Integration**: Full `__decorate` support
+
+#### **Contract Method Signatures**
+
+**DISCOVERED**: Complete method interface:
+```javascript
+// FOUND: Full smart contract API
+async initBase(updatedCommitment, updatedIpfsCID, informationArray)
+async update(updatedCommitment, updatedIpfsCID, informationArray)
+async getPrices() // Returns TokenInformationArray
+async settle(proof) // Off-chain state settlement
+async verify(signature, deployer, Price) // Signature validation
+```
+
+### **CRITICAL TECHNICAL DEPENDENCIES REVEALED**
+
+#### **Complete Dependency Graph**
+
+**DISCOVERED**: Exact dependency relationships across all 57 files:
+
+```
+Authentication Flow:
+  └── InitSupabase.js → @supabase/supabase-js
+  └── InitSignatureClient.js → mina-signer (testnet/mainnet)
+  └── IncrementCallCounter.js → Monthly usage tracking
+
+Price Aggregation Flow:
+  └── GetPriceOf.js → 19 Provider APIs
+      └── CallAndSignAPICalls.js → axios + lodash + o1js
+          └── Statistical Processing → Median + MAD outlier removal
+              └── Signature Generation → 4-field Mina signatures
+
+Chart Display Flow:
+  └── IndividualAsset.js → TimeWindowFilter.js (NOT AggregateTimeframeData.js!)
+      └── Professional sliding window navigation
+          └── Fixed data points + time window hybrid approach
+
+Blockchain Integration:
+  └── UpdateDootMina.js → PinMinaObject.ts → o1js MerkleMap
+      └── Account fetching + retry logic
+          └── Settlement proof generation
+              └── Garbage collection for WASM cleanup
+```
+
+### **Performance and Optimization Discoveries**
+
+#### **Memory Management Patterns**
+
+**DISCOVERED**: Critical WASM memory management:
+```javascript
+// FOUND: Forced garbage collection in updateDootMina.js
+if (global.gc) {
+  global.gc();
+  console.log("CLEANUP! Forced garbage collection completed");
+}
+```
+
+#### **Parallel Processing Optimizations**
+
+**FOUND**: Multiple levels of parallel processing:
+- **API Calls**: `Promise.all()` for 19 concurrent provider requests
+- **Array Operations**: Single-pass processing with `reduce()`
+- **IPFS Operations**: Parallel upload + verification + unpinning
+- **Witness Generation**: Parallel MerkleMap witness creation
+
+### **Error Handling and Resilience Patterns**
+
+#### **Comprehensive Error Handling**
+
+**DISCOVERED**: Multi-layered error handling approach:
+- **Provider Level**: Individual API call error handling with "0" fallbacks
+- **Statistical Level**: MAD-based outlier removal
+- **Network Level**: Retry logic with exponential backoff
+- **UI Level**: Graceful degradation with loading states
+- **Blockchain Level**: Timeout management with status tracking
+
+This comprehensive DFS analysis reveals that the Doot oracle system is significantly more sophisticated than initially documented, with advanced statistical processing, multi-network blockchain integration, professional-grade chart systems, and robust error handling throughout the entire stack.
