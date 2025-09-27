@@ -1,5 +1,5 @@
-const axios = require("axios");
 const unpin = require("./Unpin");
+const { pinJsonAsTextFile, fetchJsonFromCid } = require("./pinataFile");
 
 const ONE_YEAR = 60 * 60 * 24 * 365 * 1000;
 
@@ -27,10 +27,7 @@ async function pinHistoricalObject(previousCID, latestPrices) {
         historical: {},
       };
     } else {
-      const GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
-      const { data: previousObject } = await axios.get(
-        `https://${GATEWAY}/ipfs/${previousCID}`
-      );
+      const previousObject = await fetchJsonFromCid(previousCID);
 
       const previousTimestamp = previousObject.latest.timestamp;
 
@@ -50,62 +47,28 @@ async function pinHistoricalObject(previousCID, latestPrices) {
     removeOldTimestamps(toUploadObject);
     console.log("Removed Historical Data > 1Y(if any).");
 
-    const JWT = process.env.PINATA_JWT;
-    const options = {
-      method: "POST",
-      headers: {
-        accept: "application/json",
-        "content-type": "application/json",
-        authorization: `Bearer ${JWT}`,
-      },
-      body: JSON.stringify({
-        pinataContent: toUploadObject,
-        pinataMetadata: {
-          name: `historical_${timestamp}.json`,
-        },
-      }),
-    };
-
-    const response = await fetch(
-      "https://api.pinata.cloud/pinning/pinJSONToIPFS",
-      options
+    const uploadResponse = await pinJsonAsTextFile(
+      toUploadObject,
+      `historical_${timestamp}`
     );
 
-    if (!response.ok) {
-      throw new Error(
-        `IPFS upload failed: ${response.status} ${response.statusText}`
-      );
-    }
-
-    const data = await response.json();
-
-    if (!data.IpfsHash) {
+    if (!uploadResponse || !uploadResponse.IpfsHash) {
       throw new Error("No IpfsHash returned from Pinata");
     }
 
-    const GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
-    if (!GATEWAY) {
-      throw new Error("Missing NEXT_PUBLIC_PINATA_GATEWAY environment variable");
-    }
-
     try {
-      const verificationResponse = await axios.get(
-        `https://${GATEWAY}/ipfs/${data.IpfsHash}`,
-        { timeout: 10000, headers: { Accept: "application/json" } }
-      );
+      const verificationData = await fetchJsonFromCid(uploadResponse.IpfsHash);
 
-      if (
-        !verificationResponse.data ||
-        !verificationResponse.data.latest ||
-        !verificationResponse.data.historical
-      ) {
+      if (!verificationData || !verificationData.latest || !verificationData.historical) {
         throw new Error(
           "Invalid data structure: missing 'latest' or 'historical' properties"
         );
       }
     } catch (verifyError) {
       throw new Error(
-        `New IPFS CID ${data.IpfsHash} is not accessible: ${verifyError.message}`
+        `New IPFS CID ${uploadResponse.IpfsHash} is not accessible: ${
+          verifyError instanceof Error ? verifyError.message : String(verifyError)
+        }`
       );
     }
 
@@ -119,8 +82,8 @@ async function pinHistoricalObject(previousCID, latestPrices) {
       }
     }
 
-    console.log("Pinned Historical Data:", data);
-    return data.IpfsHash;
+    console.log("Pinned Historical Data:", uploadResponse);
+    return uploadResponse.IpfsHash;
   } catch (error) {
     console.error(
       "Error pinning historical object:",
