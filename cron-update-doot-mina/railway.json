@@ -2,6 +2,6 @@
   "$schema": "https://railway.com/railway.schema.json",
   "deploy": {
     "startCommand": "node orchestrator.js",
-    "cronSchedule": "11-59/20 * * * *"
+    "cronSchedule": "1-59/10 * * * *"
   }
 }
