@@ -44,12 +44,33 @@ export default async function handler(req, res) {
     try {
       // Compile offchain state first if it exists
       if (offchainState && typeof offchainState.compile === "function") {
-        await offchainState.compile();
+        try {
+          await offchainState.compile();
+        } catch (error) {
+          console.error(
+            "offchainState compilation failed with :",
+            error,
+            error.message
+          );
+          throw new Error(
+            `FATAL ERR! Contract compilation failed: ${error.message}`
+          );
+        }
       }
 
       // Compile the main Doot contract without cache for server-side reliability
-      await Doot.compile();
-      console.log("SUCCESS! Doot contract compiled successfully (server-side).");
+      try {
+        await Doot.compile();
+      } catch (error) {
+        console.error("Doot compilation failed with :", error, error.message);
+        throw new Error(
+          `FATAL ERR! Contract compilation failed: ${error.message}`
+        );
+      }
+
+      console.log(
+        "SUCCESS! Doot offchainState + contract compiled successfully."
+      );
     } catch (compileErr) {
       console.error("ERR! Contract compilation failed:", compileErr.message);
       throw new Error(`Contract compilation failed: ${compileErr.message}`);
@@ -215,7 +236,11 @@ export default async function handler(req, res) {
         zekoError = "Global timeout reached before blockchain operations";
         console.log(`TIME! Global timeout reached before Zeko L2 operations`);
       } else {
-        const result = await updateZekoL2ContractWithPolling(dootZkApp, sharedTxnData, () => globalTimeoutReached);
+        const result = await updateZekoL2ContractWithPolling(
+          dootZkApp,
+          sharedTxnData,
+          () => globalTimeoutReached
+        );
 
         if (result.timeout) {
           zekoStatus = "PENDING";
@@ -289,7 +314,11 @@ export default async function handler(req, res) {
           tokens_processed: Object.keys(tokenData).length,
           operations: "update + confirmation + settlement",
           confirmation: zekoResult?.confirmed || false,
-          settlement: zekoResult?.settlementTxHash ? "SUCCESS" : zekoStatus === "PENDING" ? "PENDING" : "SKIPPED",
+          settlement: zekoResult?.settlementTxHash
+            ? "SUCCESS"
+            : zekoStatus === "PENDING"
+            ? "PENDING"
+            : "SKIPPED",
           primary_network: "Zeko L2 (fast finality)",
         },
       },
@@ -325,7 +354,9 @@ export default async function handler(req, res) {
           global.gc();
           console.log("CLEANUP! Forced garbage collection completed");
         } else {
-          console.log("CLEANUP! Garbage collection not available - restart Node.js with --expose-gc");
+          console.log(
+            "CLEANUP! Garbage collection not available - restart Node.js with --expose-gc"
+          );
         }
       } catch (gcError) {
         console.warn("CLEANUP! GC failed:", gcError.message);
@@ -357,7 +388,9 @@ export default async function handler(req, res) {
           global.gc();
           console.log("CLEANUP! Forced garbage collection completed");
         } else {
-          console.log("CLEANUP! Garbage collection not available - restart Node.js with --expose-gc");
+          console.log(
+            "CLEANUP! Garbage collection not available - restart Node.js with --expose-gc"
+          );
         }
       } catch (gcError) {
         console.warn("CLEANUP! GC failed:", gcError.message);
@@ -394,7 +427,6 @@ async function fetchAccountWithRetry(accountInfo, maxRetries = 3) {
   }
 }
 
-
 // Local helper: verify IPFS data availability to avoid ESM/CJS interop issues
 async function verifyIpfsAccessibility(cid) {
   const GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
@@ -415,11 +447,16 @@ async function verifyIpfsAccessibility(cid) {
  * Update Zeko L2 contract with polling and global timeout awareness
  * Polls every 10 seconds, respects global timeout, waits for full confirmation
  */
-async function updateZekoL2ContractWithPolling(dootZkApp, sharedTxnData, isGlobalTimeoutReached) {
+async function updateZekoL2ContractWithPolling(
+  dootZkApp,
+  sharedTxnData,
+  isGlobalTimeoutReached
+) {
   try {
     console.log("Configuring Zeko L2 network connection...");
 
-    const { COMMITMENT, IPFS_HASH, TOKEN_INFO, caller, callerPub } = sharedTxnData;
+    const { COMMITMENT, IPFS_HASH, TOKEN_INFO, caller, callerPub } =
+      sharedTxnData;
 
     // Environment variables for Zeko L2
     const ZEKO_ENDPOINT = process.env.NEXT_PUBLIC_ZEKO_ENDPOINT;
@@ -435,7 +472,11 @@ async function updateZekoL2ContractWithPolling(dootZkApp, sharedTxnData, isGloba
 
     // Check timeout before expensive operations
     if (isGlobalTimeoutReached()) {
-      return { success: false, timeout: true, message: "Global timeout reached before network setup" };
+      return {
+        success: false,
+        timeout: true,
+        message: "Global timeout reached before network setup",
+      };
     }
 
     const contractPub = PublicKey.fromBase58(ZEKO_CONTRACT_ADDRESS);
@@ -453,7 +494,11 @@ async function updateZekoL2ContractWithPolling(dootZkApp, sharedTxnData, isGloba
 
     // Check timeout before proving
     if (isGlobalTimeoutReached()) {
-      return { success: false, timeout: true, message: "Global timeout reached before transaction creation" };
+      return {
+        success: false,
+        timeout: true,
+        message: "Global timeout reached before transaction creation",
+      };
     }
 
     console.log("Creating and proving Zeko L2 transaction...");
@@ -472,7 +517,11 @@ async function updateZekoL2ContractWithPolling(dootZkApp, sharedTxnData, isGloba
 
     // Check timeout before sending
     if (isGlobalTimeoutReached()) {
-      return { success: false, timeout: true, message: "Global timeout reached before sending transaction" };
+      return {
+        success: false,
+        timeout: true,
+        message: "Global timeout reached before sending transaction",
+      };
     }
 
     // Sign and send
@@ -494,7 +543,7 @@ async function updateZekoL2ContractWithPolling(dootZkApp, sharedTxnData, isGloba
         timeout: true,
         message: "Global timeout reached during transaction confirmation",
         txHash: pendingTxn.hash,
-        confirmed: false
+        confirmed: false,
       };
     }
 
@@ -512,7 +561,8 @@ async function updateZekoL2ContractWithPolling(dootZkApp, sharedTxnData, isGloba
           freshDootZkApp.offchainState.setContractInstance(freshDootZkApp);
 
           console.log("Creating settlement proof...");
-          const settlementProof = await freshDootZkApp.offchainState.createSettlementProof();
+          const settlementProof =
+            await freshDootZkApp.offchainState.createSettlementProof();
 
           if (!isGlobalTimeoutReached()) {
             console.log("Building settlement transaction...");
@@ -531,12 +581,16 @@ async function updateZekoL2ContractWithPolling(dootZkApp, sharedTxnData, isGloba
               const settlementPending = await settleTxn.sign([caller]).send();
               settlementTxHash = settlementPending.hash;
 
-              console.log(`SUCCESS! Zeko L2 settlement sent: ${settlementTxHash}`);
+              console.log(
+                `SUCCESS! Zeko L2 settlement sent: ${settlementTxHash}`
+              );
             }
           }
         }
       } catch (settlementError) {
-        console.warn(`WARN! Zeko L2 settlement failed: ${settlementError.message}`);
+        console.warn(
+          `WARN! Zeko L2 settlement failed: ${settlementError.message}`
+        );
         console.warn(`Settlement error stack:`, settlementError.stack);
       }
     }
@@ -563,15 +617,24 @@ async function updateZekoL2ContractWithPolling(dootZkApp, sharedTxnData, isGloba
 /**
  * Wait for transaction confirmation with 10-second polling and global timeout awareness
  */
-async function waitForTransactionConfirmationWithPolling(pendingTransaction, networkName, isGlobalTimeoutReached) {
+async function waitForTransactionConfirmationWithPolling(
+  pendingTransaction,
+  networkName,
+  isGlobalTimeoutReached
+) {
   console.log(`Waiting for ${networkName} confirmation with 10s polling...`);
 
   if (pendingTransaction.status !== "pending") {
-    console.error(`ERR! ${networkName} transaction not accepted by daemon:`, pendingTransaction.status);
+    console.error(
+      `ERR! ${networkName} transaction not accepted by daemon:`,
+      pendingTransaction.status
+    );
     return false;
   }
 
-  console.log(`SUCCESS! ${networkName} transaction accepted for processing by daemon`);
+  console.log(
+    `SUCCESS! ${networkName} transaction accepted for processing by daemon`
+  );
 
   try {
     let attempts = 0;
@@ -580,27 +643,36 @@ async function waitForTransactionConfirmationWithPolling(pendingTransaction, net
     while (attempts < maxAttempts) {
       // Check global timeout
       if (isGlobalTimeoutReached()) {
-        console.log(`WARN! ${networkName} confirmation stopped due to global timeout`);
+        console.log(
+          `WARN! ${networkName} confirmation stopped due to global timeout`
+        );
         return false;
       }
 
       try {
         // Try to get transaction status
         await pendingTransaction.wait({ maxAttempts: 1 });
-        console.log(`SUCCESS! ${networkName} transaction successfully confirmed: ${pendingTransaction.hash}`);
+        console.log(
+          `SUCCESS! ${networkName} transaction successfully confirmed: ${pendingTransaction.hash}`
+        );
         return true;
       } catch (waitError) {
-        if (waitError.message.includes("pending") || waitError.message.includes("not found")) {
+        if (
+          waitError.message.includes("pending") ||
+          waitError.message.includes("not found")
+        ) {
           // Transaction still pending, continue polling
           attempts++;
           console.log(`${networkName} still pending... (attempt ${attempts})`);
 
           // Wait 10 seconds before next poll
-          await new Promise(resolve => setTimeout(resolve, 10000));
+          await new Promise((resolve) => setTimeout(resolve, 10000));
           continue;
         } else {
           // Other error, assume confirmed or failed
-          console.log(`SUCCESS! ${networkName} confirmation completed (via error): ${pendingTransaction.hash}`);
+          console.log(
+            `SUCCESS! ${networkName} confirmation completed (via error): ${pendingTransaction.hash}`
+          );
           return true;
         }
       }
