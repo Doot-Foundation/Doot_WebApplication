@@ -111,38 +111,6 @@ async function startFetchAndUpdates(tokens) {
   return failed;
 }
 
-// Export the actual logic for direct function calls
-export async function updateAllPricesLogic() {
-  console.log('UpdateAllPrices: Starting price updates...');
-
-  try {
-    console.log('Fetching market data from all providers...');
-    const tokens = Object.keys(TOKEN_TO_SYMBOL);
-    const failed = await startFetchAndUpdates(tokens);
-
-    if (failed.length > 0) {
-      console.log(`Price update completed with ${failed.length} failures:`, failed);
-      return {
-        success: true,
-        message: `Updated prices partially.`,
-        data: { failed: failed },
-        updated: Date.now()
-      };
-    } else {
-      console.log('Price update complete - all tokens updated successfully');
-      return {
-        success: true,
-        message: `Updated prices successfully.`,
-        updated: Date.now()
-      };
-    }
-  } catch (error) {
-    console.error('UpdateAllPrices failed:', error);
-    throw error;
-  }
-}
-
-// Keep the API handler for external calls
 export default async function handler(req, res) {
   let responseAlreadySent = false;
   try {
@@ -152,11 +120,25 @@ export default async function handler(req, res) {
       return res.status(401).json("Unauthorized");
     }
 
-    const result = await updateAllPricesLogic();
-
+    const tokens = Object.keys(TOKEN_TO_SYMBOL);
+    const failed = await startFetchAndUpdates(tokens);
     if (!responseAlreadySent) {
       responseAlreadySent = true;
-      return res.status(200).json(result);
+      if (failed.length > 0) {
+        return res.status(200).json({
+          status: true,
+          message: `Updated prices partially.`,
+          data: {
+            failed: failed,
+          },
+        });
+      } else {
+        responseAlreadySent = true;
+        return res.status(200).json({
+          status: true,
+          message: `Updated prices successfully.`,
+        });
+      }
     }
   } catch (err) {
     if (!responseAlreadySent) {

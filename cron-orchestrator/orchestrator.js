@@ -1,4 +1,45 @@
 const fetch = require("node-fetch");
+const https = require("https");
+const fs = require("fs");
+
+const httpsAgent = createHttpsAgent();
+const agentOption = httpsAgent
+  ? (parsedURL) => (parsedURL.protocol === "https:" ? httpsAgent : undefined)
+  : undefined;
+
+function createHttpsAgent() {
+  const allowInsecure =
+    (process.env.CRON_ALLOW_INSECURE_SSL || "").toLowerCase() === "true";
+  const caBundlePath = process.env.CRON_CA_BUNDLE_PATH;
+  const caBundle = process.env.CRON_CA_BUNDLE;
+
+  if (caBundlePath) {
+    try {
+      const ca = fs.readFileSync(caBundlePath, "utf8");
+      console.log(`[TLS] Using CA bundle from ${caBundlePath}`);
+      return new https.Agent({ keepAlive: true, ca });
+    } catch (error) {
+      console.error(
+        `[TLS] Failed to read CA bundle at ${caBundlePath}:`,
+        error.message
+      );
+    }
+  }
+
+  if (caBundle) {
+    console.log("[TLS] Using inline CA bundle from CRON_CA_BUNDLE");
+    return new https.Agent({ keepAlive: true, ca: caBundle });
+  }
+
+  if (allowInsecure) {
+    console.warn(
+      "[TLS] CRON_ALLOW_INSECURE_SSL=true – TLS certificate validation disabled"
+    );
+    return new https.Agent({ keepAlive: true, rejectUnauthorized: false });
+  }
+
+  return undefined;
+}
 
 const TASKS = [
   {
@@ -37,14 +78,23 @@ async function executeTask(task) {
   try {
     console.log(`[${new Date().toISOString()}] Starting ${task.name}`);
 
-    const response = await fetch(`${process.env.NEXTJS_URL}${task.endpoint}`, {
+    const fetchOptions = {
       method: "POST",
       headers: {
         Authorization: `Bearer ${process.env.CRON_SECRET}`,
         "Content-Type": "application/json",
       },
       timeout: 600000, // 10 minute timeout
-    });
+    };
+
+    if (agentOption) {
+      fetchOptions.agent = agentOption;
+    }
+
+    const response = await fetch(
+      `${process.env.NEXTJS_URL}${task.endpoint}`,
+      fetchOptions
+    );
 
     const result = await response.json();
     console.log(`[${task.name}] Completed:`, result.message || "Success");
