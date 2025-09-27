@@ -1,0 +1,17 @@
+{
+  "name": "doot-cron-update-all-prices",
+  "version": "1.0.0",
+  "main": "orchestrator.js",
+  "private": true,
+  "scripts": {
+    "start": "node orchestrator.js"
+  },
+  "dependencies": {
+    "@upstash/ratelimit": "^2.0.6",
+    "@upstash/redis": "^1.35.4",
+    "axios": "^1.12.2",
+    "lodash": "^4.17.21",
+    "mina-signer": "^3.1.0",
+    "o1js": "^2.9.0"
+  }
+}

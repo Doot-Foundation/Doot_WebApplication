@@ -61,7 +61,6 @@ async function startFetchAndUpdates(tokens) {
   const failed = [];
 
   for (const token of tokens) {
-    // if (token == "mina") continue;
     console.log("\n+++++++++++ STARTING JOB +++++++++++");
 
     try {
@@ -74,7 +73,6 @@ async function startFetchAndUpdates(tokens) {
       const latest = new Array();
       latest.push(results[1]);
 
-      // Check if the price is under 1.
       const subone = results[0] < 1 ? true : false;
 
       const historical_latest = produceHistoricalLatestArray(
@@ -85,9 +83,6 @@ async function startFetchAndUpdates(tokens) {
         ipfs.historical
       );
 
-      // (IMMEDIATE, HISTORICAL_LATEST, HISTORICAL_HISTORICAL)
-      // IN THIS CASE, THE MOST FREQUENTLY CHANGED INFO IS THE LATEST - 10 MINUTES.
-      // THE HISTORICAL VALUES ARE UPDATED EVERY 30 MINUTES.
       const graphResult = await generateGraphData(
         subone,
         latest,
