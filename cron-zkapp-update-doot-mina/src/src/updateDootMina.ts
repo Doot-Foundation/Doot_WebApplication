@@ -366,7 +366,7 @@ async function updateMinaContractWithPolling(
     console.log("Creating and proving Mina L1 transaction...");
 
     const txn = await Mina.transaction(
-      { sender: sharedTxnData.callerPub, fee: 0.3 * 5e9 },
+      { sender: sharedTxnData.callerPub, fee: 0.2 * 1e9 },
       async () => {
         await dootZkApp.update(
           sharedTxnData.COMMITMENT,
@@ -436,7 +436,7 @@ async function updateMinaContractWithPolling(
           if (!isGlobalTimeoutReached()) {
             console.log("Building settlement transaction...");
             const settleTxn = await Mina.transaction(
-              { sender: sharedTxnData.callerPub, fee: 0.4 * 5e9 }, // Slightly higher fee to help with replacement
+              { sender: sharedTxnData.callerPub, fee: 0.1 * 1e9 },
               async () => {
                 await freshDootZkApp.settle(settlementProof);
               }
