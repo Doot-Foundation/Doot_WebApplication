@@ -44,6 +44,7 @@
     "node": ">=18.14.0"
   },
   "dependencies": {
+    "@upstash/ratelimit": "^2.0.6",
     "@upstash/redis": "^1.35.4",
     "axios": "^1.12.2",
     "dotenv": "^17.2.2",
