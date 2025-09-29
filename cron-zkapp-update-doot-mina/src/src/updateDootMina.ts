@@ -1,14 +1,14 @@
-import { redis } from "./utils/helper/init/InitRedis.js";
-import { TOKEN_TO_CACHE, MINA_CID_CACHE } from "./utils/constants/info.js";
-import { pinMinaObject } from "./utils/helper/PinMinaObject.js";
-import axios from "axios";
-import { Mina, PrivateKey, Field, fetchAccount, PublicKey } from "o1js";
+import { redis } from './utils/helper/init/InitRedis.js';
+import { TOKEN_TO_CACHE, MINA_CID_CACHE } from './utils/constants/info.js';
+import { pinMinaObject } from './utils/helper/PinMinaObject.js';
+import axios from 'axios';
+import { Mina, PrivateKey, Field, fetchAccount, PublicKey, UInt32 } from 'o1js';
 import {
   Doot,
   IpfsCID,
   TokenInformationArray,
   offchainState,
-} from "./utils/constants/Doot.js";
+} from './utils/constants/Doot.js';
 
 interface TokenDataMap {
   [key: string]: {
@@ -61,55 +61,63 @@ export async function updateDootMina(): Promise<UpdateResult> {
     clearTimeout(globalTimeout);
     if (global.gc) {
       global.gc();
-      console.log("CLEANUP! Forced garbage collection completed");
+      console.log('CLEANUP! Forced garbage collection completed');
     }
   };
 
   try {
-    console.log("Compiling Doot contract and offchain state...");
-    if (offchainState && typeof offchainState.compile === "function") {
+    console.log('Compiling Doot contract and offchain state...');
+    if (offchainState && typeof offchainState.compile === 'function') {
       try {
         await offchainState.compile();
       } catch (error) {
-        console.error("offchainState compilation failed with:", error);
-        throw new Error(`Contract compilation failed: ${error instanceof Error ? error.message : String(error)}`);
+        console.error('offchainState compilation failed with:', error);
+        throw new Error(
+          `Contract compilation failed: ${
+            error instanceof Error ? error.message : String(error)
+          }`
+        );
       }
     }
 
     try {
       await Doot.compile();
     } catch (error) {
-      console.error("Doot compilation failed with:", error);
-      throw new Error(`Contract compilation failed: ${error instanceof Error ? error.message : String(error)}`);
+      console.error('Doot compilation failed with:', error);
+      throw new Error(
+        `Contract compilation failed: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      );
     }
 
     console.log(
-      "SUCCESS! Doot offchainState + contract compiled successfully."
+      'SUCCESS! Doot offchainState + contract compiled successfully.'
     );
 
     console.log(
-      "\n=============== MINA L1 DOOT ORACLE UPDATE STARTED ===============\n"
+      '\n=============== MINA L1 DOOT ORACLE UPDATE STARTED ===============\n'
     );
 
     const tokenData: TokenDataMap = {};
     const tokenKeys = Object.keys(TOKEN_TO_CACHE);
     const requiredAssets = [
-      "mina",
-      "bitcoin",
-      "ethereum",
-      "solana",
-      "ripple",
-      "cardano",
-      "avalanche",
-      "polygon",
-      "chainlink",
-      "dogecoin",
+      'mina',
+      'bitcoin',
+      'ethereum',
+      'solana',
+      'ripple',
+      'cardano',
+      'avalanche',
+      'polygon',
+      'chainlink',
+      'dogecoin',
     ];
 
     const validCacheKeys: Array<{ tokenKey: string; cacheKey: string }> = [];
     for (const tokenKey of tokenKeys) {
       const cacheKey = TOKEN_TO_CACHE[tokenKey as keyof typeof TOKEN_TO_CACHE];
-      if (cacheKey && typeof cacheKey === "string" && cacheKey.trim() !== "") {
+      if (cacheKey && typeof cacheKey === 'string' && cacheKey.trim() !== '') {
         validCacheKeys.push({ tokenKey, cacheKey });
       } else {
         console.warn(`Invalid cache key for token ${tokenKey}:`, cacheKey);
@@ -133,7 +141,7 @@ export async function updateDootMina(): Promise<UpdateResult> {
     const missingAssets = requiredAssets.filter((asset) => !tokenData[asset]);
     if (missingAssets.length > 0) {
       throw new Error(
-        `Missing required assets for IPFS pinning: ${missingAssets.join(", ")}`
+        `Missing required assets for IPFS pinning: ${missingAssets.join(', ')}`
       );
     }
 
@@ -142,7 +150,7 @@ export async function updateDootMina(): Promise<UpdateResult> {
       Object.keys(tokenData)
     );
 
-    let previousCID = "NULL";
+    let previousCID = 'NULL';
     try {
       const existingMinaCacheData = await redis.get(MINA_CID_CACHE);
       if (
@@ -154,40 +162,44 @@ export async function updateDootMina(): Promise<UpdateResult> {
         console.log(`Found previous CID for unpinning: ${previousCID}`);
       }
     } catch (error) {
-      console.log(`INFO! No previous CID found (fresh start): ${error instanceof Error ? error.message : String(error)}`);
+      console.log(
+        `INFO! No previous CID found (fresh start): ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      );
     }
 
-    const ipfsResults = await pinMinaObject(tokenData, previousCID, "mina");
+    const ipfsResults = await pinMinaObject(tokenData, previousCID, 'mina');
 
     if (!ipfsResults || !Array.isArray(ipfsResults) || ipfsResults.length < 2) {
-      throw new Error("Invalid result from IPFS pinning operation");
+      throw new Error('Invalid result from IPFS pinning operation');
     }
 
     [ipfsCID, commitment] = ipfsResults;
-    console.log("\nSUCCESS! IPFS pinning successful:");
+    console.log('\nSUCCESS! IPFS pinning successful:');
     console.log(` CID: ${ipfsCID}`);
     console.log(` Commitment: ${commitment}`);
 
-    console.log("Verifying IPFS data accessibility...");
+    console.log('Verifying IPFS data accessibility...');
     await verifyIpfsAccessibility(ipfsCID);
-    console.log("SUCCESS! IPFS data verification successful");
+    console.log('SUCCESS! IPFS data verification successful');
 
-    console.log("\nPre-computing cryptographic objects for Mina L1...");
+    console.log('\nPre-computing cryptographic objects for Mina L1...');
 
     const COMMITMENT = Field.from(commitment);
     const IPFS_HASH = IpfsCID.fromString(ipfsCID);
 
     const orderedTokens = [
-      "mina",
-      "bitcoin",
-      "ethereum",
-      "solana",
-      "ripple",
-      "cardano",
-      "avalanche",
-      "polygon",
-      "chainlink",
-      "dogecoin",
+      'mina',
+      'bitcoin',
+      'ethereum',
+      'solana',
+      'ripple',
+      'cardano',
+      'avalanche',
+      'polygon',
+      'chainlink',
+      'dogecoin',
     ];
 
     const tokenInfo = new TokenInformationArray({
@@ -202,7 +214,7 @@ export async function updateDootMina(): Promise<UpdateResult> {
 
     const MINA_CALLER_KEY = process.env.DOOT_CALLER_KEY;
     if (!MINA_CALLER_KEY) {
-      throw new Error("Missing DOOT_CALLER_KEY environment variable");
+      throw new Error('Missing DOOT_CALLER_KEY environment variable');
     }
 
     const caller = PrivateKey.fromBase58(MINA_CALLER_KEY);
@@ -218,7 +230,9 @@ export async function updateDootMina(): Promise<UpdateResult> {
 
     const dootPubKeyBase58 = process.env.NEXT_PUBLIC_MINA_DOOT_PUBLIC_KEY;
     if (!dootPubKeyBase58) {
-      throw new Error("Missing NEXT_PUBLIC_MINA_DOOT_PUBLIC_KEY environment variable");
+      throw new Error(
+        'Missing NEXT_PUBLIC_MINA_DOOT_PUBLIC_KEY environment variable'
+      );
     }
 
     const dootPub = PublicKey.fromBase58(dootPubKeyBase58);
@@ -232,13 +246,13 @@ export async function updateDootMina(): Promise<UpdateResult> {
     );
 
     if (!minaResult.success) {
-      throw new Error(minaResult.error || "Mina L1 transaction failed");
+      throw new Error(minaResult.error || 'Mina L1 transaction failed');
     }
 
-    console.log("SUCCESS! Mina L1 contract updated.");
+    console.log('SUCCESS! Mina L1 contract updated.');
     console.log(
       `Transaction: ${minaResult.txHash}${
-        minaResult.confirmed ? " CONFIRMED" : " PENDING"
+        minaResult.confirmed ? ' CONFIRMED' : ' PENDING'
       }`
     );
 
@@ -246,9 +260,9 @@ export async function updateDootMina(): Promise<UpdateResult> {
       console.log(`Settlement transaction: ${minaResult.settlementTxHash}`);
     }
 
-    console.log("Updating redis cache.");
+    console.log('Updating redis cache.');
     await redis.set(MINA_CID_CACHE, [ipfsCID, commitment]);
-    console.log("SUCCESS! Redis cache updated with new IPFS data");
+    console.log('SUCCESS! Redis cache updated with new IPFS data');
 
     const elapsed = Math.round((Date.now() - startTime) / 1000);
 
@@ -256,10 +270,10 @@ export async function updateDootMina(): Promise<UpdateResult> {
 
     return {
       status: true,
-      message: "Mina L1 Doot oracle update completed",
+      message: 'Mina L1 Doot oracle update completed',
       data: {
         ipfs: { cid: ipfsCID, commitment },
-        network_type: "mina_l1",
+        network_type: 'mina_l1',
         transaction_hash: minaResult.txHash,
         settlement_hash: minaResult.settlementTxHash || undefined,
         elapsed_seconds: elapsed,
@@ -268,14 +282,19 @@ export async function updateDootMina(): Promise<UpdateResult> {
   } catch (error) {
     const elapsed = Math.round((Date.now() - startTime) / 1000);
     cleanup();
-    console.error("FATAL ERR! Mina L1 update failed:", error instanceof Error ? error.message : String(error));
+    console.error(
+      'FATAL ERR! Mina L1 update failed:',
+      error instanceof Error ? error.message : String(error)
+    );
     return {
       status: false,
-      message: "Mina L1 Doot oracle update failed",
+      message: 'Mina L1 Doot oracle update failed',
       error: error instanceof Error ? error.message : String(error),
       data: {
-        ipfs: ipfsCID ? { cid: ipfsCID, commitment: commitment || "" } : undefined,
-        network_type: "mina_l1",
+        ipfs: ipfsCID
+          ? { cid: ipfsCID, commitment: commitment || '' }
+          : undefined,
+        network_type: 'mina_l1',
         elapsed_seconds: elapsed,
         timeout_reached: globalTimeoutReached,
       },
@@ -283,7 +302,10 @@ export async function updateDootMina(): Promise<UpdateResult> {
   }
 }
 
-async function fetchAccountWithRetry(accountInfo: { publicKey: PublicKey }, maxRetries: number = 3): Promise<void> {
+async function fetchAccountWithRetry(
+  accountInfo: { publicKey: PublicKey },
+  maxRetries: number = 3
+): Promise<void> {
   for (let i = 0; i < maxRetries; i++) {
     try {
       await fetchAccount(accountInfo);
@@ -295,13 +317,66 @@ async function fetchAccountWithRetry(accountInfo: { publicKey: PublicKey }, maxR
   }
 }
 
+async function getCurrentNonce(publicKey: PublicKey): Promise<UInt32> {
+  await fetchAccountWithRetry({ publicKey });
+  const account = Mina.getAccount(publicKey);
+  return account.nonce;
+}
+
+async function waitForNonceIncrement(
+  publicKey: PublicKey,
+  originalNonce: number,
+  expectedNonce: number,
+  timeoutMs: number = 300000 // 5 minutes
+): Promise<boolean> {
+  const startTime = Date.now();
+  const pollInterval = 10000; // 10 seconds
+
+  console.log(
+    `Polling for nonce increment: waiting for nonce ${expectedNonce} (was ${originalNonce})`
+  );
+
+  while (Date.now() - startTime < timeoutMs) {
+    try {
+      const currentNonce = await getCurrentNonce(publicKey);
+      const currentNonceNumber = Number(currentNonce.toString());
+
+      console.log(
+        `Current nonce: ${currentNonceNumber}, expected: ${expectedNonce}`
+      );
+
+      if (currentNonceNumber >= expectedNonce) {
+        console.log(
+          `SUCCESS! Nonce incremented to ${currentNonceNumber}, proceeding with settlement`
+        );
+        return true;
+      }
+
+      console.log(`Nonce still ${currentNonceNumber}, waiting 10 seconds...`);
+      await new Promise((resolve) => setTimeout(resolve, pollInterval));
+    } catch (error) {
+      console.warn(
+        `Error checking nonce: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      );
+      await new Promise((resolve) => setTimeout(resolve, pollInterval));
+    }
+  }
+
+  console.warn(
+    `Timeout waiting for nonce increment after ${timeoutMs / 1000} seconds`
+  );
+  return false;
+}
+
 async function verifyIpfsAccessibility(cid: string): Promise<any> {
   const GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
-  if (!GATEWAY) throw new Error("Missing NEXT_PUBLIC_PINATA_GATEWAY");
+  if (!GATEWAY) throw new Error('Missing NEXT_PUBLIC_PINATA_GATEWAY');
   try {
     const response = await axios.get(`https://${GATEWAY}/ipfs/${cid}`, {
       timeout: 10000,
-      headers: { Accept: "application/json" },
+      headers: { Accept: 'application/json' },
     });
     return response.data;
   } catch (error) {
@@ -322,25 +397,25 @@ async function updateMinaContractWithPolling(
   isGlobalTimeoutReached: () => boolean
 ): Promise<MinaTransactionResult> {
   try {
-    console.log("Configuring Mina L1 network connection...");
+    console.log('Configuring Mina L1 network connection...');
 
     const MINA_ENDPOINT = process.env.NEXT_PUBLIC_MINA_ENDPOINT;
     const MINA_ARCHIVE_ENDPOINT = process.env.NEXT_PUBLIC_MINA_ARCHIVE_ENDPOINT;
     const MINA_DOOT_PUBLIC_KEY = process.env.NEXT_PUBLIC_MINA_DOOT_PUBLIC_KEY;
 
     if (!MINA_ENDPOINT || !MINA_DOOT_PUBLIC_KEY) {
-      throw new Error("Missing Mina environment variables");
+      throw new Error('Missing Mina environment variables');
     }
 
     console.log(`NETWORK! Connecting to: ${MINA_ENDPOINT}`);
-    console.log(` Archive: ${MINA_ARCHIVE_ENDPOINT || "(not configured)"}`);
+    console.log(` Archive: ${MINA_ARCHIVE_ENDPOINT || '(not configured)'}`);
     console.log(` Contract: ${MINA_DOOT_PUBLIC_KEY}`);
 
     if (isGlobalTimeoutReached()) {
       return {
         success: false,
         timeout: true,
-        message: "Global timeout reached before network setup",
+        message: 'Global timeout reached before network setup',
       };
     }
 
@@ -359,14 +434,19 @@ async function updateMinaContractWithPolling(
       return {
         success: false,
         timeout: true,
-        message: "Global timeout reached before transaction creation",
+        message: 'Global timeout reached before transaction creation',
       };
     }
 
-    console.log("Creating and proving Mina L1 transaction...");
+    console.log('Creating and proving Mina L1 transaction...');
+
+    // Get current nonce for the sender account
+    const currentNonce = await getCurrentNonce(sharedTxnData.callerPub);
+    const nonceNumber = Number(currentNonce.toString());
+    console.log(`Using nonce ${nonceNumber} for main transaction`);
 
     const txn = await Mina.transaction(
-      { sender: sharedTxnData.callerPub, fee: 0.2 * 1e9 },
+      { sender: sharedTxnData.callerPub, fee: 0.5 * 1e9, nonce: nonceNumber },
       async () => {
         await dootZkApp.update(
           sharedTxnData.COMMITMENT,
@@ -377,13 +457,13 @@ async function updateMinaContractWithPolling(
     );
 
     await txn.prove();
-    console.log("SUCCESS! Mina L1 transaction proved successfully");
+    console.log('SUCCESS! Mina L1 transaction proved successfully');
 
     if (isGlobalTimeoutReached()) {
       return {
         success: false,
         timeout: true,
-        message: "Global timeout reached before transaction send",
+        message: 'Global timeout reached before transaction send',
       };
     }
 
@@ -394,7 +474,7 @@ async function updateMinaContractWithPolling(
 
     const minaConfirmed = await waitForTransactionConfirmationWithPolling(
       pendingTxn,
-      "Mina L1",
+      'Mina L1',
       isGlobalTimeoutReached
     );
 
@@ -402,7 +482,7 @@ async function updateMinaContractWithPolling(
       return {
         success: false,
         timeout: true,
-        message: "Global timeout reached during transaction confirmation",
+        message: 'Global timeout reached during transaction confirmation',
         txHash: pendingTxn.hash,
         confirmed: false,
       };
@@ -410,43 +490,79 @@ async function updateMinaContractWithPolling(
 
     let settlementTxHash: string | null = null;
     if (minaConfirmed) {
-      console.log("Mina L1 confirmed! Waiting 30 seconds before settlement to avoid nonce conflicts...");
-
-      // Wait 30 seconds to ensure the main transaction is fully processed
-      await new Promise((resolve) => setTimeout(resolve, 30000));
-      console.log("30-second delay completed. Proceeding with settlement...");
+      console.log(
+        'Mina L1 confirmed! Waiting for nonce increment before settlement...'
+      );
 
       try {
         if (isGlobalTimeoutReached()) {
-          console.log("WARN! Global timeout reached before settlement");
+          console.log('WARN! Global timeout reached before settlement');
         } else {
           const freshContractPub = PublicKey.fromBase58(MINA_DOOT_PUBLIC_KEY);
           const freshDootZkApp = new Doot(freshContractPub);
           freshDootZkApp.offchainState.setContractInstance(freshDootZkApp);
 
           // Refresh account state to ensure proper nonce handling
-          console.log("Refreshing account state before settlement...");
+          console.log('Refreshing account state before settlement...');
           await fetchAccountWithRetry({ publicKey: freshContractPub });
           await fetchAccountWithRetry({ publicKey: sharedTxnData.callerPub });
 
-          console.log("Creating settlement proof...");
-          const settlementProof =
-            await freshDootZkApp.offchainState.createSettlementProof();
-
           if (!isGlobalTimeoutReached()) {
-            console.log("Building settlement transaction...");
+            console.log('Creating settlement proof...');
+            const settlementProof =
+              await freshDootZkApp.offchainState.createSettlementProof();
+
+            console.log(
+              'Settlement proof created, now checking nonce before transaction...'
+            );
+
+            // Wait for nonce to increment from the main transaction (right before sending)
+            const expectedNonce = nonceNumber + 1;
+            const nonceIncremented = await waitForNonceIncrement(
+              sharedTxnData.callerPub,
+              nonceNumber,
+              expectedNonce
+            );
+
+            if (!nonceIncremented) {
+              console.warn(
+                'WARN! Nonce did not increment in time, skipping settlement'
+              );
+              return {
+                success: true,
+                txHash: pendingTxn.hash,
+                confirmed: minaConfirmed,
+                settlementTxHash: null,
+                network: 'mina_l1',
+                finality: '3-5 minutes',
+                endpoint: MINA_ENDPOINT,
+              };
+            }
+
+            // Get the current nonce after increment
+            const currentNonce = await getCurrentNonce(sharedTxnData.callerPub);
+            const settlementNonce = Number(currentNonce.toString());
+            console.log(
+              `Using current nonce ${settlementNonce} for settlement transaction`
+            );
+
+            console.log('Building settlement transaction...');
             const settleTxn = await Mina.transaction(
-              { sender: sharedTxnData.callerPub, fee: 0.1 * 1e9 },
+              {
+                sender: sharedTxnData.callerPub,
+                fee: 0.2 * 1e9,
+                nonce: settlementNonce,
+              },
               async () => {
                 await freshDootZkApp.settle(settlementProof);
               }
             );
 
-            console.log("Proving settlement transaction...");
+            console.log('Proving settlement transaction...');
             await settleTxn.prove();
 
             if (!isGlobalTimeoutReached()) {
-              console.log("Sending settlement transaction...");
+              console.log('Sending settlement transaction...');
               const settlementPending = await settleTxn
                 .sign([sharedTxnData.caller])
                 .send();
@@ -460,9 +576,16 @@ async function updateMinaContractWithPolling(
         }
       } catch (settlementError) {
         console.warn(
-          `WARN! Mina L1 settlement failed: ${settlementError instanceof Error ? settlementError.message : String(settlementError)}`
+          `WARN! Mina L1 settlement failed: ${
+            settlementError instanceof Error
+              ? settlementError.message
+              : String(settlementError)
+          }`
         );
-        console.warn("Settlement error stack:", settlementError instanceof Error ? settlementError.stack : "");
+        console.warn(
+          'Settlement error stack:',
+          settlementError instanceof Error ? settlementError.stack : ''
+        );
       }
     }
 
@@ -471,16 +594,19 @@ async function updateMinaContractWithPolling(
       txHash: pendingTxn.hash,
       confirmed: minaConfirmed,
       settlementTxHash,
-      network: "mina_l1",
-      finality: "3-5 minutes",
+      network: 'mina_l1',
+      finality: '3-5 minutes',
       endpoint: MINA_ENDPOINT,
     };
   } catch (error) {
-    console.error("ERR! Mina L1 transaction error:", error instanceof Error ? error.message : String(error));
+    console.error(
+      'ERR! Mina L1 transaction error:',
+      error instanceof Error ? error.message : String(error)
+    );
     return {
       success: false,
       error: error instanceof Error ? error.message : String(error),
-      network: "mina_l1",
+      network: 'mina_l1',
     };
   }
 }
@@ -492,7 +618,7 @@ async function waitForTransactionConfirmationWithPolling(
 ): Promise<boolean> {
   console.log(`Waiting for ${networkName} confirmation with 20s polling...`);
 
-  if (pendingTransaction.status !== "pending") {
+  if (pendingTransaction.status !== 'pending') {
     console.error(
       `ERR! ${networkName} transaction not accepted by daemon:`,
       pendingTransaction.status
