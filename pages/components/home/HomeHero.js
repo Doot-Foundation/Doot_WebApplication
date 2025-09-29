@@ -130,7 +130,7 @@ export default function HomeHero() {
 
   const copyToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText("npm install @doot-oracles/client");
+      await navigator.clipboard.writeText("npm install @dootfoundation/client");
       toast({
         title: "Copied Successfully",
         duration: "2000",
