@@ -390,7 +390,7 @@ async function updateZekoL2ContractWithPolling(
       {
         sender: sharedTxnData.callerPub,
         fee: 0.2 * 1e9,
-        memo: 'Update Prices',
+        memo: 'Doot-Update Prices',
       },
       async () => {
         await dootZkApp.update(
@@ -466,7 +466,7 @@ async function updateZekoL2ContractWithPolling(
               {
                 sender: sharedTxnData.callerPub,
                 fee: 0.1 * 1e9,
-                memo: 'Settling OffchainState',
+                memo: 'Doot-Settling OffchainState',
               },
               async () => {
                 await freshDootZkApp.settle(settlementProof);
