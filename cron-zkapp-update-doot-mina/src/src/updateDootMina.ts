@@ -450,7 +450,7 @@ async function updateMinaContractWithPolling(
         sender: sharedTxnData.callerPub,
         fee: 0.5 * 1e9,
         nonce: nonceNumber,
-        memo: 'Update Prices',
+        memo: 'Doot-Update Prices',
       },
       async () => {
         await dootZkApp.update(
@@ -557,7 +557,7 @@ async function updateMinaContractWithPolling(
                 sender: sharedTxnData.callerPub,
                 fee: 0.2 * 1e9,
                 nonce: settlementNonce,
-                memo: 'Settling OffchainState',
+                memo: 'Doot-Settling OffchainState',
               },
               async () => {
                 await freshDootZkApp.settle(settlementProof);
