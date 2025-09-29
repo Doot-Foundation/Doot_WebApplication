@@ -41,7 +41,7 @@
     "o1js": "^2.*"
   },
   "engines": {
-    "node": ">=18.14.0"
+    "node": "22.14.0"
   },
   "dependencies": {
     "@upstash/ratelimit": "^2.0.6",
