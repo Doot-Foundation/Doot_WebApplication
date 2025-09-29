@@ -446,7 +446,12 @@ async function updateMinaContractWithPolling(
     console.log(`Using nonce ${nonceNumber} for main transaction`);
 
     const txn = await Mina.transaction(
-      { sender: sharedTxnData.callerPub, fee: 0.5 * 1e9, nonce: nonceNumber },
+      {
+        sender: sharedTxnData.callerPub,
+        fee: 0.5 * 1e9,
+        nonce: nonceNumber,
+        memo: 'Update Prices',
+      },
       async () => {
         await dootZkApp.update(
           sharedTxnData.COMMITMENT,
@@ -552,6 +557,7 @@ async function updateMinaContractWithPolling(
                 sender: sharedTxnData.callerPub,
                 fee: 0.2 * 1e9,
                 nonce: settlementNonce,
+                memo: 'Settling OffchainState',
               },
               async () => {
                 await freshDootZkApp.settle(settlementProof);

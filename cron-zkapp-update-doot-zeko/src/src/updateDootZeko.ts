@@ -387,7 +387,11 @@ async function updateZekoL2ContractWithPolling(
     console.log('Creating and proving Zeko L2 transaction...');
 
     const txn = await Mina.transaction(
-      { sender: sharedTxnData.callerPub, fee: 0.2 * 1e9 },
+      {
+        sender: sharedTxnData.callerPub,
+        fee: 0.2 * 1e9,
+        memo: 'Update Prices',
+      },
       async () => {
         await dootZkApp.update(
           sharedTxnData.COMMITMENT,
@@ -459,7 +463,11 @@ async function updateZekoL2ContractWithPolling(
           if (!isGlobalTimeoutReached()) {
             console.log('Building settlement transaction...');
             const settleTxn = await Mina.transaction(
-              { sender: sharedTxnData.callerPub, fee: 0.1 * 1e9 },
+              {
+                sender: sharedTxnData.callerPub,
+                fee: 0.1 * 1e9,
+                memo: 'Settling OffchainState',
+              },
               async () => {
                 await freshDootZkApp.settle(settlementProof);
               }
