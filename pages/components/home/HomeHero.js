@@ -551,7 +551,7 @@ export default function HomeHero() {
                             overflowWrap="anywhere"
                             wordBreak="break-word"
                           >
-                            {`https://doot.foundation/api/get/getPrice?token=${asset}`}
+                            {`https://doot.foundation/api/get/price?token=${asset}`}
                           </Text>
                         </Fade>
                       )}
