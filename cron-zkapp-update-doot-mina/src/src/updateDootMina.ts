@@ -448,7 +448,7 @@ async function updateMinaContractWithPolling(
     const txn = await Mina.transaction(
       {
         sender: sharedTxnData.callerPub,
-        fee: 0.5 * 1e9,
+        fee: 0.2 * 1e9,
         nonce: nonceNumber,
         memo: 'Doot-Update Prices',
       },
@@ -555,7 +555,7 @@ async function updateMinaContractWithPolling(
             const settleTxn = await Mina.transaction(
               {
                 sender: sharedTxnData.callerPub,
-                fee: 0.2 * 1e9,
+                fee: 0.1 * 1e9,
                 nonce: settlementNonce,
                 memo: 'Doot-Settling OffchainState',
               },
