@@ -444,11 +444,11 @@ async function updateMinaContractWithPolling(
     const currentNonce = await getCurrentNonce(sharedTxnData.callerPub);
     const nonceNumber = Number(currentNonce.toString());
     console.log(`Using nonce ${nonceNumber} for main transaction`);
-
+    const feeAlloted = 1e9 * Number(process.env.MINA_UPDATE_TXN_FEE || 2);
     const txn = await Mina.transaction(
       {
         sender: sharedTxnData.callerPub,
-        fee: 0.2 * 1e9,
+        fee: feeAlloted,
         nonce: nonceNumber,
         memo: 'Doot-Update Prices',
       },
@@ -552,10 +552,12 @@ async function updateMinaContractWithPolling(
             );
 
             console.log('Building settlement transaction...');
+            const settlementFeeAlloted =
+              1e9 * Number(process.env.MINA_SETTLEMENT_TXN_FEE || 1);
             const settleTxn = await Mina.transaction(
               {
                 sender: sharedTxnData.callerPub,
-                fee: 0.1 * 1e9,
+                fee: settlementFeeAlloted,
                 nonce: settlementNonce,
                 memo: 'Doot-Settling OffchainState',
               },
