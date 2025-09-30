@@ -507,48 +507,53 @@ async function updateMinaContractWithPolling(
           const freshDootZkApp = new Doot(freshContractPub);
           freshDootZkApp.offchainState.setContractInstance(freshDootZkApp);
 
-          // Refresh account state to ensure proper nonce handling
-          console.log('Refreshing account state before settlement...');
-          await fetchAccountWithRetry({ publicKey: freshContractPub });
-          await fetchAccountWithRetry({ publicKey: sharedTxnData.callerPub });
+          // Wait for nonce to increment from the main transaction FIRST
+          console.log('Waiting for nonce increment before settlement...');
+          const expectedNonce = nonceNumber + 1;
+          const nonceIncremented = await waitForNonceIncrement(
+            sharedTxnData.callerPub,
+            nonceNumber,
+            expectedNonce
+          );
+
+          if (!nonceIncremented) {
+            console.warn(
+              'WARN! Nonce did not increment in time, skipping settlement'
+            );
+            return {
+              success: true,
+              txHash: pendingTxn.hash,
+              confirmed: minaConfirmed,
+              settlementTxHash: null,
+              network: 'mina_l1',
+              finality: '3-5 minutes',
+              endpoint: MINA_ENDPOINT,
+            };
+          }
+
+          // Add 60-second buffer for L1 finality before creating settlement proof
+          console.log(
+            'Nonce incremented! Waiting additional 60 seconds for L1 finality before creating settlement proof...'
+          );
+          await new Promise((resolve) => setTimeout(resolve, 60000));
 
           if (!isGlobalTimeoutReached()) {
-            console.log('Creating settlement proof...');
+            // Refresh account state AFTER nonce increment and delay
+            console.log('Refreshing account state after L1 finality wait...');
+            await fetchAccountWithRetry({ publicKey: freshContractPub });
+            await fetchAccountWithRetry({ publicKey: sharedTxnData.callerPub });
+
+            console.log(
+              'Creating settlement proof with current offchain state...'
+            );
             const settlementProof =
               await freshDootZkApp.offchainState.createSettlementProof();
 
-            console.log(
-              'Settlement proof created, now checking nonce before transaction...'
-            );
-
-            // Wait for nonce to increment from the main transaction (right before sending)
-            const expectedNonce = nonceNumber + 1;
-            const nonceIncremented = await waitForNonceIncrement(
-              sharedTxnData.callerPub,
-              nonceNumber,
-              expectedNonce
-            );
-
-            if (!nonceIncremented) {
-              console.warn(
-                'WARN! Nonce did not increment in time, skipping settlement'
-              );
-              return {
-                success: true,
-                txHash: pendingTxn.hash,
-                confirmed: minaConfirmed,
-                settlementTxHash: null,
-                network: 'mina_l1',
-                finality: '3-5 minutes',
-                endpoint: MINA_ENDPOINT,
-              };
-            }
-
-            // Get the current nonce after increment
+            // Get the current nonce after all waits
             const currentNonce = await getCurrentNonce(sharedTxnData.callerPub);
             const settlementNonce = Number(currentNonce.toString());
             console.log(
-              `Using current nonce ${settlementNonce} for settlement transaction`
+              `Settlement proof created, using nonce ${settlementNonce} for transaction`
             );
 
             console.log('Building settlement transaction...');
