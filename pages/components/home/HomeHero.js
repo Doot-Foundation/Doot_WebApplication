@@ -302,7 +302,7 @@ export default function HomeHero() {
               <Flex gap={2} overflowX="auto" whiteSpace="nowrap" flex="1">
                 <Text color="gray.400">revolutionary@zkapp</Text>
                 <Text color="gray.400">:~$</Text>
-                <Text color="white">npm install @doot-oracles/client</Text>
+                <Text color="white">npm install @dootfoundation/client</Text>
                 <Box
                   fontWeight={900}
                   animation={`${blinking} 1.2s step-start infinite`}
