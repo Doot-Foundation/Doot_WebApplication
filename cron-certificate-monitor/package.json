@@ -1,0 +1,18 @@
+{
+  "name": "doot-cron-certificate-monitor",
+  "version": "1.0.0",
+  "description": "DoH certificate monitoring service for Doot Oracle",
+  "main": "orchestrator.js",
+  "private": true,
+  "scripts": {
+    "start": "node orchestrator.js"
+  },
+  "dependencies": {
+    "@upstash/redis": "^1.35.4",
+    "axios": "^1.12.2",
+    "dotenv": "^16.4.5"
+  },
+  "engines": {
+    "node": "20.x"
+  }
+}
