@@ -1,0 +1,22 @@
+{
+  "name": "doot-cron-update-all-prices-doh",
+  "version": "1.0.0",
+  "description": "DoH-protected price fetching service for Doot Oracle",
+  "main": "orchestrator.js",
+  "private": true,
+  "scripts": {
+    "start": "node orchestrator.js"
+  },
+  "dependencies": {
+    "@upstash/ratelimit": "^2.0.6",
+    "@upstash/redis": "^1.35.4",
+    "axios": "^1.12.2",
+    "dotenv": "^17.2.3",
+    "lodash": "^4.17.21",
+    "mina-signer": "^3.1.0",
+    "o1js": "^2.9.0"
+  },
+  "engines": {
+    "node": "22.x"
+  }
+}
