@@ -44,8 +44,8 @@ async function fetchIPFSWithRetry(url, maxRetries = 3, timeout = 60000) {
 
       const response = await axios.get(url, {
         timeout: timeout,
-        maxContentLength: 100 * 1024 * 1024, // 100MB
-        maxBodyLength: 100 * 1024 * 1024,
+        maxContentLength: Infinity,  // No limit - IPFS historical data can be very large
+        maxBodyLength: Infinity,     // No limit - IPFS historical data can be very large
         decompress: true,
         validateStatus: (status) => status === 200,
       });
@@ -109,7 +109,7 @@ async function startFetchAndUpdates(tokens) {
 
   console.log("Last known historical CID :", cid);
 
-  const ipfs = await fetchIPFSWithRetry(`https://${gateway}/ipfs/${cid}`, 3, 60000);
+  const ipfs = await fetchIPFSWithRetry(`https://${gateway}/ipfs/${cid}`, 3, 120000); // 2 minutes timeout for large IPFS files
   const failed = [];
 
   for (const token of tokens) {
