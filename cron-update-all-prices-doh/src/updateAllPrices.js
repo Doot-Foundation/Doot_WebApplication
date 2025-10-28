@@ -35,6 +35,45 @@ async function priceOf(token) {
   return await getPriceOf(token);
 }
 
+async function fetchIPFSWithRetry(url, maxRetries = 3, timeout = 60000) {
+  let lastError;
+
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`Fetching IPFS data (attempt ${attempt}/${maxRetries})...`);
+
+      const response = await axios.get(url, {
+        timeout: timeout,
+        maxContentLength: 100 * 1024 * 1024, // 100MB
+        maxBodyLength: 100 * 1024 * 1024,
+        decompress: true,
+        validateStatus: (status) => status === 200,
+      });
+
+      console.log(`Successfully fetched IPFS data (${response.data ? 'valid' : 'empty'} response)`);
+      return response.data;
+
+    } catch (error) {
+      lastError = error;
+      const errorMsg = error.code === 'ECONNABORTED'
+        ? 'Request timeout'
+        : error.code === 'ERR_BAD_RESPONSE'
+        ? 'Bad response from gateway'
+        : error.message;
+
+      console.error(`IPFS fetch attempt ${attempt} failed: ${errorMsg}`);
+
+      if (attempt < maxRetries) {
+        const backoffDelay = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
+        console.log(`Retrying in ${backoffDelay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, backoffDelay));
+      }
+    }
+  }
+
+  throw new Error(`Failed to fetch IPFS data after ${maxRetries} attempts: ${lastError?.message || 'Unknown error'}`);
+}
+
 async function startFetchAndUpdates(tokens) {
   const cid = await redis.get(HISTORICAL_CID_CACHE);
 
@@ -49,11 +88,8 @@ async function startFetchAndUpdates(tokens) {
   }
 
   console.log("Last known historical CID :", cid);
-  const pinnedData = await axios.get(`https://${gateway}/ipfs/${cid}`, {
-    timeout: 30000,
-  });
 
-  const ipfs = pinnedData.data;
+  const ipfs = await fetchIPFSWithRetry(`https://${gateway}/ipfs/${cid}`, 3, 60000);
   const failed = [];
 
   for (const token of tokens) {
