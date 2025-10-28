@@ -50,16 +50,36 @@ async function fetchIPFSWithRetry(url, maxRetries = 3, timeout = 60000) {
         validateStatus: (status) => status === 200,
       });
 
-      console.log(`Successfully fetched IPFS data (${response.data ? 'valid' : 'empty'} response)`);
+      // Validate response data structure
+      if (!response.data) {
+        throw new Error('IPFS response data is empty');
+      }
+
+      if (!response.data.latest || !response.data.latest.prices) {
+        throw new Error('IPFS data missing "latest.prices" structure');
+      }
+
+      if (!response.data.historical || typeof response.data.historical !== 'object') {
+        throw new Error('IPFS data missing "historical" structure');
+      }
+
+      console.log(`Successfully fetched and validated IPFS data`);
       return response.data;
 
     } catch (error) {
       lastError = error;
-      const errorMsg = error.code === 'ECONNABORTED'
-        ? 'Request timeout'
-        : error.code === 'ERR_BAD_RESPONSE'
-        ? 'Bad response from gateway'
-        : error.message;
+
+      // Handle various axios error codes
+      let errorMsg = error.message;
+      if (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT') {
+        errorMsg = 'Request timeout';
+      } else if (error.code === 'ERR_BAD_RESPONSE') {
+        errorMsg = 'Bad response from gateway';
+      } else if (error.code === 'ERR_NETWORK' || error.code === 'ECONNRESET') {
+        errorMsg = 'Network connection error';
+      } else if (axios.isAxiosError(error) && error.response) {
+        errorMsg = `HTTP ${error.response.status}: ${error.response.statusText}`;
+      }
 
       console.error(`IPFS fetch attempt ${attempt} failed: ${errorMsg}`);
 
@@ -107,8 +127,13 @@ async function startFetchAndUpdates(tokens) {
 
       const subone = results[0] < 1;
 
+      // Validate token exists in IPFS data
+      if (!ipfs.latest.prices[token]) {
+        console.warn(`Token ${token} missing from IPFS latest.prices, using empty array`);
+      }
+
       const historicalLatest = produceHistoricalLatestArray(
-        ipfs.latest.prices[token]
+        ipfs.latest.prices[token] || {}
       );
       const historicalHistorical = produceHistoricalArray(token, ipfs.historical);
 
