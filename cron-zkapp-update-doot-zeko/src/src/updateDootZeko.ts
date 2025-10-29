@@ -354,6 +354,8 @@ async function updateZekoL2ContractWithPolling(
       console.log('Configuring Zeko L2 network connection...');
 
       const ZEKO_ENDPOINT = process.env.NEXT_PUBLIC_ZEKO_ENDPOINT;
+      const ZEKO_ARCHIVE_ENDPOINT =
+        process.env.NEXT_PUBLIC_ZEKO_ARCHIVE_ENDPOINT;
       const ZEKO_CONTRACT_ADDRESS =
         process.env.NEXT_PUBLIC_ZEKO_DOOT_PUBLIC_KEY;
 
@@ -362,7 +364,7 @@ async function updateZekoL2ContractWithPolling(
       }
 
       console.log(`NETWORK! Connecting to: ${ZEKO_ENDPOINT}`);
-      console.log(` Archive: ${ZEKO_ENDPOINT}`);
+      console.log(` Archive: ${ZEKO_ARCHIVE_ENDPOINT}`);
       console.log(` Contract: ${ZEKO_CONTRACT_ADDRESS}`);
 
       if (isGlobalTimeoutReached()) {
@@ -377,7 +379,7 @@ async function updateZekoL2ContractWithPolling(
 
       const zekoNetwork = Mina.Network({
         mina: ZEKO_ENDPOINT,
-        archive: ZEKO_ENDPOINT,
+        archive: ZEKO_ARCHIVE_ENDPOINT,
       });
       Mina.setActiveInstance(zekoNetwork);
 
@@ -395,7 +397,9 @@ async function updateZekoL2ContractWithPolling(
 
       // CRITICAL FIX: Ensure actions are properly loaded
       // This happens automatically during the update() call, but we ensure account state is fresh
-      console.log('Account states fetched successfully, ready for transaction creation');
+      console.log(
+        'Account states fetched successfully, ready for transaction creation'
+      );
 
       console.log('Creating and proving Zeko L2 transaction...');
       const feeAlloted = 1e9 * Number(process.env.ZEKO_UPDATE_TXN_FEE || 2);
@@ -433,9 +437,7 @@ async function updateZekoL2ContractWithPolling(
 
       for (let sendAttempt = 1; sendAttempt <= 3; sendAttempt++) {
         try {
-          console.log(
-            `Sending transaction (send attempt ${sendAttempt}/3)...`
-          );
+          console.log(`Sending transaction (send attempt ${sendAttempt}/3)...`);
           pendingTxn = await signedTxn.send();
           sendSuccess = true;
           console.log(`SUCCESS! Zeko L2 transaction sent: ${pendingTxn.hash}`);
