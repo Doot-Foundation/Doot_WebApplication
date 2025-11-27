@@ -2,11 +2,19 @@ import { redis } from './utils/helper/init/InitRedis.js';
 import { TOKEN_TO_CACHE, MINA_CID_CACHE } from './utils/constants/info.js';
 import { pinMinaObject } from './utils/helper/PinMinaObject.js';
 import axios from 'axios';
-import { Mina, PrivateKey, Field, fetchAccount, PublicKey, UInt32 } from 'o1js';
+import {
+  Mina,
+  PrivateKey,
+  Field,
+  fetchAccount,
+  PublicKey,
+  UInt32,
+  UInt64,
+} from 'o1js';
 import {
   Doot,
   IpfsCID,
-  TokenInformationArray,
+  TokenInformationArrayInput,
   offchainState,
 } from './utils/constants/Doot.js';
 
@@ -202,7 +210,7 @@ export async function updateDootMina(): Promise<UpdateResult> {
       'dogecoin',
     ];
 
-    const tokenInfo = new TokenInformationArray({
+    const tokenInfo = new TokenInformationArrayInput({
       prices: orderedTokens.map((token) => {
         const cache = tokenData[token];
         if (!cache || !cache.price) {
@@ -210,6 +218,7 @@ export async function updateDootMina(): Promise<UpdateResult> {
         }
         return Field.from(cache.price);
       }),
+      lastUpdatedAt: UInt64.fromValue(Date.now()),
     });
 
     const MINA_CALLER_KEY = process.env.DOOT_CALLER_KEY;
@@ -304,7 +313,7 @@ export async function updateDootMina(): Promise<UpdateResult> {
 
 async function fetchAccountWithRetry(
   accountInfo: { publicKey: PublicKey },
-  maxRetries: number = 3
+  maxRetries = 3
 ): Promise<void> {
   for (let i = 0; i < maxRetries; i++) {
     try {
@@ -327,7 +336,7 @@ async function waitForNonceIncrement(
   publicKey: PublicKey,
   originalNonce: number,
   expectedNonce: number,
-  timeoutMs: number = 300000 // 5 minutes
+  timeoutMs = 300000 // 5 minutes
 ): Promise<boolean> {
   const startTime = Date.now();
   const pollInterval = 10000; // 10 seconds
@@ -390,7 +399,7 @@ async function updateMinaContractWithPolling(
   sharedTxnData: {
     COMMITMENT: Field;
     IPFS_HASH: IpfsCID;
-    TOKEN_INFO: TokenInformationArray;
+    TOKEN_INFO: TokenInformationArrayInput;
     caller: PrivateKey;
     callerPub: PublicKey;
   },
