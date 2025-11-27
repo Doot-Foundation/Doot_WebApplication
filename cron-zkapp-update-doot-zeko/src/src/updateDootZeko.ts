@@ -2,11 +2,11 @@ import { redis } from './utils/helper/init/InitRedis.js';
 import { TOKEN_TO_CACHE, ZEKO_CID_CACHE } from './utils/constants/info.js';
 import { pinMinaObject } from './utils/helper/PinMinaObject.js';
 import axios from 'axios';
-import { Mina, PrivateKey, Field, fetchAccount, PublicKey } from 'o1js';
+import { Mina, PrivateKey, Field, fetchAccount, PublicKey, UInt64 } from 'o1js';
 import {
   Doot,
   IpfsCID,
-  TokenInformationArray,
+  TokenInformationArrayInput,
   offchainState,
 } from './utils/constants/Doot.js';
 
@@ -202,7 +202,7 @@ export async function updateDootZeko(): Promise<UpdateResult> {
       'dogecoin',
     ];
 
-    const tokenInfo = new TokenInformationArray({
+    const tokenInfo = new TokenInformationArrayInput({
       prices: orderedTokens.map((token) => {
         const cache = tokenData[token];
         if (!cache || !cache.price) {
@@ -210,6 +210,7 @@ export async function updateDootZeko(): Promise<UpdateResult> {
         }
         return Field.from(cache.price);
       }),
+      lastUpdatedAt: UInt64.fromValue(Date.now()),
     });
 
     const ZEKO_CALLER_KEY = process.env.DOOT_CALLER_KEY;
@@ -304,7 +305,7 @@ export async function updateDootZeko(): Promise<UpdateResult> {
 
 async function fetchAccountWithRetry(
   accountInfo: { publicKey: PublicKey },
-  maxRetries: number = 3
+  maxRetries = 3
 ): Promise<void> {
   for (let i = 0; i < maxRetries; i++) {
     try {
@@ -337,7 +338,7 @@ async function updateZekoL2ContractWithPolling(
   sharedTxnData: {
     COMMITMENT: Field;
     IPFS_HASH: IpfsCID;
-    TOKEN_INFO: TokenInformationArray;
+    TOKEN_INFO: TokenInformationArrayInput;
     caller: PrivateKey;
     callerPub: PublicKey;
   },
