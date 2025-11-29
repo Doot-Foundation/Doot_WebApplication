@@ -1,10 +1,14 @@
 import { Doot, IpfsCID } from "@/utils/constants/Doot";
 import { Mina, fetchAccount, PublicKey } from "o1js";
 import axios from "axios";
+import { downloadObject } from "./supabaseStorage";
 
 const GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
 const ENDPOINT = process.env.NEXT_PUBLIC_MINA_ENDPOINT;
 const DOOT_PUBLIC_KEY = process.env.NEXT_PUBLIC_MINA_DOOT_PUBLIC_KEY;
+const SUPABASE_MINA_PREFIX = (
+  process.env.SUPABASE_MINA_PREFIX || "mina"
+).replace(/^\/+|\/+$/g, "");
 
 interface MinaDetails {
   IpfsHash: string;
@@ -61,16 +65,39 @@ async function getMinaDetails(cid: string): Promise<MinaDetails | undefined> {
 
     // Only fetch IPFS data if CID matches
     if (cid === onChainIpfsCid) {
-      const response = await axios.get(
-        `https://${GATEWAY}/ipfs/${onChainIpfsCid}`,
-        {
-          timeout: 10000,
-          headers: {
-            Accept: "application/json",
-          },
+      try {
+        const response = await axios.get(
+          `https://${GATEWAY}/ipfs/${onChainIpfsCid}`,
+          {
+            timeout: 10000,
+            headers: {
+              Accept: "application/json",
+            },
+          }
+        );
+        baseResponse.IpfsData = response.data;
+      } catch (ipfsErr) {
+        // Fallback to Supabase public bucket
+        try {
+          const pointerPath = `${SUPABASE_MINA_PREFIX}_latest.json`;
+          let objectPath = `${SUPABASE_MINA_PREFIX}_${onChainIpfsCid}.json`;
+          try {
+            const pointerRaw = await downloadObject({ objectPath: pointerPath });
+            const pointer = JSON.parse(pointerRaw);
+            if (pointer?.object_path) {
+              objectPath = pointer.object_path;
+            }
+          } catch {
+            // ignore pointer fetch failures; fall back to cid-based path
+          }
+          const data = await downloadObject({ objectPath });
+          baseResponse.IpfsData = JSON.parse(data);
+        } catch (fallbackErr) {
+          console.error(
+            `Failed to fetch Mina IPFS data via IPFS (${(ipfsErr as any).message}); Supabase fallback failed: ${(fallbackErr as any).message}`
+          );
         }
-      );
-      baseResponse.IpfsData = response.data;
+      }
     }
 
     return baseResponse;
@@ -100,7 +127,29 @@ async function getToPinIPFSInformation(cid: string) {
       `Failed to fetch IPFS data for CID ${cid}:`,
       error instanceof Error ? error.message : "Unknown error"
     );
-    throw error;
+
+    try {
+      const pointerPath = `${SUPABASE_MINA_PREFIX}/latest.json`;
+      let objectPath = `${SUPABASE_MINA_PREFIX}_${cid}.json`;
+      try {
+        const pointerRaw = await downloadObject({ objectPath: pointerPath });
+        const pointer = JSON.parse(pointerRaw);
+        if (pointer?.object_path) {
+          objectPath = pointer.object_path;
+        }
+      } catch {
+        // ignore pointer fetch failures; fall back to cid-based path
+      }
+      const data = await downloadObject({ objectPath });
+      return JSON.parse(data);
+    } catch (fallbackErr) {
+      console.error(
+        `Supabase fallback failed for Mina CID ${cid}: ${
+          fallbackErr instanceof Error ? fallbackErr.message : String(fallbackErr)
+        }`
+      );
+      throw error;
+    }
   }
 }
 

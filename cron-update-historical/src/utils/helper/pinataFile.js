@@ -64,7 +64,7 @@ async function fetchJsonFromCid(cid) {
 
   const response = await axios.get(url, {
     responseType: "text",
-    timeout: 10000,
+    timeout: 20 * 60 * 1000, // 20 minutes to allow large historical fetches
     headers: {
       Accept: "text/plain, application/json",
     },

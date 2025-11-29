@@ -1,0 +1,24 @@
+[2025-11-29T09:00:30.302Z] [CERTIFICATE_SERVICE] Failed to initialize Cloudflare fingerprints
+Stack: TypeError: fetch failed
+    at node:internal/deps/undici/undici:13502:13
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async HttpClient.request (/home/botvenom/Desktop/work/web3/mina/projects/professional/Doot/protocol/ui/cron-update-all-prices-doh/node_modules/@upstash/redis/nodejs.js:174:15)
+    at async Pipeline.exec (/home/botvenom/Desktop/work/web3/mina/projects/professional/Doot/protocol/ui/cron-update-all-prices-doh/node_modules/@upstash/redis/nodejs.js:2695:17)
+    at async AutoPipelineExecutor.withAutoPipeline (/home/botvenom/Desktop/work/web3/mina/projects/professional/Doot/protocol/ui/cron-update-all-prices-doh/node_modules/@upstash/redis/nodejs.js:394:21)
+    at async initializeFingerprintsInRedis (/home/botvenom/Desktop/work/web3/mina/projects/professional/Doot/protocol/ui/cron-update-all-prices-doh/src/certificateService.js:95:28)
+    at async initializeCertificateValidation (/home/botvenom/Desktop/work/web3/mina/projects/professional/Doot/protocol/ui/cron-update-all-prices-doh/src/certificateService.js:274:3)
+    at async /home/botvenom/Desktop/work/web3/mina/projects/professional/Doot/protocol/ui/cron-update-all-prices-doh/orchestrator.js:11:5
+
+[ENTRY] --------------------------------------------------------------------------------------------------
+[2025-11-29T09:00:34.611Z] [CERTIFICATE_SERVICE] Failed to initialize Google fingerprints
+Stack: TypeError: fetch failed
+    at node:internal/deps/undici/undici:13502:13
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async HttpClient.request (/home/botvenom/Desktop/work/web3/mina/projects/professional/Doot/protocol/ui/cron-update-all-prices-doh/node_modules/@upstash/redis/nodejs.js:174:15)
+    at async Pipeline.exec (/home/botvenom/Desktop/work/web3/mina/projects/professional/Doot/protocol/ui/cron-update-all-prices-doh/node_modules/@upstash/redis/nodejs.js:2695:17)
+    at async AutoPipelineExecutor.withAutoPipeline (/home/botvenom/Desktop/work/web3/mina/projects/professional/Doot/protocol/ui/cron-update-all-prices-doh/node_modules/@upstash/redis/nodejs.js:394:21)
+    at async initializeFingerprintsInRedis (/home/botvenom/Desktop/work/web3/mina/projects/professional/Doot/protocol/ui/cron-update-all-prices-doh/src/certificateService.js:95:28)
+    at async initializeCertificateValidation (/home/botvenom/Desktop/work/web3/mina/projects/professional/Doot/protocol/ui/cron-update-all-prices-doh/src/certificateService.js:274:3)
+    at async /home/botvenom/Desktop/work/web3/mina/projects/professional/Doot/protocol/ui/cron-update-all-prices-doh/orchestrator.js:11:5
+
+[ENTRY] --------------------------------------------------------------------------------------------------

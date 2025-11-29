@@ -1,5 +1,18 @@
 import unpin from "./Unpin";
 import { CircuitString, MerkleMap, Field } from "o1js";
+import { uploadWithHashAndCleanup, downloadObject } from "./supabaseStorage";
+
+function isSupabaseCid(cid: string | null | undefined): boolean {
+  return typeof cid === "string" && cid.startsWith("supabase-");
+}
+
+function buildSupabaseCid(objectPath: string): string {
+  const bucket =
+    process.env.SUPABASE_HISTORICAL_BUCKET ||
+    process.env.SUPABASE_PRICE_BUCKET ||
+    "fallback";
+  return `supabase-${bucket}-${objectPath}`;
+}
 
 // Types
 interface CryptoAsset {
@@ -40,6 +53,10 @@ const ASSETS = [
   "Cardano",
 ] as const;
 
+const SUPABASE_MINA_PREFIX = (
+  process.env.SUPABASE_MINA_PREFIX || "mina"
+).replace(/^\/+|\/+$/g, "");
+
 async function pinMinaObject(
   obj: AssetObject,
   previousCID: string,
@@ -79,7 +96,8 @@ async function pinMinaObject(
       },
     };
 
-    // Prepare upload options
+    const serializedPayload = JSON.stringify(toUploadObject);
+
     const options = {
       method: "POST",
       headers: {
@@ -93,20 +111,48 @@ async function pinMinaObject(
       }),
     };
 
-    // SAFE PATTERN: Upload first, verify accessibility, then unpin old data
-    const response = await fetch("https://api.pinata.cloud/pinning/pinJSONToIPFS", options);
+    let data: { IpfsHash: string } = { IpfsHash: "" };
+    let pinataSucceeded = false;
+    try {
+      // SAFE PATTERN: Upload first, verify accessibility, then unpin old data
+      const response = await fetch(
+        "https://api.pinata.cloud/pinning/pinJSONToIPFS",
+        options
+      );
 
-    if (!response.ok) {
-      throw new Error(`IPFS upload failed: ${response.status} ${response.statusText}`);
+      if (!response.ok) {
+        throw new Error(`IPFS upload failed: ${response.status} ${response.statusText}`);
+      }
+
+      data = await response.json();
+
+      if (!data.IpfsHash) {
+        throw new Error("No IpfsHash returned from Pinata");
+      }
+      pinataSucceeded = true;
+    } catch (pinErr) {
+      console.warn(
+        `Pinata upload failed, using Supabase CID instead: ${
+          pinErr instanceof Error ? pinErr.message : String(pinErr)
+        }`
+      );
     }
 
-    const data = await response.json();
+    // Supabase mirror + cleanup (always mirror, even if gateway is flaky)
+    const objectPath = `${SUPABASE_MINA_PREFIX}_${timestamp}.json`;
+    const pointerPath = `${SUPABASE_MINA_PREFIX}_latest.json`;
+    const supabaseCid = buildSupabaseCid(objectPath);
+    await uploadWithHashAndCleanup({
+      objectPath,
+      pointerPath,
+      serializedPayload,
+      updatedAt: timestamp,
+      cleanupPrefix: SUPABASE_MINA_PREFIX,
+      cid: data.IpfsHash || supabaseCid,
+    });
 
-    if (!data.IpfsHash) {
-      throw new Error("No IpfsHash returned from Pinata");
-    }
-
-    // Critical: Verify the new CID returns valid data before unpinning old CID
+    // Critical: Verify the new CID returns valid data before unpinning old CID.
+    // If IPFS gateway is unreachable, fall back to Supabase object to avoid blocking.
     const GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
     if (!GATEWAY) {
       throw new Error("Missing NEXT_PUBLIC_PINATA_GATEWAY environment variable");
@@ -134,11 +180,26 @@ async function pinMinaObject(
         throw new Error("Invalid data structure: missing 'assets' or 'merkle_map' properties");
       }
     } catch (verifyError) {
-      throw new Error(`New IPFS CID ${data.IpfsHash} is not accessible: ${verifyError instanceof Error ? verifyError.message : String(verifyError)}`);
+      console.warn(
+        `IPFS verification failed (${verifyError instanceof Error ? verifyError.message : String(verifyError)}). Attempting Supabase fallback...`
+      );
+      try {
+        const downloaded = await downloadObject({ objectPath });
+        const parsed = JSON.parse(downloaded);
+        if (!parsed?.assets || !parsed?.merkle_map) {
+          throw new Error("Supabase fallback data missing required properties");
+        }
+      } catch (fallbackErr) {
+        throw new Error(
+          `Supabase fallback verification failed for ${objectPath}: ${
+            fallbackErr instanceof Error ? fallbackErr.message : String(fallbackErr)
+          }`
+        );
+      }
     }
 
     // Only NOW it's safe to unpin the old CID
-    if (previousCID && previousCID !== "NULL") {
+    if (previousCID && previousCID !== "NULL" && !isSupabaseCid(previousCID)) {
       try {
         await unpin(previousCID, networkPrefix.charAt(0).toUpperCase() + networkPrefix.slice(1));
       } catch (unpinError) {
