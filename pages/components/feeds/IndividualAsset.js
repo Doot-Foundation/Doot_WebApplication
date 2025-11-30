@@ -66,7 +66,6 @@ export default function IndividualAsset({ token }) {
   }
 
   const axios = require("axios");
-  const GATEWAY = process.env.NEXT_PUBLIC_PINATA_GATEWAY;
 
   const providers = Object.keys(ENDPOINT_TO_DATA_PROVIDER);
 
@@ -101,21 +100,16 @@ export default function IndividualAsset({ token }) {
     setIPFSHistorical(tokenHistoricalArray);
   }
 
-  console.log(ipfsData);
-
-
   async function getCID() {
-    const response = await axios.get(
-      "/api/get/pinned/getLatestHistoricalPinCID"
-    );
-    const cid = response.data.data.cid;
-
     try {
-      const ipfsData = await axios.get(`https://${GATEWAY}/ipfs/${cid}`);
-      setIPFSData(ipfsData.data);
-    } catch (err) {
-      const ipfsData = await axios.get(`https://ipfs.io/ipfs/${cid}`);
-      setIPFSData(ipfsData.data);
+      const response = await axios.get("/api/get/pinned/getPinnedHistoricalInfo");
+      if (response.data?.status) {
+        setIPFSData(response.data.data);
+      } else {
+        console.error("Failed to load historical data:", response.data?.error);
+      }
+    } catch (error) {
+      console.error("Failed to load historical data:", error.message);
     }
   }
 

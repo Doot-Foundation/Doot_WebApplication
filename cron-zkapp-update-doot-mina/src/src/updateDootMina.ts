@@ -2,6 +2,7 @@ import { redis } from './utils/helper/init/InitRedis.js';
 import { TOKEN_TO_CACHE, MINA_CID_CACHE } from './utils/constants/info.js';
 import { pinMinaObject } from './utils/helper/PinMinaObject.js';
 import axios from 'axios';
+import { downloadObject } from './utils/helper/supabaseStorage.js';
 import {
   Mina,
   PrivateKey,
@@ -390,7 +391,32 @@ async function verifyIpfsAccessibility(cid: string): Promise<any> {
     return response.data;
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
-    throw new Error(`Failed to fetch IPFS data for CID ${cid}: ${msg}`);
+    console.warn(`IPFS verification failed (${msg}). Attempting Supabase fallback...`);
+    try {
+      const prefix = (process.env.SUPABASE_MINA_PREFIX || 'mina').replace(
+        /^\/+|\/+$/g,
+        ''
+      );
+      const pointerPath = `${prefix}_latest.json`;
+      let objectPath = `${prefix}_${cid}.json`;
+      try {
+        const pointerRaw = await downloadObject({ objectPath: pointerPath });
+        const pointer = JSON.parse(pointerRaw);
+        if (pointer?.object_path) {
+          objectPath = pointer.object_path;
+        }
+      } catch {
+        // ignore pointer fetch failures; fall back to cid-based path
+      }
+      const downloaded = await downloadObject({ objectPath });
+      return JSON.parse(downloaded);
+    } catch (fallbackErr) {
+      const fb =
+        fallbackErr instanceof Error ? fallbackErr.message : String(fallbackErr);
+      throw new Error(
+        `Failed to fetch IPFS data for CID ${cid}: ${msg}; Supabase fallback failed: ${fb}`
+      );
+    }
   }
 }
 
