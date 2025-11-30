@@ -62,6 +62,7 @@ async function pinMinaObject(
   previousCID: string,
   networkPrefix: string = "mina"
 ): Promise<[string, string]> {
+  let unpinned = false;
   try {
     const Map = new MerkleMap();
 
@@ -202,6 +203,7 @@ async function pinMinaObject(
     if (previousCID && previousCID !== "NULL" && !isSupabaseCid(previousCID)) {
       try {
         await unpin(previousCID, networkPrefix.charAt(0).toUpperCase() + networkPrefix.slice(1));
+        unpinned = true;
       } catch (unpinError) {
         // Don't fail the entire operation if unpinning fails
         console.warn(`Failed to unpin old CID ${previousCID}: ${unpinError instanceof Error ? unpinError.message : String(unpinError)}`);
@@ -216,6 +218,20 @@ async function pinMinaObject(
       error instanceof Error ? error.message : "Unknown error"
     );
     throw error;
+  } finally {
+    // Best-effort unpin if main path failed before unpinning
+    if (!unpinned && previousCID && previousCID !== "NULL" && !isSupabaseCid(previousCID)) {
+      try {
+        await unpin(previousCID, networkPrefix.charAt(0).toUpperCase() + networkPrefix.slice(1));
+        console.log(`Best-effort unpin succeeded for ${previousCID}`);
+      } catch (err) {
+        console.warn(
+          `Best-effort unpin failed for ${previousCID}: ${
+            err instanceof Error ? err.message : String(err)
+          }`
+        );
+      }
+    }
   }
 }
 

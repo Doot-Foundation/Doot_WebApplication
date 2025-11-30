@@ -112,6 +112,7 @@ async function pinHistoricalObject(previousCID, latestPrices) {
     const timestamp = Date.now();
     let toUploadObject;
     let cidForState = null;
+    let unpinned = false;
 
     if (previousCID === "NULL") {
       console.log("Fresh Historical: true");
@@ -201,6 +202,7 @@ async function pinHistoricalObject(previousCID, latestPrices) {
     if (previousCID !== "NULL" && !isSupabaseCid(previousCID)) {
       try {
         await unpin(previousCID, "Historical");
+        unpinned = true;
       } catch (unpinError) {
         console.warn(
           `Failed to unpin old CID ${previousCID}: ${unpinError.message}`
@@ -216,6 +218,19 @@ async function pinHistoricalObject(previousCID, latestPrices) {
       error.message || "Unknown error"
     );
     throw error;
+  } finally {
+    if (!unpinned && previousCID !== "NULL" && !isSupabaseCid(previousCID)) {
+      try {
+        await unpin(previousCID, "Historical");
+        console.log(`Best-effort unpin succeeded for ${previousCID}`);
+      } catch (err) {
+        console.warn(
+          `Best-effort unpin failed for ${previousCID}: ${
+            err instanceof Error ? err.message : String(err)
+          }`
+        );
+      }
+    }
   }
 }
 
