@@ -1,12 +1,15 @@
 import { config } from "dotenv";
 import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import { dirname, join, resolve } from 'path';
 
 // Load environment variables FIRST - before any other imports
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const projectRoot = join(__dirname, '..', '..');
-config({ path: join(projectRoot, '.env') });
+const pkgRoot = resolve(__dirname, '..', '..'); // cron package root
+// Load only this package's env files
+[join(pkgRoot, '.env.local'), join(pkgRoot, '.env')].forEach((p) =>
+  config({ path: p, override: true })
+);
 
 // Now import modules that depend on environment variables
 const { updateDootZeko } = await import("./updateDootZeko.js");

@@ -108,11 +108,11 @@ async function fetchHistoricalSource(cid) {
 }
 
 async function pinHistoricalObject(previousCID, latestPrices) {
+  let unpinned = false;
   try {
     const timestamp = Date.now();
     let toUploadObject;
     let cidForState = null;
-    let unpinned = false;
 
     if (previousCID === "NULL") {
       console.log("Fresh Historical: true");
@@ -159,7 +159,11 @@ async function pinHistoricalObject(previousCID, latestPrices) {
       }
 
       const verificationData = await fetchJsonFromCid(uploadResponse.IpfsHash);
-      if (!verificationData || !verificationData.latest || !verificationData.historical) {
+      if (
+        !verificationData ||
+        !verificationData.latest ||
+        !verificationData.historical
+      ) {
         throw new Error(
           "Invalid data structure: missing 'latest' or 'historical' properties"
         );
@@ -169,7 +173,9 @@ async function pinHistoricalObject(previousCID, latestPrices) {
     } catch (verifyError) {
       console.warn(
         `Pinata upload/verification failed, using Supabase-only CID: ${
-          verifyError instanceof Error ? verifyError.message : String(verifyError)
+          verifyError instanceof Error
+            ? verifyError.message
+            : String(verifyError)
         }`
       );
       const baseUrl = (process.env.SUPABASE_URL || "").replace(/\/+$/, "");
@@ -196,8 +202,12 @@ async function pinHistoricalObject(previousCID, latestPrices) {
     console.log(
       `Supabase backup completed: object=${supabaseResult.objectPath}, pointer=${supabaseResult.pointerPath}`
     );
-    const prefix = (process.env.SUPABASE_HISTORICAL_PREFIX || "historical") + "_";
-    await cleanupPrefixExcept(prefix, [supabaseResult.objectPath, supabaseResult.pointerPath]);
+    const prefix =
+      (process.env.SUPABASE_HISTORICAL_PREFIX || "historical") + "_";
+    await cleanupPrefixExcept(prefix, [
+      supabaseResult.objectPath,
+      supabaseResult.pointerPath,
+    ]);
 
     if (previousCID !== "NULL" && !isSupabaseCid(previousCID)) {
       try {

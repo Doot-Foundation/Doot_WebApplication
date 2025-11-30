@@ -330,7 +330,9 @@ async function verifyIpfsAccessibility(cid: string): Promise<any> {
     return response.data;
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
-    console.warn(`IPFS verification failed (${msg}). Attempting Supabase fallback...`);
+    console.warn(
+      `IPFS verification failed (${msg}). Attempting Supabase fallback...`
+    );
     try {
       const prefix = (process.env.SUPABASE_ZEKO_PREFIX || 'zeko').replace(
         /^\/+|\/+$/g,
@@ -351,7 +353,9 @@ async function verifyIpfsAccessibility(cid: string): Promise<any> {
       return JSON.parse(downloaded);
     } catch (fallbackErr) {
       const fb =
-        fallbackErr instanceof Error ? fallbackErr.message : String(fallbackErr);
+        fallbackErr instanceof Error
+          ? fallbackErr.message
+          : String(fallbackErr);
       throw new Error(
         `Failed to fetch IPFS data for CID ${cid}: ${msg}; Supabase fallback failed: ${fb}`
       );
@@ -386,7 +390,7 @@ async function updateZekoL2ContractWithPolling(
       const ZEKO_CONTRACT_ADDRESS =
         process.env.NEXT_PUBLIC_ZEKO_DOOT_PUBLIC_KEY;
 
-      if (!ZEKO_ENDPOINT || !ZEKO_CONTRACT_ADDRESS) {
+      if (!ZEKO_ENDPOINT || !ZEKO_CONTRACT_ADDRESS || !ZEKO_ARCHIVE_ENDPOINT) {
         throw new Error('Missing Zeko environment variables');
       }
 
