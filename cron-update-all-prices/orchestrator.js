@@ -1,3 +1,8 @@
+try {
+  require("dotenv").config();
+} catch (e) {
+  console.warn("dotenv not found; relying on platform environment variables");
+}
 const { updateAllPrices } = require("./src/updateAllPrices");
 
 (async () => {

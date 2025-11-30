@@ -1,6 +1,11 @@
 const path = require("path");
-require("dotenv").config({ path: path.resolve(__dirname, "../.env.local") });
-require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
+// Load dotenv if available; fall back to injected env on platforms like Railway
+try {
+  require("dotenv").config({ path: path.resolve(__dirname, "../.env.local") });
+  require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
+} catch (e) {
+  console.warn("dotenv not found; relying on platform environment variables");
+}
 const { updateHistorical } = require("./src/updateHistorical");
 
 (async () => {

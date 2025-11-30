@@ -1,15 +1,23 @@
-import { config } from "dotenv";
 import { fileURLToPath } from 'url';
 import { dirname, join, resolve } from 'path';
 
-// Load environment variables FIRST - before any other imports
+// Load environment variables FIRST - before any other imports (optional dotenv)
+let dotenvConfig: ((options: any) => void) | undefined;
+try {
+  const dotenv = await import('dotenv');
+  dotenvConfig = dotenv.config;
+} catch (e) {
+  console.warn('dotenv not found; relying on platform environment variables');
+}
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const pkgRoot = resolve(__dirname, '..', '..'); // cron package root
-// Load only this package's env files
-[join(pkgRoot, '.env.local'), join(pkgRoot, '.env')].forEach((p) =>
-  config({ path: p, override: true })
-);
+if (dotenvConfig) {
+  [join(pkgRoot, '.env.local'), join(pkgRoot, '.env')].forEach((p) =>
+    dotenvConfig!({ path: p, override: true })
+  );
+}
 
 // Now import modules that depend on environment variables
 const { updateDootZeko } = await import("./updateDootZeko.js");
