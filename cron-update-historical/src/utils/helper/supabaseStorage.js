@@ -84,6 +84,60 @@ function sha256String(value) {
   return crypto.createHash("sha256").update(value).digest("hex");
 }
 
+async function listAllObjectsForPrefix(prefix) {
+  const url = `${SUPABASE_URL.replace(
+    /\/+$/,
+    ""
+  )}/storage/v1/object/list/${SUPABASE_HISTORICAL_BUCKET}`;
+
+  const normalizedPrefix = (prefix || "").replace(/^\/+/, "");
+  const limit = 1000;
+  let offset = 0;
+  const allEntries = [];
+
+  // Paginate through all objects in the bucket, then filter by prefix locally.
+  // This avoids relying on Supabase's folder semantics and ensures we see
+  // every object even when there are more than 1000 items.
+  while (true) {
+    const response = await axios.post(
+      url,
+      {
+        prefix: "",
+        limit,
+        offset,
+        sortBy: { column: "name", order: "asc" },
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${SUPABASE_SERVICE_KEY}`,
+          "Content-Type": "application/json",
+        },
+        timeout: 30000,
+        validateStatus: (status) => status === 200,
+      }
+    );
+
+    const entries = Array.isArray(response.data) ? response.data : [];
+    if (entries.length === 0) break;
+
+    for (const entry of entries) {
+      const name =
+        typeof entry.name === "string"
+          ? entry.name.replace(/^\/+/, "")
+          : "";
+      if (!name) continue;
+      if (!normalizedPrefix || name.startsWith(normalizedPrefix)) {
+        allEntries.push({ ...entry, name });
+      }
+    }
+
+    if (entries.length < limit) break;
+    offset += limit;
+  }
+
+  return allEntries;
+}
+
 /**
  * Uploads the historical payload and pointer to Supabase storage and verifies round-trip integrity.
  */
@@ -139,35 +193,22 @@ async function uploadHistoricalBackup({
 }
 
 async function cleanupPrefixExcept(prefix, keepPaths) {
-  const url = `${SUPABASE_URL.replace(
-    /\/+$/,
-    ""
-  )}/storage/v1/object/list/${SUPABASE_HISTORICAL_BUCKET}`;
-
-  const response = await axios.post(
-    url,
-    {
-      prefix: prefix || "",
-      limit: 1000,
-      sortBy: { column: "name", order: "desc" },
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${SUPABASE_SERVICE_KEY}`,
-        "Content-Type": "application/json",
-      },
-      timeout: 30000,
-      validateStatus: (status) => status === 200,
-    }
-  );
+  const normalizedPrefix = (prefix || "").replace(/^\/+/, "");
+  if (!normalizedPrefix) {
+    return;
+  }
 
   const keepSet = new Set(keepPaths.map((p) => p.replace(/^\/+/, "")));
-  const entries = Array.isArray(response.data) ? response.data : [];
+  const entries = await listAllObjectsForPrefix(normalizedPrefix);
   const deletions = [];
 
   for (const entry of entries) {
-    const name = entry.name;
-    const fullPath = name;
+    const fullPath =
+      typeof entry.name === "string"
+        ? entry.name.replace(/^\/+/, "")
+        : "";
+    if (!fullPath) continue;
+
     if (!keepSet.has(fullPath)) {
       const delUrl = `${SUPABASE_URL.replace(
         /\/+$/,

@@ -93,25 +93,53 @@ async function listObjects(options: { bucket?: string; prefix?: string }) {
     /\/+$/,
     ""
   )}/storage/v1/object/list/${resolvedBucket}`;
+  const normalizedPrefix = (prefix || "").replace(/^\/+/, "");
+  const limit = 1000;
+  let offset = 0;
+  const allEntries: any[] = [];
 
-  const response = await axios.post(
-    url,
-    {
-      prefix: prefix || "",
-      limit: 1000,
-      sortBy: { column: "name", order: "desc" },
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${SUPABASE_SERVICE_KEY}`,
-        "Content-Type": "application/json",
+  // Paginate through all objects in the bucket and filter by prefix locally.
+  // This avoids relying on Supabase "folder" semantics and ensures we don't
+  // leave behind older mina_*/zeko_* objects when there are >1000 items.
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const response = await axios.post(
+      url,
+      {
+        prefix: "",
+        limit,
+        offset,
+        sortBy: { column: "name", order: "asc" },
       },
-      timeout: 30000,
-      validateStatus: (status) => status === 200,
-    }
-  );
+      {
+        headers: {
+          Authorization: `Bearer ${SUPABASE_SERVICE_KEY}`,
+          "Content-Type": "application/json",
+        },
+        timeout: 30000,
+        validateStatus: (status) => status === 200,
+      }
+    );
 
-  return Array.isArray(response.data) ? response.data : [];
+    const entries = Array.isArray(response.data) ? response.data : [];
+    if (entries.length === 0) break;
+
+    for (const entry of entries) {
+      const name =
+        typeof entry.name === "string"
+          ? (entry.name as string).replace(/^\/+/, "")
+          : "";
+      if (!name) continue;
+      if (!normalizedPrefix || name.startsWith(normalizedPrefix)) {
+        allEntries.push({ ...entry, name });
+      }
+    }
+
+    if (entries.length < limit) break;
+    offset += limit;
+  }
+
+  return allEntries;
 }
 
 async function deleteObject(options: { bucket?: string; objectPath: string }) {
@@ -137,16 +165,26 @@ export async function cleanupPrefixExcept(options: {
   keep: string[];
 }): Promise<void> {
   const { bucket, prefix, keep } = options;
-  const keepSet = new Set(keep.map((p) => p.replace(/^\/+/, "").trim()));
-  const list = await listObjects({ bucket, prefix });
+  const normalizedPrefix = (prefix || "").replace(/^\/+/, "").trim();
+  if (!normalizedPrefix) {
+    return;
+  }
+
+  const keepSet = new Set(
+    keep.map((p) => p.replace(/^\/+/, "").trim())
+  );
+  const list = await listObjects({ bucket, prefix: normalizedPrefix });
 
   const deletions: Promise<void>[] = [];
   for (const entry of list) {
-    const name = entry.name as string;
-    const path = prefix ? `${prefix.replace(/\/+$/, "")}/${name}` : name;
+    const rawName = entry.name as string;
+    const path = rawName.replace(/^\/+/, "").trim();
+    if (!path || !path.startsWith(normalizedPrefix)) {
+      continue;
+    }
     if (!keepSet.has(path)) {
       deletions.push(
-        deleteObject({ bucket, objectPath: path }).catch((err) => {
+        deleteObject({ bucket, objectPath: path }).catch((err: any) => {
           console.warn(
             `Failed to delete Supabase object ${path}: ${err.message}`
           );

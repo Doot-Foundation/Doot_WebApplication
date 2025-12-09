@@ -137,7 +137,7 @@ export async function pinMinaObject(
       pointerPath,
       serializedPayload,
       updatedAt: timestamp,
-      cleanupPrefix: prefix,
+      cleanupPrefix: `${prefix}_`,
       cid: data.IpfsHash || supabaseCid,
     });
 
